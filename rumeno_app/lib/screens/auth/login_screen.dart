@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String _roleEmoji(UserRole? role) {
     switch (role) {
       case UserRole.farmer:
-        return '🌾';
+        return '🐄';
       case UserRole.vet:
         return '🩺';
       case UserRole.admin:
