@@ -63,11 +63,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             ScaleTransition(
               scale: _scaleAnimation,
               child: Container(
-                width: 120,
-                height: 120,
+                width: 240,
+                height: 240,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
+                  shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.2),
@@ -76,11 +76,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     ),
                   ],
                 ),
-                child: Center(
-                  child: Icon(
-                    Icons.eco,
-                    size: 60,
-                    color: RumenoTheme.primaryGreen,
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/Rumeno_logo.png',
+                    width: 240,
+                    height: 240,
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),

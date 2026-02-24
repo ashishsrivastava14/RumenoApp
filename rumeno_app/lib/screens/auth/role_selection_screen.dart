@@ -31,13 +31,20 @@ class RoleSelectionScreen extends StatelessWidget {
                 const SizedBox(height: 40),
                 // Logo
                 Container(
-                  width: 80,
-                  height: 80,
+                  width: 160,
+                  height: 160,
                   decoration: BoxDecoration(
-                    color: RumenoTheme.primaryGreen,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(40),
                   ),
-                  child: const Icon(Icons.eco, size: 40, color: Colors.white),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(40),
+                    child: Image.asset(
+                      'assets/images/Rumeno_logo.png',
+                      width: 160,
+                      height: 160,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Text(
