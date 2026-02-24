@@ -49,60 +49,136 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: [
-              RumenoTheme.primaryGreen,
-              RumenoTheme.primaryDarkGreen,
+              RumenoTheme.backgroundCream,
+              Colors.white,
+              RumenoTheme.primaryGreen.withValues(alpha: 0.05),
             ],
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: [
-            ScaleTransition(
-              scale: _scaleAnimation,
-              child: Image.asset(
-                'assets/images/Rumeno_logo.png',
-                width: 240,
-                height: 240,
-                fit: BoxFit.contain,
-              ),
-            ),
-            const SizedBox(height: 24),
-            FadeTransition(
-              opacity: _fadeAnimation,
-              child: Column(
-                children: [
-                  Text(
-                    'RUMENO',
-                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 4,
-                        ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Digital Farm Management',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.8),
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 60),
-            FadeTransition(
-              opacity: _fadeAnimation,
-              child: const SizedBox(
-                width: 30,
-                height: 30,
-                child: CircularProgressIndicator(
-                  strokeWidth: 3,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            // Animated background pattern
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.08,
+                child: Image.asset(
+                  'assets/images/animals_bg.png',
+                  fit: BoxFit.cover,
                 ),
               ),
+            ),
+            // Decorative circles
+            Positioned(
+              top: -100,
+              right: -100,
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      RumenoTheme.primaryGreen.withValues(alpha: 0.1),
+                      RumenoTheme.primaryGreen.withValues(alpha: 0.0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -80,
+              left: -80,
+              child: Container(
+                width: 250,
+                height: 250,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      RumenoTheme.primaryGreen.withValues(alpha: 0.08),
+                      RumenoTheme.primaryGreen.withValues(alpha: 0.0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Main content
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Logo with shadow
+                  ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Container(
+                    width: 240,
+                    height: 240,
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: RumenoTheme.primaryGreen.withValues(alpha: 0.2),
+                          blurRadius: 30,
+                          offset: const Offset(0, 15),
+                        ),
+                      ],
+                    ),
+                    child: Image.asset(
+                      'assets/images/Rumeno_logo.png',
+                      width: 240,
+                      height: 240,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: Column(
+                    children: [
+                      ShaderMask(
+                        shaderCallback: (bounds) => LinearGradient(
+                          colors: [
+                            RumenoTheme.primaryGreen,
+                            RumenoTheme.primaryGreen.withValues(alpha: 0.8),
+                          ],
+                        ).createShader(bounds),
+                        child: Text(
+                          'RUMENO',
+                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 4,
+                              ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Digital Farm Management',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: Colors.black54,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 60),
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      valueColor: AlwaysStoppedAnimation<Color>(RumenoTheme.primaryGreen),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             ),
           ],
         ),
