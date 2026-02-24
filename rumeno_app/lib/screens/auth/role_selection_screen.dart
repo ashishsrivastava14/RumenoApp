@@ -29,7 +29,7 @@ class RoleSelectionScreen extends StatelessWidget {
             // Animal background image
             Positioned.fill(
               child: Opacity(
-                opacity: 0.16,
+                opacity: 0.10,
                 child: Image.asset(
                   'assets/images/animals_bg.png',
                   fit: BoxFit.cover,

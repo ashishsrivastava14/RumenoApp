@@ -62,28 +62,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           children: [
             ScaleTransition(
               scale: _scaleAnimation,
-              child: Container(
+              child: Image.asset(
+                'assets/images/Rumeno_logo.png',
                 width: 240,
                 height: 240,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/Rumeno_logo.png',
-                    width: 240,
-                    height: 240,
-                    fit: BoxFit.contain,
-                  ),
-                ),
+                fit: BoxFit.contain,
               ),
             ),
             const SizedBox(height: 24),
