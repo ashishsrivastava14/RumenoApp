@@ -73,7 +73,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 const SizedBox(height: 48),
                 // Role Cards
                 _RoleCard(
-                  emoji: '🌾',
+                  emoji: '🐄',
                   title: 'Farm Owner / Staff',
                   subtitle: 'Manage your farm, animals, and operations',
                   onTap: () {
