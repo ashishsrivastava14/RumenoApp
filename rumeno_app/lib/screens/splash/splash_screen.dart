@@ -57,9 +57,23 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             ],
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: [
+            // Animal background image
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.16,
+                child: Image.asset(
+                  'assets/images/splash_bg.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            // Main content
+            Positioned.fill(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
             ScaleTransition(
               scale: _scaleAnimation,
               child: Container(
@@ -120,6 +134,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               ),
+            ),
+          ],
+        ),
             ),
           ],
         ),

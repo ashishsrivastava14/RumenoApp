@@ -5,6 +5,7 @@ import '../../config/theme.dart';
 import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
 
+
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
 
@@ -23,8 +24,21 @@ class RoleSelectionScreen extends StatelessWidget {
             ],
           ),
         ),
-        child: SafeArea(
-          child: Padding(
+        child: Stack(
+          children: [
+            // Animal background image
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.16,
+                child: Image.asset(
+                  'assets/images/animals_bg.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            // Main content
+            SafeArea(
+              child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
@@ -90,6 +104,8 @@ class RoleSelectionScreen extends StatelessWidget {
               ],
             ),
           ),
+        ),
+          ],
         ),
       ),
     );
