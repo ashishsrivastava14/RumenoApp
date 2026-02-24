@@ -1,4 +1,4 @@
-enum UserRole { farmer, vet, admin }
+enum UserRole { farmer, vet, admin, farmProducts }
 
 class AppUser {
   final String id;

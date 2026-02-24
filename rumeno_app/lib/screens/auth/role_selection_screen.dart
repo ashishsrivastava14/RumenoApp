@@ -101,6 +101,16 @@ class RoleSelectionScreen extends StatelessWidget {
                     context.go('/login');
                   },
                 ),
+                const SizedBox(height: 16),
+                _RoleCard(
+                  emoji: '🛒',
+                  title: 'Farm Products',
+                  subtitle: 'Browse and purchase farm products',
+                  onTap: () {
+                    context.read<AuthProvider>().selectRole(UserRole.farmProducts);
+                    context.go('/login');
+                  },
+                ),
               ],
             ),
           ),

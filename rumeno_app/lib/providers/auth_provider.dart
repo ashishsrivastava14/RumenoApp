@@ -27,6 +27,9 @@ class AuthProvider extends ChangeNotifier {
       case UserRole.admin:
         _currentUser = mockAdminUser;
         break;
+      case UserRole.farmProducts:
+        _currentUser = mockFarmProductsUser;
+        break;
     }
     _isAuthenticated = true;
     notifyListeners();

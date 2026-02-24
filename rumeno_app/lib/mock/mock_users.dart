@@ -24,3 +24,10 @@ const mockAdminUser = AppUser(
   phone: '9876543200',
   role: UserRole.admin,
 );
+
+const mockFarmProductsUser = AppUser(
+  id: 'FP001',
+  name: 'Product Buyer',
+  phone: '9876543212',
+  role: UserRole.farmProducts,
+);

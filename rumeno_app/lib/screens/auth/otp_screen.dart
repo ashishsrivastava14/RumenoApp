@@ -67,6 +67,10 @@ class _OtpScreenState extends State<OtpScreen> {
           case UserRole.admin:
             context.go('/admin/dashboard');
             break;
+          case UserRole.farmProducts:
+            // TODO: Navigate to farm products screen when created
+            context.go('/farmer/dashboard');
+            break;
         }
       });
     } else {

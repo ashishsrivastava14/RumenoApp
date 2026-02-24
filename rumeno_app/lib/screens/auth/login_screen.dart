@@ -24,6 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
         return 'Veterinarian';
       case UserRole.admin:
         return 'Super Admin';
+      case UserRole.farmProducts:
+        return 'Farm Products';
       case null:
         return '';
     }
@@ -37,6 +39,8 @@ class _LoginScreenState extends State<LoginScreen> {
         return '🩺';
       case UserRole.admin:
         return '🔧';
+      case UserRole.farmProducts:
+        return '🛒';
       case null:
         return '';
     }
