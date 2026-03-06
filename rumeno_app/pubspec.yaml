@@ -45,6 +45,7 @@ flutter:
 
   assets:
     - assets/images/Rumeno_logo.png
+    - assets/images/Rumeno_logo-rb.png
     - assets/images/animals_bg.png
     - assets/images/splash_bg.png
     - assets/images/farm_bg.png

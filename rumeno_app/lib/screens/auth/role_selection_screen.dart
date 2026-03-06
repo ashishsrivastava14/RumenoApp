@@ -147,7 +147,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                                 ],
                               ),
                               child: Image.asset(
-                                'assets/images/Rumeno_logo.png',
+                                'assets/images/Rumeno_logo-rb.png',
                                 width: 220,
                                 height: 220,
                                 fit: BoxFit.contain,

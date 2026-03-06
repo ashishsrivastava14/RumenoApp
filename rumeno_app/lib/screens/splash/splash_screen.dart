@@ -127,7 +127,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       ],
                     ),
                     child: Image.asset(
-                      'assets/images/Rumeno_logo.png',
+                      'assets/images/Rumeno_logo-rb.png',
                       width: 240,
                       height: 240,
                       fit: BoxFit.contain,
@@ -146,16 +146,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                             RumenoTheme.primaryGreen.withValues(alpha: 0.8),
                           ],
                         ).createShader(bounds),
-                        child: Text(
-                          'RUMENO',
-                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 4,
-                              ),
-                        ),
+                        // child: Text(
+                        //   'RUMENO',
+                        //   style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                        //         color: Colors.white,
+                        //         fontWeight: FontWeight.w900,
+                        //         letterSpacing: 4,
+                        //       ),
+                        // ),
                       ),
-                      const SizedBox(height: 8),
+                      //const SizedBox(height: 8),
                       Text(
                         'Digital Farm Management',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
