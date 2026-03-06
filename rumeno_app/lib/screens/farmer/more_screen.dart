@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/common/marketplace_button.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key});
@@ -14,6 +15,7 @@ class MoreScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('More'),
         automaticallyImplyLeading: false,
+        actions: const [VeterinarianButton(), MarketplaceButton()],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

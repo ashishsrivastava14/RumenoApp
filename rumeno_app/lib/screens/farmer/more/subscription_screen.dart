@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../config/theme.dart';
 import '../../../models/models.dart';
 import '../../../widgets/cards/subscription_card.dart';
+import '../../../widgets/common/marketplace_button.dart';
 
 class SubscriptionScreen extends StatelessWidget {
   const SubscriptionScreen({super.key});
@@ -10,7 +11,10 @@ class SubscriptionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
-      appBar: AppBar(title: const Text('My Subscription')),
+      appBar: AppBar(
+        title: const Text('My Subscription'),
+        actions: const [VeterinarianButton(), MarketplaceButton()],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

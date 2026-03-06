@@ -8,6 +8,7 @@ import '../../../models/models.dart';
 import '../../../widgets/charts/line_chart_widget.dart';
 import '../../../widgets/cards/vaccination_card.dart';
 import '../../../widgets/cards/health_record_card.dart';
+import '../../../widgets/common/marketplace_button.dart';
 
 class AnimalDetailScreen extends StatelessWidget {
   final String animalId;
@@ -80,6 +81,7 @@ class AnimalDetailScreen extends StatelessWidget {
                 ),
               ),
               title: Text(animal.tagId),
+              actions: const [VeterinarianButton(), MarketplaceButton()],
             ),
             SliverPersistentHeader(
               pinned: true,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme.dart';
+import '../../../widgets/common/marketplace_button.dart';
 
 class FarmProfileScreen extends StatelessWidget {
   const FarmProfileScreen({super.key});
@@ -8,7 +9,10 @@ class FarmProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
-      appBar: AppBar(title: const Text('Farm Profile')),
+      appBar: AppBar(
+        title: const Text('Farm Profile'),
+        actions: const [VeterinarianButton(), MarketplaceButton()],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

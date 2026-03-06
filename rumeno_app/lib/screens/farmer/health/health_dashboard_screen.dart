@@ -6,6 +6,7 @@ import '../../../models/models.dart';
 import '../../../widgets/cards/vaccination_card.dart';
 import '../../../widgets/cards/health_record_card.dart';
 import '../../../widgets/common/section_header.dart';
+import '../../../widgets/common/marketplace_button.dart';
 
 class HealthDashboardScreen extends StatelessWidget {
   const HealthDashboardScreen({super.key});
@@ -22,6 +23,8 @@ class HealthDashboardScreen extends StatelessWidget {
         title: const Text('Health Center'),
         automaticallyImplyLeading: false,
         actions: [
+          const VeterinarianButton(),
+          const MarketplaceButton(),
           IconButton(
             icon: const Icon(Icons.vaccines),
             onPressed: () => context.go('/farmer/health/vaccination'),

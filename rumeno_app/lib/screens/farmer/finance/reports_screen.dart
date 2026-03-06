@@ -3,6 +3,7 @@ import '../../../config/theme.dart';
 import '../../../widgets/charts/bar_chart_widget.dart';
 import '../../../widgets/charts/pie_chart_widget.dart';
 import '../../../widgets/common/date_range_picker_widget.dart';
+import '../../../widgets/common/marketplace_button.dart';
 
 class ReportsScreen extends StatelessWidget {
   const ReportsScreen({super.key});
@@ -11,7 +12,10 @@ class ReportsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
-      appBar: AppBar(title: const Text('Financial Reports')),
+      appBar: AppBar(
+        title: const Text('Financial Reports'),
+        actions: const [VeterinarianButton(), MarketplaceButton()],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

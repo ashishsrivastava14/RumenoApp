@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/theme.dart';
 import '../../../models/models.dart';
+import '../../../widgets/common/marketplace_button.dart';
 
 class AddAnimalScreen extends StatefulWidget {
   const AddAnimalScreen({super.key});
@@ -50,7 +51,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
-      appBar: AppBar(title: const Text('Add Animal')),
+      appBar: AppBar(
+        title: const Text('Add Animal'),
+        actions: const [VeterinarianButton(), MarketplaceButton()],
+      ),
       body: Form(
         key: _formKey,
         child: Stepper(

@@ -5,6 +5,7 @@ import '../../../mock/mock_animals.dart';
 import '../../../models/models.dart';
 import '../../../widgets/cards/animal_card.dart';
 import '../../../widgets/common/search_bar_widget.dart';
+import '../../../widgets/common/marketplace_button.dart';
 
 class AnimalListScreen extends StatefulWidget {
   const AnimalListScreen({super.key});
@@ -50,6 +51,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         title: const Text('My Animals'),
         automaticallyImplyLeading: false,
         actions: [
+          const VeterinarianButton(),
+          const MarketplaceButton(),
           PopupMenuButton<String>(
             icon: const Icon(Icons.sort),
             onSelected: (v) => setState(() => _sortBy = v),

@@ -3,6 +3,7 @@ import '../../../config/theme.dart';
 import '../../../mock/mock_health.dart';
 import '../../../models/models.dart';
 import '../../../widgets/cards/health_record_card.dart';
+import '../../../widgets/common/marketplace_button.dart';
 
 class TreatmentScreen extends StatelessWidget {
   const TreatmentScreen({super.key});
@@ -11,7 +12,10 @@ class TreatmentScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
-      appBar: AppBar(title: const Text('Disease & Treatment')),
+      appBar: AppBar(
+        title: const Text('Disease & Treatment'),
+        actions: const [VeterinarianButton(), MarketplaceButton()],
+      ),
       body: ListView(
         children: [
           Padding(

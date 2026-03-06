@@ -9,6 +9,8 @@ import '../../providers/auth_provider.dart';
 import '../../widgets/common/section_header.dart';
 import '../../widgets/common/stat_card.dart';
 import '../../widgets/common/alert_banner.dart';
+import '../../widgets/common/marketplace_button.dart';
+// VeterinarianButton is defined in marketplace_button.dart
 
 class FarmerDashboardScreen extends StatelessWidget {
   const FarmerDashboardScreen({super.key});
@@ -31,6 +33,7 @@ class FarmerDashboardScreen extends StatelessWidget {
               pinned: true,
               backgroundColor: RumenoTheme.primaryGreen,
               automaticallyImplyLeading: false,
+              actions: const [VeterinarianButton(), MarketplaceButton()],
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
                   padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),

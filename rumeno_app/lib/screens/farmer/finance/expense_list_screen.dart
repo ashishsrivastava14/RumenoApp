@@ -4,6 +4,7 @@ import '../../../mock/mock_finance.dart';
 import '../../../models/models.dart';
 import '../../../widgets/cards/expense_card.dart';
 import '../../../widgets/common/search_bar_widget.dart';
+import '../../../widgets/common/marketplace_button.dart';
 
 class ExpenseListScreen extends StatefulWidget {
   const ExpenseListScreen({super.key});
@@ -33,7 +34,10 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
-      appBar: AppBar(title: const Text('All Expenses')),
+      appBar: AppBar(
+        title: const Text('All Expenses'),
+        actions: const [VeterinarianButton(), MarketplaceButton()],
+      ),
       body: Column(
         children: [
           SearchBarWidget(hintText: 'Search expenses...', onChanged: (v) => setState(() => _search = v)),

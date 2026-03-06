@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme.dart';
+import '../../../widgets/common/marketplace_button.dart';
 
 class TeamManagementScreen extends StatelessWidget {
   const TeamManagementScreen({super.key});
@@ -22,7 +23,10 @@ class TeamManagementScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
-      appBar: AppBar(title: const Text('Team Members')),
+      appBar: AppBar(
+        title: const Text('Team Members'),
+        actions: const [VeterinarianButton(), MarketplaceButton()],
+      ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: _members.length,

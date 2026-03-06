@@ -8,6 +8,7 @@ import '../../../widgets/cards/expense_card.dart';
 import '../../../widgets/charts/line_chart_widget.dart';
 import '../../../widgets/charts/pie_chart_widget.dart';
 import '../../../widgets/common/section_header.dart';
+import '../../../widgets/common/marketplace_button.dart';
 
 class FinanceDashboardScreen extends StatelessWidget {
   const FinanceDashboardScreen({super.key});
@@ -24,6 +25,8 @@ class FinanceDashboardScreen extends StatelessWidget {
         title: const Text('Finance'),
         automaticallyImplyLeading: false,
         actions: [
+          const VeterinarianButton(),
+          const MarketplaceButton(),
           IconButton(
             icon: const Icon(Icons.bar_chart),
             onPressed: () => context.go('/farmer/finance/reports'),

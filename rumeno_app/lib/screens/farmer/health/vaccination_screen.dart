@@ -3,6 +3,7 @@ import '../../../config/theme.dart';
 import '../../../mock/mock_health.dart';
 import '../../../models/models.dart';
 import '../../../widgets/cards/vaccination_card.dart';
+import '../../../widgets/common/marketplace_button.dart';
 
 class VaccinationScreen extends StatefulWidget {
   const VaccinationScreen({super.key});
@@ -32,6 +33,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> with SingleTicker
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
         title: const Text('Vaccinations'),
+        actions: const [VeterinarianButton(), MarketplaceButton()],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,

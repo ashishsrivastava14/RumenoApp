@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../config/theme.dart';
 import '../../../mock/mock_health.dart';
+import '../../../widgets/common/marketplace_button.dart';
 import '../../../models/models.dart';
 import '../../../widgets/common/stat_card.dart';
 import '../../../widgets/charts/progress_indicator_card.dart';
@@ -20,6 +21,7 @@ class BreedingDashboardScreen extends StatelessWidget {
         backgroundColor: RumenoTheme.backgroundCream,
         appBar: AppBar(
           title: const Text('Breeding'),
+          actions: const [VeterinarianButton(), MarketplaceButton()],
           bottom: const TabBar(
             indicatorColor: Colors.white,
             labelColor: Colors.white,
