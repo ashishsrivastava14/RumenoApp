@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
     _controller.forward();
 
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
         context.go('/role-selection');
       }
