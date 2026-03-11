@@ -42,7 +42,7 @@ class VeterinarianButton extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(left: 12, right: 1, top: 4, bottom: 4),
           child: Image.asset(
-            'assets/images/veterinarian.png',
+            'assets/images/veterinarian-yellow.png',
             width: 36,
             height: 36,
           ),
@@ -93,7 +93,7 @@ class MarketplaceButton extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(left: 2, right: 0, top: 4, bottom: 4),
           child: Image.asset(
-            'assets/images/ecommerce.png',
+            'assets/images/ecommerce-yellow.png',
             width: 56,
             height: 56,
           ),

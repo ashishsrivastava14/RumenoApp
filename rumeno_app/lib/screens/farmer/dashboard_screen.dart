@@ -589,8 +589,9 @@ class _OverviewTile extends StatelessWidget {
               Text(
                 label,
                 style: const TextStyle(
-                  fontSize: 10.5,
-                  color: Color(0xFF7A7A7A),
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF3A3A3A),
                 ),
               ),
             ],
