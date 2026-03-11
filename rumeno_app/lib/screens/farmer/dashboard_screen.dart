@@ -6,8 +6,20 @@ import '../../config/theme.dart';
 import '../../mock/mock_health.dart';
 import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import '../../widgets/common/marketplace_button.dart';
 // VeterinarianButton is defined in marketplace_button.dart
+
+/// Simple TTS helper for accessibility – long-press any card to hear its content.
+class _DashboardTts {
+  static FlutterTts? _tts;
+  static Future<void> speak(String text) async {
+    _tts ??= FlutterTts();
+    await _tts!.setLanguage('en-IN');
+    await _tts!.setSpeechRate(0.45);
+    await _tts!.speak(text);
+  }
+}
 
 class FarmerDashboardScreen extends StatelessWidget {
   const FarmerDashboardScreen({super.key});
@@ -60,7 +72,7 @@ class FarmerDashboardScreen extends StatelessWidget {
             const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(16, 8, 16, 6),
-                child: _SectionTitle(title: 'Active Alerts'),
+                child: _SectionTitle(title: 'Active Alerts', icon: Icons.warning_amber_rounded),
               ),
             ),
             SliverList(
@@ -74,7 +86,7 @@ class FarmerDashboardScreen extends StatelessWidget {
             const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(16, 18, 16, 10),
-                child: _SectionTitle(title: 'Upcoming Events'),
+                child: _SectionTitle(title: 'Upcoming Events', icon: Icons.event_rounded),
               ),
             ),
             SliverList(
@@ -320,7 +332,7 @@ class _StatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 128,
+      height: 180,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
@@ -389,81 +401,73 @@ class _StatChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 148,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: gradient.colors.first.withValues(alpha: 0.38),
-            blurRadius: 14,
-            offset: const Offset(0, 7),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.22),
-                  borderRadius: BorderRadius.circular(9),
-                ),
-                child: Icon(icon, color: Colors.white, size: 18),
+    return GestureDetector(
+      onLongPress: () => _DashboardTts.speak('$title: $value'),
+      child: Container(
+        width: 160,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: gradient.colors.first.withValues(alpha: 0.38),
+              blurRadius: 14,
+              offset: const Offset(0, 7),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.22),
+                borderRadius: BorderRadius.circular(11),
               ),
-              if (trend != null)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(6),
+              child: Icon(icon, color: Colors.white, size: 26),
+            ),
+            const Spacer(),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                height: 1.1,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            if (trend != null) ...[
+              const SizedBox(height: 4),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(up ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                      color: Colors.white, size: 14),
+                  const SizedBox(width: 3),
+                  Text(
+                    trend!,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(up ? Icons.north : Icons.south,
-                          color: Colors.white, size: 9),
-                      const SizedBox(width: 1),
-                      Text(
-                        trend!,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 8.5,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                ],
+              ),
             ],
-          ),
-          const Spacer(),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              height: 1.1,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -483,7 +487,7 @@ class _FarmOverview extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionTitle(title: 'Farm Overview'),
+          const _SectionTitle(title: 'Farm Overview', icon: Icons.agriculture_rounded),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -549,54 +553,59 @@ class _OverviewTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+    return GestureDetector(
+      onLongPress: () => _DashboardTts.speak('$label: $value'),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
-            child: Icon(icon, color: color, size: 19),
-          ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                  height: 1.1,
-                ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(14),
               ),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF3A3A3A),
-                ),
+              child: Icon(icon, color: color, size: 26),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                      height: 1.1,
+                    ),
+                  ),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF3A3A3A),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -616,8 +625,8 @@ class _QuickActionsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionTitle(title: 'Quick Actions'),
-          const SizedBox(height: 10),
+          const _SectionTitle(title: 'Quick Actions', icon: Icons.touch_app_rounded),
+          const SizedBox(height: 12),
           Row(
             children: [
               _QuickBtn(
@@ -627,7 +636,7 @@ class _QuickActionsSection extends StatelessWidget {
                     colors: [Color(0xFF2E4A12), Color(0xFF7FB23A)]),
                 onTap: () => context.go('/farmer/animals/add'),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               _QuickBtn(
                 icon: Icons.water_drop_outlined,
                 label: 'Log Milk',
@@ -637,7 +646,11 @@ class _QuickActionsSection extends StatelessWidget {
                   const SnackBar(content: Text('Milk logging coming soon!')),
                 ),
               ),
-              const SizedBox(width: 10),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
               _QuickBtn(
                 icon: Icons.medical_services_outlined,
                 label: 'Health',
@@ -645,7 +658,7 @@ class _QuickActionsSection extends StatelessWidget {
                     colors: [Color(0xFF00695C), Color(0xFF4DB6AC)]),
                 onTap: () => context.go('/farmer/health'),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               _QuickBtn(
                 icon: Icons.receipt_long_rounded,
                 label: 'Finance',
@@ -679,30 +692,31 @@ class _QuickBtn extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
+        onLongPress: () => _DashboardTts.speak(label),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 13),
+          padding: const EdgeInsets.symmetric(vertical: 20),
           decoration: BoxDecoration(
             gradient: gradient,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
                 color: gradient.colors.first.withValues(alpha: 0.35),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
               ),
             ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: Colors.white, size: 22),
-              const SizedBox(height: 5),
+              Icon(icon, color: Colors.white, size: 38),
+              const SizedBox(height: 8),
               Text(
                 label,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -743,44 +757,47 @@ class _AlertCard extends StatelessWidget {
       ),
     };
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border(left: BorderSide(color: color, width: 4)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-        leading: Container(
-          width: 34,
-          height: 34,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 18),
+    return GestureDetector(
+      onLongPress: () => _DashboardTts.speak(alert.message),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(14),
+          border: Border(left: BorderSide(color: color, width: 5)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        title: Text(
-          alert.message,
-          style: const TextStyle(
-            fontSize: 12.5,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF2D2D2D),
+        child: ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          leading: Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 26),
           ),
-        ),
-        trailing: Icon(
-          Icons.arrow_forward_ios_rounded,
-          size: 13,
-          color: color.withValues(alpha: 0.5),
+          title: Text(
+            alert.message,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF2D2D2D),
+            ),
+          ),
+          trailing: Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: color.withValues(alpha: 0.5),
+          ),
         ),
       ),
     );
@@ -933,10 +950,11 @@ class _EventCard extends StatelessWidget {
 
 class _SectionTitle extends StatelessWidget {
   final String title;
+  final IconData? icon;
   final String? actionLabel;
   final VoidCallback? onAction;
 
-  const _SectionTitle({required this.title, this.actionLabel, this.onAction});
+  const _SectionTitle({required this.title, this.icon, this.actionLabel, this.onAction});
 
   @override
   Widget build(BuildContext context) {
@@ -945,6 +963,10 @@ class _SectionTitle extends StatelessWidget {
       children: [
         Row(
           children: [
+            if (icon != null) ...[
+              Icon(icon, color: const Color(0xFF3D5A1E), size: 20),
+              const SizedBox(width: 6),
+            ],
             Container(
               width: 4,
               height: 17,
@@ -961,7 +983,7 @@ class _SectionTitle extends StatelessWidget {
             Text(
               title,
               style: const TextStyle(
-                fontSize: 15.5,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF2D2D2D),
               ),
