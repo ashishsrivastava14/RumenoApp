@@ -33,18 +33,20 @@ class AnimalCard extends StatelessWidget {
     }
   }
 
-  IconData _speciesIcon(Species species) {
+  String _speciesImage(Species species) {
     switch (species) {
       case Species.cow:
+        return 'assets/images/animal_cow.png';
       case Species.buffalo:
-        return Icons.pets;
+        return 'assets/images/animal_buffalo.png';
       case Species.goat:
+        return 'assets/images/animal_goat.png';
       case Species.sheep:
-        return Icons.grass;
+        return 'assets/images/animal_sheep.png';
       case Species.pig:
-        return Icons.cruelty_free;
+        return 'assets/images/animal_pig.png';
       case Species.horse:
-        return Icons.directions_run;
+        return 'assets/images/animal_horse.png';
     }
   }
 
@@ -97,10 +99,10 @@ class AnimalCard extends StatelessWidget {
                     color: _speciesColor(animal.species).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Icon(
-                    _speciesIcon(animal.species),
-                    color: _speciesColor(animal.species),
-                    size: 28,
+                  padding: const EdgeInsets.all(8),
+                  child: Image.asset(
+                    _speciesImage(animal.species),
+                    fit: BoxFit.contain,
                   ),
                 ),
                 const SizedBox(width: 14),
