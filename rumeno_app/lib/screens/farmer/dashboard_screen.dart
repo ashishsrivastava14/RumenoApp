@@ -37,19 +37,7 @@ class FarmerDashboardScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F5F8),
-      body: Stack(
-        children: [
-          // Background watermark logo
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.10,
-              child: Image.asset(
-                'assets/images/Rumeno_logo-rb.png',
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          RefreshIndicator(
+      body: RefreshIndicator(
         color: RumenoTheme.primaryGreen,
         onRefresh: () async => await Future.delayed(const Duration(seconds: 1)),
         child: CustomScrollView(
@@ -102,8 +90,6 @@ class FarmerDashboardScreen extends StatelessWidget {
             const SliverToBoxAdapter(child: SizedBox(height: 36)),
           ],
         ),
-      ),
-        ],
       ),
     );
   }
