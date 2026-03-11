@@ -15,7 +15,7 @@ class _FarmerShellState extends State<FarmerShell> {
   int _currentIndex = 0;
 
   static const _tabs = [
-    '/farmer',
+    '/farmer/dashboard',
     '/farmer/animals',
     '/farmer/health',
     '/farmer/finance',
