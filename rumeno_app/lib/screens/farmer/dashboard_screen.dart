@@ -190,26 +190,19 @@ class _Header extends StatelessWidget {
             // ── Greeting row: avatar + name ──
             Row(
               children: [
-                // Avatar circle
+                // Farm image avatar
                 Container(
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withValues(alpha: 0.18),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.45),
                       width: 2,
                     ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      _initials(user?.name ?? 'Farmer'),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 21,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    image: const DecorationImage(
+                      image: AssetImage('assets/images/farm_bg.png'),
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
