@@ -92,17 +92,13 @@ class AnimalCard extends StatelessWidget {
             child: Row(
               children: [
                 // Avatar
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: _speciesColor(animal.species).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  padding: const EdgeInsets.all(8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(28),
                   child: Image.asset(
                     _speciesImage(animal.species),
-                    fit: BoxFit.contain,
+                    width: 56,
+                    height: 56,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(width: 14),
