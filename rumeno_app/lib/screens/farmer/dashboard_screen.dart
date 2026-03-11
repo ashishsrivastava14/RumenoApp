@@ -34,6 +34,7 @@ class FarmerDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().currentUser;
     final greeting = _greeting(DateTime.now().hour);
+    final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F5F8),
@@ -42,9 +43,14 @@ class FarmerDashboardScreen extends StatelessWidget {
         onRefresh: () async => await Future.delayed(const Duration(seconds: 1)),
         child: CustomScrollView(
           slivers: [
-            // ── Header ──────────────────────────────────────────
-            SliverToBoxAdapter(
-              child: _Header(user: user, greeting: greeting),
+            // ── Header (farm image + sticky gradient bar) ────────
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _StickyHeaderDelegate(
+                user: user,
+                greeting: greeting,
+                topPadding: topPadding,
+              ),
             ),
 
             // ── Gradient Stat Cards ──────────────────────────────
@@ -96,146 +102,246 @@ class FarmerDashboardScreen extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────
-//  HEADER  (gradient + wave clip + avatar)
+//  STICKY HEADER DELEGATE  (farm image + animated gradient bar)
 // ─────────────────────────────────────────────────────────────
 
-class _Header extends StatelessWidget {
+class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   final dynamic user;
   final String greeting;
+  final double topPadding;
 
-  const _Header({required this.user, required this.greeting});
+  const _StickyHeaderDelegate({
+    required this.user,
+    required this.greeting,
+    required this.topPadding,
+  });
 
-  String _initials(String name) {
-    final parts = name.trim().split(' ');
-    if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    return name.isNotEmpty ? name[0].toUpperCase() : 'F';
-  }
+  static const double _kExpandedAdd = 210.0;
+  static const double _kCollapsedHeight = 62.0;
 
   @override
-  Widget build(BuildContext context) {
-    final top = MediaQuery.of(context).padding.top;
-    return ClipPath(
-      clipper: _WaveClipper(),
-      child: Container(
-        padding: EdgeInsets.fromLTRB(20, top + 14, 20, 56),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF2E4A12), Color(0xFF5B7A2E), Color(0xFF8B9A46)],
-            stops: [0.0, 0.55, 1.0],
+  double get minExtent => topPadding + _kCollapsedHeight;
+
+  @override
+  double get maxExtent => topPadding + _kExpandedAdd;
+
+  @override
+  bool shouldRebuild(_StickyHeaderDelegate old) =>
+      old.user != user ||
+      old.greeting != greeting ||
+      old.topPadding != topPadding;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final t = (shrinkOffset / (maxExtent - minExtent)).clamp(0.0, 1.0);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+        bottomLeft: Radius.circular(24 * (1 - t)),
+        bottomRight: Radius.circular(24 * (1 - t)),
+      ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // ── Farm image background (fades as header collapses) ──
+          Opacity(
+            opacity: (1.0 - t * 1.4).clamp(0.0, 1.0),
+            child: Image.asset('assets/images/farm-3.png', fit: BoxFit.cover),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Top row: farm name + plan badge + actions ──
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.agriculture_rounded, color: Colors.white54, size: 15),
-                    const SizedBox(width: 5),
-                    Text(
-                      user?.farmName ?? 'Patel Dairy Farm',
-                      style: const TextStyle(
-                        color: Colors.white60,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+
+          // ── Gradient overlay (deepens on collapse) ──
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.lerp(const Color(0xEE1B2E0A), const Color(0xFF1A3A0D), t)!,
+                  Color.lerp(const Color(0x441B2E0A), const Color(0xFF2B5218), t)!,
+                  Color.lerp(const Color(0xCC1B2E0A), const Color(0xFF1A3A0D), t)!,
+                ],
+                stops: const [0.0, 0.45, 1.0],
+              ),
+            ),
+          ),
+
+          // ── Expanded greeting (fades out while collapsing) ──
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 18,
+            child: Opacity(
+              opacity: (1.0 - t * 2.8).clamp(0.0, 1.0),
+              child: Row(
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.5),
+                        width: 2.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.35),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                      image: const DecorationImage(
+                        image: AssetImage('assets/images/farm_bg.png'),
+                        fit: BoxFit.cover,
                       ),
                     ),
-                  ],
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Plan badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: RumenoTheme.planPro.withValues(alpha: 0.25),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: RumenoTheme.planPro.withValues(alpha: 0.65),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                  ),
+                  const SizedBox(width: 14),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Icon(Icons.star_rounded, color: RumenoTheme.planPro, size: 12),
-                          const SizedBox(width: 3),
+                          const Icon(Icons.agriculture_rounded, color: Colors.white54, size: 12),
+                          const SizedBox(width: 4),
                           Text(
-                            'Pro',
-                            style: TextStyle(
-                              color: RumenoTheme.planPro,
-                              fontWeight: FontWeight.bold,
+                            user?.farmName ?? 'Patel Dairy Farm',
+                            style: const TextStyle(
+                              color: Colors.white60,
                               fontSize: 11,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    _NotifBell(count: 5),
-                    const VeterinarianButton(),
-                    const MarketplaceButton(),
-                  ],
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // ── Greeting row: avatar + name ──
-            Row(
-              children: [
-                // Farm image avatar
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.45),
-                      width: 2,
-                    ),
-                    image: const DecorationImage(
-                      image: AssetImage('assets/images/farm_bg.png'),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                      const SizedBox(height: 2),
                       Text(
                         greeting,
-                        style: const TextStyle(color: Colors.white60, fontSize: 12),
+                        style: const TextStyle(color: Colors.white70, fontSize: 11),
                       ),
                       Text(
                         user?.name ?? 'Farmer',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 22,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           height: 1.2,
+                          shadows: [
+                            Shadow(color: Colors.black45, blurRadius: 6),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 1),
                       Text(
                         DateFormat('EEEE, dd MMM yyyy').format(DateTime.now()),
-                        style: const TextStyle(color: Colors.white54, fontSize: 11),
+                        style: const TextStyle(color: Colors.white54, fontSize: 10),
                       ),
                     ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+
+          // ── Sticky top bar (always visible, gradient strengthens on collapse) ──
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: topPadding + _kCollapsedHeight,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, topPadding + 6, 4, 0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Mini avatar – slides in from transparent as we collapse
+                  Opacity(
+                    opacity: t,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      margin: const EdgeInsets.only(right: 9),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white38, width: 1.5),
+                        image: const DecorationImage(
+                          image: AssetImage('assets/images/farm_bg.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Farm info text
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.agriculture_rounded, color: Colors.white54, size: 12),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                user?.farmName ?? 'Patel Dairy Farm',
+                                style: const TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Opacity(
+                          opacity: t,
+                          child: Text(
+                            user?.name ?? 'Farmer',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              height: 1.1,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Plan badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: RumenoTheme.planPro.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: RumenoTheme.planPro.withValues(alpha: 0.65)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.star_rounded, color: RumenoTheme.planPro, size: 11),
+                        const SizedBox(width: 3),
+                        Text(
+                          'Pro',
+                          style: TextStyle(
+                            color: RumenoTheme.planPro,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _NotifBell(count: 5),
+                  const VeterinarianButton(),
+                  const MarketplaceButton(),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -284,23 +390,6 @@ class _NotifBell extends StatelessWidget {
   }
 }
 
-class _WaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    return Path()
-      ..lineTo(0, size.height - 28)
-      ..quadraticBezierTo(
-          size.width * 0.25, size.height, size.width * 0.5, size.height - 16)
-      ..quadraticBezierTo(
-          size.width * 0.75, size.height - 32, size.width, size.height - 16)
-      ..lineTo(size.width, 0)
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(_) => false;
-}
-
 // ─────────────────────────────────────────────────────────────
 //  GRADIENT STAT CARDS
 // ─────────────────────────────────────────────────────────────
@@ -311,10 +400,10 @@ class _StatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 180,
+      height: 196,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
         children: const [
           _StatChip(
             title: 'Total Animals',
