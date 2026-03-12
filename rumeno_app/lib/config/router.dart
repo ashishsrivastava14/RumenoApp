@@ -21,6 +21,7 @@ import '../screens/farmer/breeding/breeding_dashboard_screen.dart';
 import '../screens/farmer/finance/finance_dashboard_screen.dart';
 import '../screens/farmer/finance/expense_list_screen.dart';
 import '../screens/farmer/finance/reports_screen.dart';
+import '../screens/farmer/milk/milk_log_screen.dart';
 import '../screens/farmer/more_screen.dart';
 import '../screens/farmer/more/farm_profile_screen.dart';
 import '../screens/farmer/more/team_management_screen.dart';
@@ -103,6 +104,13 @@ GoRouter createRouter(AuthProvider authProvider) {
             routes: [
               GoRoute(path: 'expenses', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const ExpenseListScreen()),
               GoRoute(path: 'reports', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const ReportsScreen()),
+            ],
+          ),
+          GoRoute(
+            path: '/farmer/milk',
+            builder: (_, _) => const MilkLogScreen(),
+            routes: [
+              GoRoute(path: 'log', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const MilkLogScreen()),
             ],
           ),
           GoRoute(path: '/farmer/breeding', builder: (_, _) => const BreedingDashboardScreen()),

@@ -710,9 +710,7 @@ class _QuickActionsSection extends StatelessWidget {
                 label: 'Log Milk',
                 gradient: const LinearGradient(
                     colors: [Color(0xFF1565C0), Color(0xFF42A5F5)]),
-                onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Milk logging coming soon!')),
-                ),
+                onTap: () => context.push('/farmer/milk/log'),
               ),
             ],
           ),

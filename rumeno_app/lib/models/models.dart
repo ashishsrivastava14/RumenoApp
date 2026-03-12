@@ -346,3 +346,25 @@ class UpcomingEvent {
     this.animalId,
   });
 }
+
+enum MilkSession { morning, evening }
+
+class MilkRecord {
+  final String id;
+  final String animalId;
+  final DateTime date;
+  final MilkSession session;
+  final double quantityLitres;
+  final String? notes;
+
+  const MilkRecord({
+    required this.id,
+    required this.animalId,
+    required this.date,
+    required this.session,
+    required this.quantityLitres,
+    this.notes,
+  });
+
+  String get sessionLabel => session == MilkSession.morning ? 'Morning' : 'Evening';
+}
