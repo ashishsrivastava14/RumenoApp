@@ -358,9 +358,7 @@ class _NotifBell extends StatelessWidget {
       children: [
         IconButton(
           icon: const Icon(Icons.notifications_outlined, color: Colors.white, size: 22),
-          onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Notifications coming soon!')),
-          ),
+          onPressed: () => context.go('/farmer/more/notifications'),
         ),
         if (count > 0)
           Positioned(
