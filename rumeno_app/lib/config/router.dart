@@ -25,6 +25,9 @@ import '../screens/farmer/more_screen.dart';
 import '../screens/farmer/more/farm_profile_screen.dart';
 import '../screens/farmer/more/team_management_screen.dart';
 import '../screens/farmer/more/subscription_screen.dart';
+import '../screens/farmer/more/notification_settings_screen.dart';
+import '../screens/farmer/more/help_support_screen.dart';
+import '../screens/farmer/more/data_export_screen.dart';
 
 // Vet
 import '../screens/vet/vet_shell.dart';
@@ -110,6 +113,9 @@ GoRouter createRouter(AuthProvider authProvider) {
               GoRoute(path: 'profile', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const FarmProfileScreen()),
               GoRoute(path: 'team', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const TeamManagementScreen()),
               GoRoute(path: 'subscription', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const SubscriptionScreen()),
+              GoRoute(path: 'notifications', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const NotificationSettingsScreen()),
+              GoRoute(path: 'help', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const HelpSupportScreen()),
+              GoRoute(path: 'export', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const DataExportScreen()),
             ],
           ),
         ],

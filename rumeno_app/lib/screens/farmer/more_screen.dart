@@ -17,58 +17,227 @@ class MoreScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         actions: const [VeterinarianButton(), MarketplaceButton()],
       ),
-      body: ListView(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        children: [
-          // Profile card
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: RumenoTheme.primaryGreen.withValues(alpha: 0.15),
-                  child: Text('RP', style: TextStyle(color: RumenoTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 20)),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Rajesh Patel', style: Theme.of(context).textTheme.titleMedium),
-                      Text('Patel Dairy Farm', style: Theme.of(context).textTheme.bodySmall),
-                      Container(
-                        margin: const EdgeInsets.only(top: 4),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(color: RumenoTheme.planPro.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
-                        child: Text('Pro Plan', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: RumenoTheme.planPro)),
-                      ),
-                    ],
+        child: Column(
+          children: [
+            // ── Profile Card ──
+            GestureDetector(
+              onTap: () => context.go('/farmer/more/profile'),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [RumenoTheme.primaryGreen, RumenoTheme.primaryDarkGreen],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: RumenoTheme.primaryGreen.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                Icon(Icons.edit, color: RumenoTheme.primaryGreen),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 68,
+                      height: 68,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: 0.2),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2),
+                      ),
+                      child: const Center(
+                        child: Text('👨‍🌾', style: TextStyle(fontSize: 36)),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Rajesh Patel',
+                            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Patel Dairy Farm',
+                            style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 14),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.star_rounded, color: Colors.amber, size: 16),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Pro Plan',
+                                  style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.edit_rounded, color: Colors.white, size: 22),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // ── Main Menu Grid ──
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisSpacing: 14,
+              mainAxisSpacing: 14,
+              childAspectRatio: 1.05,
+              children: [
+                _BigMenuTile(
+                  emoji: '🏡',
+                  label: 'My Farm',
+                  sublabel: 'Farm Details',
+                  color: const Color(0xFF4CAF50),
+                  onTap: () => context.go('/farmer/more/profile'),
+                ),
+                _BigMenuTile(
+                  emoji: '👥',
+                  label: 'My Team',
+                  sublabel: 'Workers',
+                  color: const Color(0xFF2196F3),
+                  onTap: () => context.go('/farmer/more/team'),
+                ),
+                _BigMenuTile(
+                  emoji: '💳',
+                  label: 'My Plan',
+                  sublabel: 'Subscription',
+                  color: const Color(0xFFFF9800),
+                  onTap: () => context.go('/farmer/more/subscription'),
+                ),
+                _BigMenuTile(
+                  emoji: '🔔',
+                  label: 'Alerts',
+                  sublabel: 'Notifications',
+                  color: const Color(0xFFE91E63),
+                  onTap: () => context.go('/farmer/more/notifications'),
+                ),
+                _BigMenuTile(
+                  emoji: '🌐',
+                  label: 'Language',
+                  sublabel: 'भाषा बदलें',
+                  color: const Color(0xFF9C27B0),
+                  onTap: () => _showLanguageDialog(context),
+                ),
+                _BigMenuTile(
+                  emoji: '📋',
+                  label: 'Export',
+                  sublabel: 'Save Data',
+                  color: const Color(0xFF00BCD4),
+                  onTap: () => context.go('/farmer/more/export'),
+                ),
+                _BigMenuTile(
+                  emoji: '❓',
+                  label: 'Help',
+                  sublabel: 'Support',
+                  color: const Color(0xFF607D8B),
+                  onTap: () => context.go('/farmer/more/help'),
+                ),
+                _BigMenuTile(
+                  emoji: '🚪',
+                  label: 'Logout',
+                  sublabel: 'Sign Out',
+                  color: const Color(0xFFE53935),
+                  onTap: () => _showLogoutConfirm(context),
+                ),
               ],
             ),
+
+            const SizedBox(height: 24),
+
+            // ── App info ──
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    '🐄  Rumeno App',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: RumenoTheme.textDark,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Version 1.0.0',
+                    style: TextStyle(fontSize: 12, color: RumenoTheme.textGrey),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLogoutConfirm(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Text('🚪', style: TextStyle(fontSize: 28)),
+            SizedBox(width: 10),
+            Text('Logout?'),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to sign out?',
+          style: TextStyle(fontSize: 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('No, Stay', style: TextStyle(fontSize: 16)),
           ),
-          const SizedBox(height: 16),
-          _MenuItem(icon: Icons.business, title: 'Farm Profile', subtitle: 'Edit farm details, logo, GPS', onTap: () => context.go('/farmer/more/profile')),
-          _MenuItem(icon: Icons.people, title: 'Team Members', subtitle: 'Manage staff and roles', onTap: () => context.go('/farmer/more/team')),
-          _MenuItem(icon: Icons.card_membership, title: 'Subscription Plan', subtitle: 'Pro Plan - Active', onTap: () => context.go('/farmer/more/subscription')),
-          _MenuItem(icon: Icons.notifications, title: 'Notification Settings', subtitle: 'Configure alerts', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notification settings')))),
-          _MenuItem(icon: Icons.language, title: 'Language', subtitle: 'English', onTap: () => _showLanguageDialog(context)),
-          _MenuItem(icon: Icons.download, title: 'Data Export', subtitle: 'Export your farm data', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Data export (mock)')))),
-          _MenuItem(icon: Icons.help_outline, title: 'Help & Support', subtitle: 'FAQs and contact', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Help & Support')))),
-          const SizedBox(height: 8),
-          _MenuItem(
-            icon: Icons.logout,
-            title: 'Logout',
-            subtitle: 'Sign out of your account',
-            isDestructive: true,
-            onTap: () {
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: RumenoTheme.errorRed),
+            onPressed: () {
+              Navigator.pop(ctx);
               context.read<AuthProvider>().logout();
               context.go('/role-selection');
             },
+            child: const Text('Yes, Logout', style: TextStyle(fontSize: 16)),
           ),
         ],
       ),
@@ -76,45 +245,168 @@ class MoreScreen extends StatelessWidget {
   }
 
   void _showLanguageDialog(BuildContext context) {
-    showDialog(
+    final languages = [
+      {'name': 'English', 'native': 'English', 'flag': '🇬🇧'},
+      {'name': 'Hindi', 'native': 'हिन्दी', 'flag': '🇮🇳'},
+      {'name': 'Gujarati', 'native': 'ગુજરાતી', 'flag': '🇮🇳'},
+      {'name': 'Marathi', 'native': 'मराठी', 'flag': '🇮🇳'},
+      {'name': 'Punjabi', 'native': 'ਪੰਜਾਬੀ', 'flag': '🇮🇳'},
+    ];
+
+    showModalBottomSheet(
       context: context,
-      builder: (ctx) => SimpleDialog(
-        title: const Text('Select Language'),
-        children: ['English', 'Hindi (हिन्दी)', 'Gujarati (ગુજરાતી)', 'Marathi (मराठी)', 'Punjabi (ਪੰਜਾਬੀ)']
-            .map((l) => SimpleDialogOption(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Language set to $l (mock)')));
-                  },
-                  child: Text(l),
-                ))
-            .toList(),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Row(
+              children: [
+                Text('🌐', style: TextStyle(fontSize: 28)),
+                SizedBox(width: 10),
+                Text('Select Language', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 20),
+            ...languages.map((l) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('✅  Language set to ${l['name']}'),
+                      backgroundColor: RumenoTheme.successGreen,
+                    ),
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: l['name'] == 'English'
+                        ? RumenoTheme.primaryGreen.withValues(alpha: 0.08)
+                        : Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: l['name'] == 'English'
+                          ? RumenoTheme.primaryGreen
+                          : Colors.grey.shade200,
+                      width: l['name'] == 'English' ? 2 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(l['flag']!, style: const TextStyle(fontSize: 24)),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l['name']!,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: l['name'] == 'English' ? RumenoTheme.primaryGreen : RumenoTheme.textDark,
+                              ),
+                            ),
+                            Text(
+                              l['native']!,
+                              style: TextStyle(fontSize: 13, color: RumenoTheme.textGrey),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (l['name'] == 'English')
+                        const Icon(Icons.check_circle, color: RumenoTheme.primaryGreen, size: 22),
+                    ],
+                  ),
+                ),
+              ),
+            )),
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _MenuItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
+class _BigMenuTile extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final String sublabel;
+  final Color color;
   final VoidCallback onTap;
-  final bool isDestructive;
 
-  const _MenuItem({required this.icon, required this.title, required this.subtitle, required this.onTap, this.isDestructive = false});
+  const _BigMenuTile({
+    required this.emoji,
+    required this.label,
+    required this.sublabel,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: Icon(icon, color: isDestructive ? RumenoTheme.errorRed : RumenoTheme.primaryGreen),
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.w500, color: isDestructive ? RumenoTheme.errorRed : null)),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-        trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
-        onTap: onTap,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.15),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Center(
+                child: Text(emoji, style: const TextStyle(fontSize: 32)),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: RumenoTheme.textDark,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              sublabel,
+              style: TextStyle(fontSize: 12, color: color),
+            ),
+          ],
+        ),
       ),
     );
   }
