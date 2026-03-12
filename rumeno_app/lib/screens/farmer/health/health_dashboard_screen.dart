@@ -156,14 +156,14 @@ class HealthDashboardScreen extends StatelessWidget {
         'l': 'Deworming',
         's': 'Antiparasitic schedule',
         'c': RumenoTheme.accentOlive,
-        'r': null
+        'r': '/farmer/health/deworming'
       },
       {
         'e': '🔬',
         'l': 'Lab Reports',
         's': 'Test results & history',
         'c': RumenoTheme.warmBrown,
-        'r': null
+        'r': '/farmer/health/lab-reports'
       },
     ];
     return Padding(

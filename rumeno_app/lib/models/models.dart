@@ -368,3 +368,57 @@ class MilkRecord {
 
   String get sessionLabel => session == MilkSession.morning ? 'Morning' : 'Evening';
 }
+
+enum DewormingStatus { due, overdue, done }
+
+class DewormingRecord {
+  final String id;
+  final String animalId;
+  final String medicineName;
+  final String? dose;
+  final DateTime? dateAdministered;
+  final DateTime dueDate;
+  final DateTime? nextDueDate;
+  final String? vetName;
+  final DewormingStatus status;
+  final String? notes;
+
+  const DewormingRecord({
+    required this.id,
+    required this.animalId,
+    required this.medicineName,
+    this.dose,
+    this.dateAdministered,
+    required this.dueDate,
+    this.nextDueDate,
+    this.vetName,
+    required this.status,
+    this.notes,
+  });
+}
+
+enum LabReportStatus { pending, completed }
+
+class LabReport {
+  final String id;
+  final String animalId;
+  final String testName;
+  final DateTime testDate;
+  final String? result;
+  final String? labName;
+  final String? vetName;
+  final LabReportStatus status;
+  final String? notes;
+
+  const LabReport({
+    required this.id,
+    required this.animalId,
+    required this.testName,
+    required this.testDate,
+    this.result,
+    this.labName,
+    this.vetName,
+    required this.status,
+    this.notes,
+  });
+}

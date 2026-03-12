@@ -17,6 +17,8 @@ import '../screens/farmer/animals/animal_detail_screen.dart';
 import '../screens/farmer/health/health_dashboard_screen.dart';
 import '../screens/farmer/health/vaccination_screen.dart';
 import '../screens/farmer/health/treatment_screen.dart';
+import '../screens/farmer/health/deworming_screen.dart';
+import '../screens/farmer/health/lab_reports_screen.dart';
 import '../screens/farmer/breeding/breeding_dashboard_screen.dart';
 import '../screens/farmer/finance/finance_dashboard_screen.dart';
 import '../screens/farmer/finance/expense_list_screen.dart';
@@ -96,6 +98,8 @@ GoRouter createRouter(AuthProvider authProvider) {
             routes: [
               GoRoute(path: 'vaccination', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const VaccinationScreen()),
               GoRoute(path: 'treatment', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const TreatmentScreen()),
+              GoRoute(path: 'deworming', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const DewormingScreen()),
+              GoRoute(path: 'lab-reports', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const LabReportsScreen()),
             ],
           ),
           GoRoute(

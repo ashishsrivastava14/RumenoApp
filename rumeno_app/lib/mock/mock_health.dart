@@ -52,3 +52,27 @@ final List<UpcomingEvent> mockUpcomingEvents = [
   UpcomingEvent(id: 'EVT004', title: 'Follow-up - C-008', eventType: 'Treatment', date: DateTime(2026, 2, 25), animalId: '8'),
   UpcomingEvent(id: 'EVT005', title: 'Weight Check - All Goats', eventType: 'General', date: DateTime(2026, 3, 1)),
 ];
+
+final List<DewormingRecord> mockDewormingRecords = [
+  DewormingRecord(id: 'DW001', animalId: '1', medicineName: 'Albendazole', dose: '10ml', dateAdministered: DateTime(2025, 12, 15), dueDate: DateTime(2025, 12, 15), nextDueDate: DateTime(2026, 3, 15), vetName: 'Dr. Anita Sharma', status: DewormingStatus.done),
+  DewormingRecord(id: 'DW002', animalId: '2', medicineName: 'Fenbendazole', dose: '8ml', dateAdministered: DateTime(2026, 1, 10), dueDate: DateTime(2026, 1, 10), nextDueDate: DateTime(2026, 4, 10), vetName: 'Dr. Pradeep Rao', status: DewormingStatus.done),
+  DewormingRecord(id: 'DW003', animalId: '3', medicineName: 'Ivermectin', dose: '5ml', dueDate: DateTime(2026, 2, 20), status: DewormingStatus.overdue),
+  DewormingRecord(id: 'DW004', animalId: '5', medicineName: 'Albendazole', dose: '10ml', dueDate: DateTime(2026, 3, 15), status: DewormingStatus.due),
+  DewormingRecord(id: 'DW005', animalId: '8', medicineName: 'Oxfendazole', dose: '7ml', dateAdministered: DateTime(2026, 2, 1), dueDate: DateTime(2026, 2, 1), nextDueDate: DateTime(2026, 5, 1), vetName: 'Dr. Anita Sharma', status: DewormingStatus.done),
+  DewormingRecord(id: 'DW006', animalId: '10', medicineName: 'Fenbendazole', dueDate: DateTime(2026, 3, 20), status: DewormingStatus.due),
+  DewormingRecord(id: 'DW007', animalId: '14', medicineName: 'Ivermectin', dose: '3ml', dateAdministered: DateTime(2026, 1, 25), dueDate: DateTime(2026, 1, 25), nextDueDate: DateTime(2026, 4, 25), vetName: 'Dr. Anita Sharma', status: DewormingStatus.done),
+  DewormingRecord(id: 'DW008', animalId: '16', medicineName: 'Albendazole', dueDate: DateTime(2026, 2, 28), status: DewormingStatus.overdue),
+  DewormingRecord(id: 'DW009', animalId: '7', medicineName: 'Levamisole', dose: '6ml', dueDate: DateTime(2026, 3, 25), status: DewormingStatus.due),
+  DewormingRecord(id: 'DW010', animalId: '12', medicineName: 'Praziquantel', dose: '4ml', dateAdministered: DateTime(2026, 2, 10), dueDate: DateTime(2026, 2, 10), nextDueDate: DateTime(2026, 5, 10), vetName: 'Dr. Pradeep Rao', status: DewormingStatus.done),
+];
+
+final List<LabReport> mockLabReports = [
+  LabReport(id: 'LR001', animalId: '1', testName: 'Complete Blood Count', testDate: DateTime(2026, 2, 15), result: 'WBC: 8.5, RBC: 6.2, Hb: 11.5 - Normal', labName: 'VetLab Diagnostics', vetName: 'Dr. Anita Sharma', status: LabReportStatus.completed),
+  LabReport(id: 'LR002', animalId: '3', testName: 'Brucella Test', testDate: DateTime(2026, 2, 18), result: 'Negative', labName: 'VetLab Diagnostics', vetName: 'Dr. Anita Sharma', status: LabReportStatus.completed),
+  LabReport(id: 'LR003', animalId: '8', testName: 'Milk Culture & Sensitivity', testDate: DateTime(2026, 2, 20), labName: 'AgriTest Labs', vetName: 'Dr. Pradeep Rao', status: LabReportStatus.pending, notes: 'Testing for mastitis pathogens'),
+  LabReport(id: 'LR004', animalId: '5', testName: 'Fecal Egg Count', testDate: DateTime(2026, 2, 12), result: 'EPG: 450 - Moderate load', labName: 'VetLab Diagnostics', vetName: 'Dr. Anita Sharma', status: LabReportStatus.completed),
+  LabReport(id: 'LR005', animalId: '14', testName: 'Liver Function Test', testDate: DateTime(2026, 2, 22), labName: 'AgriTest Labs', vetName: 'Dr. Anita Sharma', status: LabReportStatus.pending),
+  LabReport(id: 'LR006', animalId: '9', testName: 'Tuberculin Test', testDate: DateTime(2026, 1, 30), result: 'Negative', labName: 'State Veterinary Lab', vetName: 'Dr. Anita Sharma', status: LabReportStatus.completed),
+  LabReport(id: 'LR007', animalId: '2', testName: 'Pregnancy Confirmation', testDate: DateTime(2026, 2, 5), result: 'Positive - approx 5 months', labName: 'VetLab Diagnostics', vetName: 'Dr. Pradeep Rao', status: LabReportStatus.completed),
+  LabReport(id: 'LR008', animalId: '20', testName: 'Blood Smear', testDate: DateTime(2026, 2, 21), labName: 'AgriTest Labs', status: LabReportStatus.pending, notes: 'Checking for blood parasites'),
+];
