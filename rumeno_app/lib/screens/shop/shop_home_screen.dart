@@ -81,7 +81,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
               ),
             ),
             bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(56),
+              preferredSize: const Size.fromHeight(58),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
                 child: GestureDetector(
