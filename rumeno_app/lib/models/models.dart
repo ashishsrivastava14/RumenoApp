@@ -422,3 +422,323 @@ class LabReport {
     this.notes,
   });
 }
+
+// ─── Ecommerce Models ───
+
+enum ProductCategory { animalFeed, supplements, veterinaryMedicines, farmEquipment }
+
+enum OrderStatus { pending, confirmed, packed, shipped, delivered, cancelled, returned }
+
+enum VendorStatus { pending, approved, rejected, suspended }
+
+enum DiscountType { percentage, flat }
+
+enum CouponStatus { active, expired, disabled }
+
+class Product {
+  final String id;
+  final String name;
+  final String description;
+  final double price;
+  final double? mrp;
+  final ProductCategory category;
+  final String vendorId;
+  final String vendorName;
+  final bool isRumenoOwned;
+  final int stockQuantity;
+  final String imageUrl;
+  final String? youtubeVideoUrl;
+  final double rating;
+  final int reviewCount;
+  final bool isFeatured;
+  final bool isApproved;
+  final String unit;
+  final double? weightKg;
+  final DateTime createdAt;
+  final List<String> tags;
+
+  const Product({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.price,
+    this.mrp,
+    required this.category,
+    required this.vendorId,
+    required this.vendorName,
+    this.isRumenoOwned = false,
+    required this.stockQuantity,
+    required this.imageUrl,
+    this.youtubeVideoUrl,
+    this.rating = 0.0,
+    this.reviewCount = 0,
+    this.isFeatured = false,
+    this.isApproved = true,
+    required this.unit,
+    this.weightKg,
+    required this.createdAt,
+    this.tags = const [],
+  });
+
+  bool get inStock => stockQuantity > 0;
+
+  double get discountPercent {
+    if (mrp == null || mrp! <= price) return 0;
+    return ((mrp! - price) / mrp! * 100);
+  }
+
+  String get categoryName {
+    switch (category) {
+      case ProductCategory.animalFeed:
+        return 'Animal Feed';
+      case ProductCategory.supplements:
+        return 'Supplements';
+      case ProductCategory.veterinaryMedicines:
+        return 'Veterinary Medicines';
+      case ProductCategory.farmEquipment:
+        return 'Farm Equipment';
+    }
+  }
+}
+
+class CartItem {
+  final Product product;
+  int quantity;
+
+  CartItem({required this.product, this.quantity = 1});
+
+  double get totalPrice => product.price * quantity;
+}
+
+class ShippingAddress {
+  final String id;
+  final String name;
+  final String phone;
+  final String addressLine1;
+  final String? addressLine2;
+  final String city;
+  final String state;
+  final String pincode;
+  final bool isDefault;
+
+  const ShippingAddress({
+    required this.id,
+    required this.name,
+    required this.phone,
+    required this.addressLine1,
+    this.addressLine2,
+    required this.city,
+    required this.state,
+    required this.pincode,
+    this.isDefault = false,
+  });
+
+  String get fullAddress =>
+      '$addressLine1${addressLine2 != null ? ', $addressLine2' : ''}, $city, $state - $pincode';
+}
+
+class Order {
+  final String id;
+  final String userId;
+  final List<OrderItem> items;
+  final ShippingAddress address;
+  final double subtotal;
+  final double discount;
+  final double deliveryCharge;
+  final double totalAmount;
+  final OrderStatus status;
+  final String? couponCode;
+  final String paymentMethod;
+  final String? paymentId;
+  final String? trackingNumber;
+  final DateTime orderDate;
+  final DateTime? packedDate;
+  final DateTime? shippedDate;
+  final DateTime? deliveredDate;
+
+  const Order({
+    required this.id,
+    required this.userId,
+    required this.items,
+    required this.address,
+    required this.subtotal,
+    this.discount = 0,
+    this.deliveryCharge = 0,
+    required this.totalAmount,
+    required this.status,
+    this.couponCode,
+    required this.paymentMethod,
+    this.paymentId,
+    this.trackingNumber,
+    required this.orderDate,
+    this.packedDate,
+    this.shippedDate,
+    this.deliveredDate,
+  });
+
+  String get statusLabel {
+    switch (status) {
+      case OrderStatus.pending:
+        return 'Pending';
+      case OrderStatus.confirmed:
+        return 'Confirmed';
+      case OrderStatus.packed:
+        return 'Packed';
+      case OrderStatus.shipped:
+        return 'Shipped';
+      case OrderStatus.delivered:
+        return 'Delivered';
+      case OrderStatus.cancelled:
+        return 'Cancelled';
+      case OrderStatus.returned:
+        return 'Returned';
+    }
+  }
+}
+
+class OrderItem {
+  final String productId;
+  final String productName;
+  final String productImage;
+  final double price;
+  final int quantity;
+  final String vendorId;
+
+  const OrderItem({
+    required this.productId,
+    required this.productName,
+    required this.productImage,
+    required this.price,
+    required this.quantity,
+    required this.vendorId,
+  });
+
+  double get totalPrice => price * quantity;
+}
+
+class Vendor {
+  final String id;
+  final String businessName;
+  final String ownerName;
+  final String phone;
+  final String email;
+  final String? gstNumber;
+  final String? panNumber;
+  final String? bankAccountNumber;
+  final String? ifscCode;
+  final String? bankName;
+  final String address;
+  final String city;
+  final String state;
+  final String pincode;
+  final String? idProofUrl;
+  final VendorStatus status;
+  final double commissionPercent;
+  final double walletBalance;
+  final double totalEarnings;
+  final int totalProducts;
+  final int totalOrders;
+  final DateTime joinedDate;
+
+  const Vendor({
+    required this.id,
+    required this.businessName,
+    required this.ownerName,
+    required this.phone,
+    required this.email,
+    this.gstNumber,
+    this.panNumber,
+    this.bankAccountNumber,
+    this.ifscCode,
+    this.bankName,
+    required this.address,
+    required this.city,
+    required this.state,
+    required this.pincode,
+    this.idProofUrl,
+    required this.status,
+    this.commissionPercent = 10.0,
+    this.walletBalance = 0,
+    this.totalEarnings = 0,
+    this.totalProducts = 0,
+    this.totalOrders = 0,
+    required this.joinedDate,
+  });
+
+  String get statusLabel {
+    switch (status) {
+      case VendorStatus.pending:
+        return 'Pending';
+      case VendorStatus.approved:
+        return 'Approved';
+      case VendorStatus.rejected:
+        return 'Rejected';
+      case VendorStatus.suspended:
+        return 'Suspended';
+    }
+  }
+}
+
+class Coupon {
+  final String id;
+  final String code;
+  final DiscountType discountType;
+  final double discountValue;
+  final double? minOrderValue;
+  final double? maxDiscount;
+  final int usageLimit;
+  final int usedCount;
+  final DateTime validFrom;
+  final DateTime validUntil;
+  final CouponStatus status;
+
+  const Coupon({
+    required this.id,
+    required this.code,
+    required this.discountType,
+    required this.discountValue,
+    this.minOrderValue,
+    this.maxDiscount,
+    required this.usageLimit,
+    this.usedCount = 0,
+    required this.validFrom,
+    required this.validUntil,
+    required this.status,
+  });
+
+  bool get isValid =>
+      status == CouponStatus.active &&
+      DateTime.now().isAfter(validFrom) &&
+      DateTime.now().isBefore(validUntil) &&
+      usedCount < usageLimit;
+
+  double calculateDiscount(double orderAmount) {
+    if (!isValid) return 0;
+    if (minOrderValue != null && orderAmount < minOrderValue!) return 0;
+    double disc = discountType == DiscountType.percentage
+        ? orderAmount * discountValue / 100
+        : discountValue;
+    if (maxDiscount != null && disc > maxDiscount!) disc = maxDiscount!;
+    return disc;
+  }
+}
+
+class ProductReview {
+  final String id;
+  final String productId;
+  final String userId;
+  final String userName;
+  final double rating;
+  final String? comment;
+  final DateTime createdAt;
+
+  const ProductReview({
+    required this.id,
+    required this.productId,
+    required this.userId,
+    required this.userName,
+    required this.rating,
+    this.comment,
+    required this.createdAt,
+  });
+}

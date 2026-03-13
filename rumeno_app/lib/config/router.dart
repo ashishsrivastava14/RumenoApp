@@ -8,6 +8,19 @@ import '../screens/auth/role_selection_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/otp_screen.dart';
 
+// Shop / Ecommerce
+import '../screens/shop/shop_home_screen.dart';
+import '../screens/shop/product_detail_screen.dart';
+import '../screens/shop/cart_screen.dart';
+import '../screens/shop/checkout_screen.dart';
+import '../screens/shop/order_success_screen.dart';
+import '../screens/shop/orders_screen.dart';
+import '../screens/shop/order_detail_screen.dart';
+import '../screens/shop/search_screen.dart';
+import '../screens/shop/category_screen.dart';
+import '../screens/shop/shop_account_screen.dart';
+import '../screens/shop/vendor_register_screen.dart';
+
 // Farmer
 import '../screens/farmer/farmer_shell.dart';
 import '../screens/farmer/dashboard_screen.dart';
@@ -52,6 +65,8 @@ import '../screens/admin/more/admin_partners_screen.dart';
 import '../screens/admin/more/admin_notifications_screen.dart';
 import '../screens/admin/more/admin_reports_screen.dart';
 import '../screens/admin/more/admin_settings_screen.dart';
+import '../screens/admin/more/admin_vendors_screen.dart';
+import '../screens/admin/more/admin_marketplace_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _farmerShellKey = GlobalKey<NavigatorState>();
@@ -70,6 +85,43 @@ GoRouter createRouter(AuthProvider authProvider) {
       GoRoute(path: '/role-selection', builder: (_, _) => const RoleSelectionScreen()),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/otp', builder: (_, _) => const OtpScreen()),
+
+      // ─── Shop / Ecommerce ───
+      GoRoute(path: '/shop', builder: (_, _) => const ShopHomeScreen()),
+      GoRoute(path: '/shop/search', builder: (_, _) => const SearchScreen()),
+      GoRoute(path: '/shop/cart', builder: (_, _) => const CartScreen()),
+      GoRoute(path: '/shop/checkout', builder: (_, _) => const CheckoutScreen()),
+      GoRoute(
+        path: '/shop/product/:id',
+        builder: (_, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return ProductDetailScreen(productId: id);
+        },
+      ),
+      GoRoute(
+        path: '/shop/category/:category',
+        builder: (_, state) {
+          final category = state.pathParameters['category'] ?? '';
+          return CategoryScreen(categoryKey: category);
+        },
+      ),
+      GoRoute(path: '/shop/orders', builder: (_, _) => const OrdersScreen()),
+      GoRoute(
+        path: '/shop/order/:id',
+        builder: (_, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return OrderDetailScreen(orderId: id);
+        },
+      ),
+      GoRoute(
+        path: '/shop/order-success/:id',
+        builder: (_, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return OrderSuccessScreen(orderId: id);
+        },
+      ),
+      GoRoute(path: '/shop/account', builder: (_, _) => const ShopAccountScreen()),
+      GoRoute(path: '/shop/vendor-register', builder: (_, _) => const VendorRegisterScreen()),
 
       // ─── Farmer Shell ───
       ShellRoute(
@@ -164,6 +216,8 @@ GoRouter createRouter(AuthProvider authProvider) {
               GoRoute(path: 'notifications', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminNotificationsScreen()),
               GoRoute(path: 'reports', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminReportsScreen()),
               GoRoute(path: 'settings', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminSettingsScreen()),
+              GoRoute(path: 'vendors', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminVendorsScreen()),
+              GoRoute(path: 'marketplace', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminMarketplaceScreen()),
             ],
           ),
         ],

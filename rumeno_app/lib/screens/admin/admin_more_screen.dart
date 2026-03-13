@@ -38,6 +38,8 @@ class AdminMoreScreen extends StatelessWidget {
           const SizedBox(height: 16),
 
           _menuSection(context, 'Management', [
+            _MenuItem(Icons.storefront_rounded, 'Marketplace', () => context.go('/admin/more/marketplace')),
+            _MenuItem(Icons.people_outline_rounded, 'Vendor Management', () => context.go('/admin/more/vendors')),
             _MenuItem(Icons.card_membership_rounded, 'Subscription Plans', () => context.go('/admin/more/subscriptions')),
             _MenuItem(Icons.payment_rounded, 'Payments', () => context.go('/admin/more/payments')),
             _MenuItem(Icons.people_alt_rounded, 'Partners / Vets', () => context.go('/admin/more/partners')),

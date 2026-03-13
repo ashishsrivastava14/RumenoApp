@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'config/theme.dart';
 import 'config/router.dart';
 import 'providers/auth_provider.dart';
+import 'providers/ecommerce_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,12 +20,14 @@ class RumenoApp extends StatefulWidget {
 
 class _RumenoAppState extends State<RumenoApp> {
   late final AuthProvider _authProvider;
+  late final EcommerceProvider _ecommerceProvider;
   late final GoRouter _router;
 
   @override
   void initState() {
     super.initState();
     _authProvider = AuthProvider();
+    _ecommerceProvider = EcommerceProvider();
     _router = createRouter(_authProvider);
   }
 
@@ -32,13 +35,17 @@ class _RumenoAppState extends State<RumenoApp> {
   void dispose() {
     _router.dispose();
     _authProvider.dispose();
+    _ecommerceProvider.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: _authProvider,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: _authProvider),
+        ChangeNotifierProvider.value(value: _ecommerceProvider),
+      ],
       child: MaterialApp.router(
         title: 'Rumeno - Farm Management',
         debugShowCheckedModeBanner: false,
