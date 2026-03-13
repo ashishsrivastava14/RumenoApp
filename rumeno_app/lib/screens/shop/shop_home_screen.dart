@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
@@ -15,6 +16,12 @@ class ShopHomeScreen extends StatefulWidget {
 }
 
 class _ShopHomeScreenState extends State<ShopHomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<EcommerceProvider>().resetFilters();
+  }
+
   @override
   Widget build(BuildContext context) {
     final ecommerce = context.watch<EcommerceProvider>();
@@ -153,40 +160,28 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                         label: 'Feed',
                         color: const Color(0xFF4CAF50),
                         bgColor: const Color(0xFFE8F5E9),
-                        onTap: () {
-                          ecommerce.setCategory(ProductCategory.animalFeed);
-                          context.go('/shop/category/animalFeed');
-                        },
+                        onTap: () => context.go('/shop/category/animalFeed'),
                       ),
                       _BigCategoryTile(
                         icon: Icons.science_rounded,
                         label: 'Tonic',
                         color: const Color(0xFFFF9800),
                         bgColor: const Color(0xFFFFF3E0),
-                        onTap: () {
-                          ecommerce.setCategory(ProductCategory.supplements);
-                          context.go('/shop/category/supplements');
-                        },
+                        onTap: () => context.go('/shop/category/supplements'),
                       ),
                       _BigCategoryTile(
                         icon: Icons.medication_rounded,
                         label: 'Medicine',
                         color: const Color(0xFFE53935),
                         bgColor: const Color(0xFFFFEBEE),
-                        onTap: () {
-                          ecommerce.setCategory(ProductCategory.veterinaryMedicines);
-                          context.go('/shop/category/veterinaryMedicines');
-                        },
+                        onTap: () => context.go('/shop/category/veterinaryMedicines'),
                       ),
                       _BigCategoryTile(
                         icon: Icons.construction_rounded,
                         label: 'Tools',
                         color: const Color(0xFF2196F3),
                         bgColor: const Color(0xFFE3F2FD),
-                        onTap: () {
-                          ecommerce.setCategory(ProductCategory.farmEquipment);
-                          context.go('/shop/category/farmEquipment');
-                        },
+                        onTap: () => context.go('/shop/category/farmEquipment'),
                       ),
                     ],
                   ),
@@ -252,26 +247,47 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                             style: TextStyle(color: Colors.white70, fontSize: 15),
                           ),
                           const SizedBox(height: 10),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.local_offer_rounded, color: RumenoTheme.primaryGreen, size: 18),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'Code: WELCOME20',
-                                  style: TextStyle(
-                                    color: RumenoTheme.primaryGreen,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
+                          GestureDetector(
+                            onTap: () {
+                              Clipboard.setData(const ClipboardData(text: 'WELCOME20'));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Row(
+                                    children: [
+                                      Icon(Icons.check_circle, color: Colors.white, size: 20),
+                                      SizedBox(width: 8),
+                                      Text('Coupon code WELCOME20 copied!'),
+                                    ],
                                   ),
+                                  duration: const Duration(seconds: 2),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: RumenoTheme.successGreen,
                                 ),
-                              ],
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.local_offer_rounded, color: RumenoTheme.primaryGreen, size: 18),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Code: WELCOME20',
+                                    style: TextStyle(
+                                      color: RumenoTheme.primaryGreen,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Icon(Icons.copy_rounded, color: RumenoTheme.primaryGreen, size: 16),
+                                ],
+                              ),
                             ),
                           ),
                         ],

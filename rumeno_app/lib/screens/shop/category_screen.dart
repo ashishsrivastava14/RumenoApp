@@ -68,7 +68,7 @@ class CategoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final category = _parseCategory();
     final ecommerce = context.watch<EcommerceProvider>();
-    final products = ecommerce.products.where((p) => p.category == category).toList();
+    final products = ecommerce.getProductsByCategory(category);
     final catColor = _categoryColor(category);
 
     return Scaffold(

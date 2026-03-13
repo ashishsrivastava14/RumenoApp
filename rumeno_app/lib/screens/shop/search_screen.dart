@@ -22,6 +22,7 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
     final ecommerce = context.read<EcommerceProvider>();
     _searchController.text = ecommerce.searchQuery;
+    ecommerce.setCategory(null);
   }
 
   @override

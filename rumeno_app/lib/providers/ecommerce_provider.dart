@@ -90,6 +90,12 @@ class EcommerceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void resetFilters() {
+    _selectedCategory = null;
+    _searchQuery = '';
+    notifyListeners();
+  }
+
   Product? getProductById(String id) {
     try {
       return _allProducts.firstWhere((p) => p.id == id);
