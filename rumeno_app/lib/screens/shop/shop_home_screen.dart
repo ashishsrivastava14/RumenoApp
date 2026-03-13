@@ -111,16 +111,6 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                           'Search...',
                           style: TextStyle(color: RumenoTheme.textGrey, fontSize: 16),
                         ),
-                        const Spacer(),
-                        Container(
-                          margin: const EdgeInsets.only(right: 6),
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: RumenoTheme.primaryGreen.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(Icons.mic, color: RumenoTheme.primaryGreen, size: 22),
-                        ),
                       ],
                     ),
                   ),
