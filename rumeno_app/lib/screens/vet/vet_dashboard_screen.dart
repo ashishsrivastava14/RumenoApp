@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 import '../../mock/mock_users.dart';
 import '../../widgets/common/stat_card.dart';
 import '../../widgets/common/section_header.dart';
+import '../../widgets/common/marketplace_button.dart';
 import 'package:intl/intl.dart';
 
 class VetDashboardScreen extends StatelessWidget {
@@ -21,6 +23,11 @@ class VetDashboardScreen extends StatelessWidget {
             expandedHeight: 140,
             pinned: true,
             automaticallyImplyLeading: false,
+            actions: const [
+              FarmButton(),
+              MarketplaceButton(),
+              SizedBox(width: 8),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(

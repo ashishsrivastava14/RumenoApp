@@ -5,6 +5,7 @@ import '../../config/theme.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/common/marketplace_button.dart';
 
 class ShopHomeScreen extends StatefulWidget {
   const ShopHomeScreen({super.key});
@@ -56,6 +57,8 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                   ),
                 ),
                 const Spacer(),
+                const VeterinarianButton(),
+                const FarmButton(),
                 // Cart with badge
                 _CartIconWithBadge(
                   count: ecommerce.cartItemCount,
