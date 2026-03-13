@@ -151,6 +151,15 @@ class OrderDetailScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(item.productName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                                    if (item.productDescription.isNotEmpty) ...[                                     
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        item.productDescription,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(color: RumenoTheme.textGrey, fontSize: 12),
+                                      ),
+                                    ],
                                     const SizedBox(height: 4),
                                     Row(
                                       children: [

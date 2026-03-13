@@ -241,6 +241,7 @@ class EcommerceProvider extends ChangeNotifier {
           .map((c) => OrderItem(
                 productId: c.product.id,
                 productName: c.product.name,
+                productDescription: c.product.description,
                 productImage: c.product.imageUrl,
                 price: c.product.price,
                 quantity: c.quantity,

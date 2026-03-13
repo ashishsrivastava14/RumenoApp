@@ -133,6 +133,13 @@ class _CartItemCard extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                   ),
                   const SizedBox(height: 3),
+                  Text(
+                    product.description,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: RumenoTheme.textGrey, fontSize: 12),
+                  ),
+                  const SizedBox(height: 3),
                   Text(product.unit, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 12)),
                   const SizedBox(height: 8),
                   Row(

@@ -544,6 +544,13 @@ class _FeaturedProductCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                       ),
+                      const SizedBox(height: 3),
+                      Text(
+                        product.description,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: RumenoTheme.textGrey, fontSize: 11),
+                      ),
                       const SizedBox(height: 4),
                       // Star rating visual
                       Row(
@@ -701,6 +708,13 @@ class _ProductGridCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      product.description,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: RumenoTheme.textGrey, fontSize: 11),
                     ),
                     const SizedBox(height: 2),
                     Text(product.unit, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 11)),

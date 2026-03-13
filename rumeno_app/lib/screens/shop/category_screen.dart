@@ -259,6 +259,13 @@ class _CategoryProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                     ),
+                    const SizedBox(height: 2),
+                    Text(
+                      product.description,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: RumenoTheme.textGrey, fontSize: 11),
+                    ),
                     const SizedBox(height: 3),
                     Row(
                       children: List.generate(5, (i) => Icon(

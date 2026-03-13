@@ -599,6 +599,7 @@ class Order {
 class OrderItem {
   final String productId;
   final String productName;
+  final String productDescription;
   final String productImage;
   final double price;
   final int quantity;
@@ -607,6 +608,7 @@ class OrderItem {
   const OrderItem({
     required this.productId,
     required this.productName,
+    this.productDescription = '',
     required this.productImage,
     required this.price,
     required this.quantity,
