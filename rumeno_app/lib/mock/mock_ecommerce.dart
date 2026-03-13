@@ -541,6 +541,7 @@ final List<Order> mockOrders = [
       OrderItem(
         productId: 'P001',
         productName: 'Rumeno Premium Cattle Feed',
+        productDescription: 'High-protein balanced cattle feed enriched with essential vitamins and minerals. Ideal for dairy cows and buffaloes for improved milk yield.',
         productImage: 'assets/images/products/product-1.png',
         price: 850,
         quantity: 2,
@@ -549,6 +550,7 @@ final List<Order> mockOrders = [
       OrderItem(
         productId: 'P002',
         productName: 'Rumeno Mineral Mixture',
+        productDescription: 'Complete mineral supplement with calcium, phosphorus, and trace minerals. Prevents deficiency diseases and improves reproductive health.',
         productImage: 'assets/images/products/product-2.png',
         price: 450,
         quantity: 1,
@@ -577,6 +579,7 @@ final List<Order> mockOrders = [
       OrderItem(
         productId: 'P004',
         productName: 'Rumeno Milking Machine (Single Bucket)',
+        productDescription: 'Portable single-bucket milking machine with vacuum pump. Suitable for small dairy farms with up to 10 animals.',
         productImage: 'assets/images/products/equipment-1.png',
         price: 18500,
         quantity: 1,
@@ -602,6 +605,7 @@ final List<Order> mockOrders = [
       OrderItem(
         productId: 'P007',
         productName: 'VetCare Calcium Gel',
+        productDescription: 'Fast-acting oral calcium gel for prevention and treatment of milk fever in dairy cows. Easy to administer.',
         productImage: 'assets/images/products/Medicine-1.png',
         price: 550,
         quantity: 3,
@@ -610,6 +614,7 @@ final List<Order> mockOrders = [
       OrderItem(
         productId: 'P003',
         productName: 'Rumeno Dewormer Plus',
+        productDescription: 'Broad-spectrum deworming medicine effective against roundworms, tapeworms, and flukes. Single dose treatment for cattle and buffaloes.',
         productImage: 'assets/images/products/Medicine-1.png',
         price: 320,
         quantity: 2,
@@ -632,6 +637,7 @@ final List<Order> mockOrders = [
       OrderItem(
         productId: 'P010',
         productName: 'FarmFresh TMR Mix',
+        productDescription: 'Total Mixed Ration for dairy cattle with balanced nutrition. Contains maize, soybean, wheat bran, and vitamins.',
         productImage: 'assets/images/products/product-6.png',
         price: 950,
         quantity: 5,

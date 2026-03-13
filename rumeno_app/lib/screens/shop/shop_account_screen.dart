@@ -356,7 +356,7 @@ class ShopAccountScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                             onTap: () {
                               Navigator.pop(ctx);
-                              context.go('/shop/product/${product.id}');
+                              context.push('/shop/product/${product.id}');
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(12),

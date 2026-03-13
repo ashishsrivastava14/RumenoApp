@@ -244,7 +244,7 @@ class _SearchResultCard extends StatelessWidget {
       elevation: 2,
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
-        onTap: () => context.go('/shop/product/${product.id}'),
+        onTap: () => context.push('/shop/product/${product.id}'),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
@@ -298,6 +298,13 @@ class _SearchResultCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      product.description,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: RumenoTheme.textGrey, fontSize: 12),
                     ),
                     const SizedBox(height: 3),
                     Text('${product.vendorName} · ${product.unit}', style: TextStyle(color: RumenoTheme.textGrey, fontSize: 12)),

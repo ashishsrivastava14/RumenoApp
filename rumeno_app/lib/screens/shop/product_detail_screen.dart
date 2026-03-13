@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../config/theme.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
@@ -43,7 +45,13 @@ class ProductDetailScreen extends StatelessWidget {
             pinned: true,
             backgroundColor: Colors.white,
             leading: GestureDetector(
-              onTap: () => context.pop(),
+              onTap: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/shop');
+                }
+              },
               child: Container(
                 margin: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -94,9 +102,10 @@ class ProductDetailScreen extends StatelessWidget {
               // Share button
               GestureDetector(
                 onTap: () {
+                  Clipboard.setData(ClipboardData(text: 'Check out ${product.name} on Rumeno Shop! https://rumeno.in/shop/product/${product.id}'));
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Share link copied!'),
+                      content: Text('Share link copied to clipboard!'),
                       duration: Duration(seconds: 1),
                       behavior: SnackBarBehavior.floating,
                     ),
@@ -359,13 +368,20 @@ class ProductDetailScreen extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Video will open in YouTube app'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
+                        onPressed: () async {
+                          final url = Uri.parse(product.youtubeVideoUrl!);
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                          } else {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Could not open video'),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            }
+                          }
                         },
                         icon: const Icon(Icons.play_circle_filled_rounded, color: Colors.red, size: 28),
                         label: const Text('Watch Video', style: TextStyle(fontSize: 15)),
