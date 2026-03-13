@@ -18,9 +18,15 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: Text('Cart (${ecommerce.cartItemCount} items)'),
+        title: Row(
+          children: [
+            const Icon(Icons.shopping_cart_rounded, size: 22),
+            const SizedBox(width: 8),
+            Text('Cart (${ecommerce.cartItemCount})'),
+          ],
+        ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => context.go('/shop'),
         ),
       ),
@@ -29,15 +35,27 @@ class CartScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.shopping_cart_outlined, size: 80, color: RumenoTheme.textLight),
-                  const SizedBox(height: 16),
-                  Text('Your cart is empty', style: Theme.of(context).textTheme.titleMedium),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: RumenoTheme.primaryGreen.withValues(alpha: 0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.shopping_cart_outlined, size: 80, color: RumenoTheme.textLight),
+                  ),
+                  const SizedBox(height: 20),
+                  Text('Cart is empty', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 20)),
                   const SizedBox(height: 8),
-                  Text('Add products to get started', style: TextStyle(color: RumenoTheme.textGrey)),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () => context.go('/shop'),
-                    child: const Text('Start Shopping'),
+                  Text('Add products to get started', style: TextStyle(color: RumenoTheme.textGrey, fontSize: 15)),
+                  const SizedBox(height: 28),
+                  SizedBox(
+                    width: 220,
+                    height: 52,
+                    child: ElevatedButton.icon(
+                      onPressed: () => context.go('/shop'),
+                      icon: const Icon(Icons.storefront_rounded, size: 22),
+                      label: const Text('Start Shopping', style: TextStyle(fontSize: 16)),
+                    ),
                   ),
                 ],
               ),
@@ -60,13 +78,13 @@ class CartScreen extends StatelessWidget {
                 _PriceSummary(),
               ],
             ),
-      bottomNavigationBar: cartItems.isEmpty ? ShopBottomBar(currentIndex: 2) : _CheckoutButton(),
+      bottomNavigationBar: cartItems.isEmpty ? const ShopBottomBar(currentIndex: 2) : _CheckoutButton(),
     );
   }
 }
 
 class _CartItemCard extends StatelessWidget {
-  final dynamic item;
+  final CartItem item;
   const _CartItemCard({required this.item});
 
   @override
@@ -75,26 +93,31 @@ class _CartItemCard extends StatelessWidget {
     final product = item.product;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            // Product image
-            Container(
-              width: 70,
-              height: 70,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  product.imageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Icon(_getCategoryIcon(product.category), size: 32, color: Colors.grey.shade400),
+            // Product image - larger
+            GestureDetector(
+              onTap: () => context.go('/shop/product/${product.id}'),
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    product.imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Icon(_getCategoryIcon(product.category), size: 36, color: Colors.grey.shade400),
+                  ),
                 ),
               ),
             ),
@@ -107,22 +130,23 @@ class _CartItemCard extends StatelessWidget {
                     product.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                   ),
-                  const SizedBox(height: 2),
-                  Text(product.unit, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 11)),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 3),
+                  Text(product.unit, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 12)),
+                  const SizedBox(height: 8),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         '₹${product.price.toStringAsFixed(0)}',
-                        style: TextStyle(color: RumenoTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 15),
+                        style: TextStyle(color: RumenoTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 17),
                       ),
-                      if (product.mrp != null && product.mrp > product.price) ...[
-                        const SizedBox(width: 4),
+                      if (product.mrp != null && product.mrp! > product.price) ...[
+                        const SizedBox(width: 6),
                         Text(
-                          '₹${product.mrp.toStringAsFixed(0)}',
-                          style: TextStyle(color: RumenoTheme.textLight, fontSize: 11, decoration: TextDecoration.lineThrough),
+                          '₹${product.mrp!.toStringAsFixed(0)}',
+                          style: TextStyle(color: RumenoTheme.textLight, fontSize: 12, decoration: TextDecoration.lineThrough),
                         ),
                       ],
                     ],
@@ -132,36 +156,67 @@ class _CartItemCard extends StatelessWidget {
             ),
             Column(
               children: [
-                // Remove button
-                IconButton(
-                  icon: Icon(Icons.delete_outline, color: RumenoTheme.errorRed, size: 20),
-                  onPressed: () => ecommerce.removeFromCart(product.id),
+                // Remove button - larger touch target
+                GestureDetector(
+                  onTap: () {
+                    ecommerce.removeFromCart(product.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('${product.name} removed'),
+                        duration: const Duration(seconds: 1),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: RumenoTheme.errorRed.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.delete_rounded, color: RumenoTheme.errorRed, size: 20),
+                  ),
                 ),
-                // Quantity controls
+                const SizedBox(height: 10),
+                // Quantity controls - LARGE
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: RumenoTheme.primaryGreen.withValues(alpha: 0.3), width: 1.5),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      InkWell(
+                      GestureDetector(
                         onTap: () => ecommerce.updateCartQuantity(product.id, item.quantity - 1),
-                        child: Padding(
-                          padding: const EdgeInsets.all(6),
-                          child: Icon(Icons.remove, size: 16, color: RumenoTheme.textGrey),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: RumenoTheme.primaryGreen.withValues(alpha: 0.1),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(8),
+                              bottomLeft: Radius.circular(8),
+                            ),
+                          ),
+                          child: Icon(Icons.remove_rounded, size: 20, color: RumenoTheme.primaryGreen),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        child: Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       ),
-                      InkWell(
+                      GestureDetector(
                         onTap: () => ecommerce.updateCartQuantity(product.id, item.quantity + 1),
-                        child: Padding(
-                          padding: const EdgeInsets.all(6),
-                          child: Icon(Icons.add, size: 16, color: RumenoTheme.primaryGreen),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: RumenoTheme.primaryGreen.withValues(alpha: 0.1),
+                            borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(8),
+                              bottomRight: Radius.circular(8),
+                            ),
+                          ),
+                          child: Icon(Icons.add_rounded, size: 20, color: RumenoTheme.primaryGreen),
                         ),
                       ),
                     ],
@@ -186,31 +241,38 @@ class _CouponSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: coupon != null
           ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: RumenoTheme.successGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: RumenoTheme.successGreen.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.check_circle, color: RumenoTheme.successGreen, size: 20),
-                  const SizedBox(width: 8),
+                  Icon(Icons.check_circle_rounded, color: RumenoTheme.successGreen, size: 24),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(coupon.code, style: TextStyle(fontWeight: FontWeight.bold, color: RumenoTheme.successGreen, fontSize: 13)),
+                        Text(coupon.code, style: TextStyle(fontWeight: FontWeight.bold, color: RumenoTheme.successGreen, fontSize: 14)),
                         Text(
                           'You save ₹${ecommerce.cartDiscount.toStringAsFixed(0)}',
-                          style: TextStyle(color: RumenoTheme.successGreen, fontSize: 11),
+                          style: TextStyle(color: RumenoTheme.successGreen, fontSize: 12),
                         ),
                       ],
                     ),
                   ),
-                  TextButton(
-                    onPressed: () => ecommerce.removeCoupon(),
-                    child: Text('Remove', style: TextStyle(color: RumenoTheme.errorRed, fontSize: 12)),
+                  GestureDetector(
+                    onTap: () => ecommerce.removeCoupon(),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: RumenoTheme.errorRed.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text('Remove', style: TextStyle(color: RumenoTheme.errorRed, fontSize: 13, fontWeight: FontWeight.w600)),
+                    ),
                   ),
                 ],
               ),
@@ -218,19 +280,19 @@ class _CouponSection extends StatelessWidget {
           : GestureDetector(
               onTap: () => _showCouponDialog(context),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: RumenoTheme.primaryGreen.withValues(alpha: 0.3), width: 1.5),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.local_offer_outlined, color: RumenoTheme.primaryGreen),
-                    const SizedBox(width: 8),
-                    const Text('Apply Coupon', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+                    Icon(Icons.local_offer_rounded, color: RumenoTheme.primaryGreen, size: 24),
+                    const SizedBox(width: 10),
+                    const Text('Apply Coupon', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                     const Spacer(),
-                    Icon(Icons.chevron_right, color: RumenoTheme.textGrey),
+                    Icon(Icons.chevron_right_rounded, color: RumenoTheme.primaryGreen, size: 26),
                   ],
                 ),
               ),
@@ -243,53 +305,84 @@ class _CouponSection extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) {
         return Padding(
           padding: EdgeInsets.only(
             left: 20,
             right: 20,
-            top: 20,
+            top: 24,
             bottom: MediaQuery.of(context).viewInsets.bottom + 20,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Apply Coupon', style: Theme.of(context).textTheme.titleLarge),
+              Row(
+                children: [
+                  const Icon(Icons.local_offer_rounded, color: RumenoTheme.primaryGreen, size: 26),
+                  const SizedBox(width: 8),
+                  Text('Apply Coupon', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22)),
+                ],
+              ),
               const SizedBox(height: 16),
               TextField(
                 controller: controller,
                 textCapitalization: TextCapitalization.characters,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 decoration: const InputDecoration(
-                  hintText: 'Enter coupon code',
-                  prefixIcon: Icon(Icons.local_offer_outlined),
+                  hintText: 'Coupon code here...',
+                  prefixIcon: Icon(Icons.local_offer_outlined, size: 24),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                height: 50,
+                child: ElevatedButton.icon(
                   onPressed: () {
                     final error = context.read<EcommerceProvider>().applyCoupon(controller.text);
                     Navigator.pop(context);
                     if (error != null) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(error), behavior: SnackBarBehavior.floating),
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(child: Text(error)),
+                            ],
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: RumenoTheme.errorRed,
+                        ),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Coupon applied!'), behavior: SnackBarBehavior.floating),
+                        const SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(Icons.check_circle, color: Colors.white, size: 20),
+                              SizedBox(width: 8),
+                              Text('Coupon applied!'),
+                            ],
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: RumenoTheme.successGreen,
+                        ),
                       );
                     }
                   },
-                  child: const Text('Apply'),
+                  icon: const Icon(Icons.check_rounded),
+                  label: const Text('Apply', style: TextStyle(fontSize: 16)),
                 ),
               ),
-              const SizedBox(height: 12),
-              Text('Available Coupons:', style: TextStyle(fontWeight: FontWeight.w600, color: RumenoTheme.textGrey, fontSize: 13)),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
+              Text('Available Coupons:', style: TextStyle(fontWeight: FontWeight.w600, color: RumenoTheme.textGrey, fontSize: 14)),
+              const SizedBox(height: 10),
               ..._availableCoupons(context),
+              const SizedBox(height: 8),
             ],
           ),
         );
@@ -299,7 +392,7 @@ class _CouponSection extends StatelessWidget {
 
   List<Widget> _availableCoupons(BuildContext context) {
     return [
-      _couponTile(context, 'WELCOME20', '20% off on first order (max ₹200)', 'Min order: ₹500'),
+      _couponTile(context, 'WELCOME20', '20% off (max ₹200)', 'Min order: ₹500'),
       _couponTile(context, 'FLAT100', '₹100 off', 'Min order: ₹999'),
       _couponTile(context, 'FEED15', '15% off on feed (max ₹500)', 'Min order: ₹1500'),
     ];
@@ -307,35 +400,52 @@ class _CouponSection extends StatelessWidget {
 
   Widget _couponTile(BuildContext context, String code, String desc, String condition) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(8),
+        color: RumenoTheme.primaryGreen.withValues(alpha: 0.05),
+        border: Border.all(color: RumenoTheme.primaryGreen.withValues(alpha: 0.2)),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: RumenoTheme.primaryGreen.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.local_offer_rounded, color: RumenoTheme.primaryGreen, size: 20),
+          ),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(code, style: TextStyle(fontWeight: FontWeight.bold, color: RumenoTheme.primaryGreen, fontSize: 13)),
-                Text(desc, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 11)),
-                Text(condition, style: TextStyle(color: RumenoTheme.textLight, fontSize: 10)),
+                Text(code, style: TextStyle(fontWeight: FontWeight.bold, color: RumenoTheme.primaryGreen, fontSize: 14)),
+                Text(desc, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 12)),
+                Text(condition, style: TextStyle(color: RumenoTheme.textLight, fontSize: 11)),
               ],
             ),
           ),
-          TextButton(
-            onPressed: () {
-              final error = context.read<EcommerceProvider>().applyCoupon(code);
-              Navigator.pop(context);
-              if (error != null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(error), behavior: SnackBarBehavior.floating),
-                );
-              }
-            },
-            child: const Text('APPLY', style: TextStyle(fontSize: 12)),
+          SizedBox(
+            height: 36,
+            child: ElevatedButton(
+              onPressed: () {
+                final error = context.read<EcommerceProvider>().applyCoupon(code);
+                Navigator.pop(context);
+                if (error != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(error), behavior: SnackBarBehavior.floating, backgroundColor: RumenoTheme.errorRed),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+              ),
+              child: const Text('APPLY'),
+            ),
           ),
         ],
       ),
@@ -356,22 +466,26 @@ class _PriceSummary extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _priceRow('Subtotal', '₹${ecommerce.cartSubtotal.toStringAsFixed(0)}'),
+          _priceRow(context, Icons.receipt_rounded, 'Subtotal', '₹${ecommerce.cartSubtotal.toStringAsFixed(0)}'),
           if (ecommerce.cartDiscount > 0)
-            _priceRow('Discount', '-₹${ecommerce.cartDiscount.toStringAsFixed(0)}', color: RumenoTheme.successGreen),
+            _priceRow(context, Icons.local_offer_rounded, 'Discount', '-₹${ecommerce.cartDiscount.toStringAsFixed(0)}', color: RumenoTheme.successGreen),
           _priceRow(
+            context,
+            Icons.local_shipping_rounded,
             'Delivery',
             ecommerce.deliveryCharge == 0 ? 'FREE' : '₹${ecommerce.deliveryCharge.toStringAsFixed(0)}',
             color: ecommerce.deliveryCharge == 0 ? RumenoTheme.successGreen : null,
           ),
-          const Divider(height: 16),
+          const Divider(height: 20),
           Row(
             children: [
-              Text('Total', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              Icon(Icons.payments_rounded, color: RumenoTheme.primaryGreen, size: 22),
+              const SizedBox(width: 6),
+              Text('Total', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, fontSize: 16)),
               const Spacer(),
               Text(
                 '₹${ecommerce.cartTotal.toStringAsFixed(0)}',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: RumenoTheme.primaryGreen),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: RumenoTheme.primaryGreen),
               ),
             ],
           ),
@@ -380,14 +494,16 @@ class _PriceSummary extends StatelessWidget {
     );
   }
 
-  Widget _priceRow(String label, String value, {Color? color}) {
+  Widget _priceRow(BuildContext context, IconData icon, String label, String value, {Color? color}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Text(label, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 13)),
+          Icon(icon, size: 18, color: color ?? RumenoTheme.textGrey),
+          const SizedBox(width: 6),
+          Text(label, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 14)),
           const Spacer(),
-          Text(value, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13, color: color)),
+          Text(value, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: color)),
         ],
       ),
     );
@@ -401,28 +517,36 @@ class _CheckoutButton extends StatelessWidget {
     final ecommerce = context.watch<EcommerceProvider>();
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8, offset: const Offset(0, -2))],
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: const Offset(0, -3))],
       ),
       child: SafeArea(
         child: SizedBox(
           width: double.infinity,
-          child: ElevatedButton(
+          height: 54,
+          child: ElevatedButton.icon(
             onPressed: () {
               if (!auth.isAuthenticated) {
-                // Redirect to login before checkout
                 context.go('/login');
               } else {
                 context.go('/shop/checkout');
               }
             },
-            style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
-            child: Text(
+            icon: Icon(
+              auth.isAuthenticated ? Icons.shopping_bag_rounded : Icons.login_rounded,
+              size: 24,
+            ),
+            label: Text(
               auth.isAuthenticated
-                  ? 'Proceed to Checkout (₹${ecommerce.cartTotal.toStringAsFixed(0)})'
+                  ? 'Checkout ₹${ecommerce.cartTotal.toStringAsFixed(0)}'
                   : 'Login to Checkout',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: RumenoTheme.primaryGreen,
+              foregroundColor: Colors.white,
             ),
           ),
         ),
@@ -434,14 +558,14 @@ class _CheckoutButton extends StatelessWidget {
 IconData _getCategoryIcon(dynamic category) {
   switch (category) {
     case ProductCategory.animalFeed:
-      return Icons.grass;
+      return Icons.grass_rounded;
     case ProductCategory.supplements:
-      return Icons.science;
+      return Icons.science_rounded;
     case ProductCategory.veterinaryMedicines:
-      return Icons.medication;
+      return Icons.medication_rounded;
     case ProductCategory.farmEquipment:
-      return Icons.construction;
+      return Icons.construction_rounded;
     default:
-      return Icons.shopping_bag;
+      return Icons.shopping_bag_rounded;
   }
 }

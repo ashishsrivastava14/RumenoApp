@@ -14,26 +14,17 @@ class ShopHomeScreen extends StatefulWidget {
 }
 
 class _ShopHomeScreenState extends State<ShopHomeScreen> {
-  final _searchController = TextEditingController();
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final ecommerce = context.watch<EcommerceProvider>();
-    final auth = context.watch<AuthProvider>();
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       body: CustomScrollView(
         slivers: [
-          // ─── App Bar with search, Farm/Vet icons ───
+          // ─── Simplified App Bar ───
           SliverAppBar(
-            expandedHeight: 130,
+            expandedHeight: 120,
             floating: true,
             pinned: true,
             backgroundColor: RumenoTheme.primaryGreen,
@@ -42,14 +33,22 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
               children: [
                 Image.asset(
                   'assets/images/Rumeno_logo-rb.png',
-                  height: 32,
-                  width: 32,
+                  height: 36,
+                  width: 36,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Icon(Icons.store, color: Colors.white, size: 28),
+                  errorBuilder: (_, __, ___) => Container(
+                    width: 36,
+                    height: 36,
+                    decoration: const BoxDecoration(
+                      color: Colors.white24,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.store, color: Colors.white, size: 24),
+                  ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 const Text(
-                  'Rumeno',
+                  'Rumeno Shop',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -57,60 +56,10 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                   ),
                 ),
                 const Spacer(),
-                // Farm App Icon
-                _HeaderIconButton(
-                  icon: Icons.agriculture,
-                  label: 'Farm',
-                  onTap: () {
-                    if (auth.isAuthenticated) {
-                      context.go('/farmer/dashboard');
-                    } else {
-                      auth.selectRole(UserRole.farmer);
-                      context.go('/login');
-                    }
-                  },
-                ),
-                const SizedBox(width: 4),
-                // Vet Icon
-                _HeaderIconButton(
-                  icon: Icons.medical_services,
-                  label: 'Vet',
-                  onTap: () {
-                    if (auth.isAuthenticated) {
-                      context.go('/vet/dashboard');
-                    } else {
-                      auth.selectRole(UserRole.vet);
-                      context.go('/login');
-                    }
-                  },
-                ),
-                const SizedBox(width: 4),
-                // Cart Icon
-                Stack(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
-                      onPressed: () => context.go('/shop/cart'),
-                    ),
-                    if (ecommerce.cartItemCount > 0)
-                      Positioned(
-                        right: 4,
-                        top: 4,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: RumenoTheme.errorRed,
-                            shape: BoxShape.circle,
-                          ),
-                          constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
-                          child: Text(
-                            '${ecommerce.cartItemCount}',
-                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
+                // Cart with badge
+                _CartIconWithBadge(
+                  count: ecommerce.cartItemCount,
+                  onTap: () => context.go('/shop/cart'),
                 ),
               ],
             ),
@@ -135,19 +84,32 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                 child: GestureDetector(
                   onTap: () => context.go('/shop/search'),
                   child: Container(
-                    height: 44,
+                    height: 48,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4),
+                      ],
                     ),
                     child: Row(
                       children: [
-                        const SizedBox(width: 12),
-                        Icon(Icons.search, color: RumenoTheme.textGrey, size: 22),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 14),
+                        Icon(Icons.search, color: RumenoTheme.textGrey, size: 26),
+                        const SizedBox(width: 10),
                         Text(
-                          'Search feed, medicines, equipment...',
-                          style: TextStyle(color: RumenoTheme.textGrey, fontSize: 14),
+                          'Search...',
+                          style: TextStyle(color: RumenoTheme.textGrey, fontSize: 16),
+                        ),
+                        const Spacer(),
+                        Container(
+                          margin: const EdgeInsets.only(right: 6),
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: RumenoTheme.primaryGreen.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.mic, color: RumenoTheme.primaryGreen, size: 22),
                         ),
                       ],
                     ),
@@ -157,52 +119,67 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
             ),
           ),
 
-          // ─── Categories ───
+          // ─── Categories - Large Grid ───
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Shop by Category',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 12),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _CategoryChip(
-                        icon: Icons.grass,
+                      Icon(Icons.category_rounded, color: RumenoTheme.primaryGreen, size: 24),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Categories',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.75,
+                    children: [
+                      _BigCategoryTile(
+                        icon: Icons.grass_rounded,
                         label: 'Feed',
                         color: const Color(0xFF4CAF50),
+                        bgColor: const Color(0xFFE8F5E9),
                         onTap: () {
                           ecommerce.setCategory(ProductCategory.animalFeed);
                           context.go('/shop/category/animalFeed');
                         },
                       ),
-                      _CategoryChip(
-                        icon: Icons.science,
-                        label: 'Supplements',
+                      _BigCategoryTile(
+                        icon: Icons.science_rounded,
+                        label: 'Tonic',
                         color: const Color(0xFFFF9800),
+                        bgColor: const Color(0xFFFFF3E0),
                         onTap: () {
                           ecommerce.setCategory(ProductCategory.supplements);
                           context.go('/shop/category/supplements');
                         },
                       ),
-                      _CategoryChip(
-                        icon: Icons.medication,
-                        label: 'Medicines',
+                      _BigCategoryTile(
+                        icon: Icons.medication_rounded,
+                        label: 'Medicine',
                         color: const Color(0xFFE53935),
+                        bgColor: const Color(0xFFFFEBEE),
                         onTap: () {
                           ecommerce.setCategory(ProductCategory.veterinaryMedicines);
                           context.go('/shop/category/veterinaryMedicines');
                         },
                       ),
-                      _CategoryChip(
-                        icon: Icons.construction,
-                        label: 'Equipment',
+                      _BigCategoryTile(
+                        icon: Icons.construction_rounded,
+                        label: 'Tools',
                         color: const Color(0xFF2196F3),
+                        bgColor: const Color(0xFFE3F2FD),
                         onTap: () {
                           ecommerce.setCategory(ProductCategory.farmEquipment);
                           context.go('/shop/category/farmEquipment');
@@ -218,24 +195,31 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
           // ─── Promotional Banner ───
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Container(
-                height: 140,
+                height: 150,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(18),
                   gradient: LinearGradient(
                     colors: [
+                      const Color(0xFF2E7D32),
                       RumenoTheme.primaryGreen,
-                      RumenoTheme.accentOlive,
                     ],
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: RumenoTheme.primaryGreen.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Stack(
                   children: [
                     Positioned(
-                      right: -20,
-                      bottom: -20,
-                      child: Icon(Icons.local_offer, size: 120, color: Colors.white.withValues(alpha: 0.15)),
+                      right: -30,
+                      bottom: -30,
+                      child: Icon(Icons.local_shipping_rounded, size: 150, color: Colors.white.withValues(alpha: 0.1)),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(20),
@@ -243,33 +227,48 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
-                            'Free Delivery',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'On orders above ₹999',
-                            style: TextStyle(color: Colors.white70, fontSize: 14),
+                          Row(
+                            children: [
+                              const Icon(Icons.local_shipping_rounded, color: Colors.white, size: 28),
+                              const SizedBox(width: 8),
+                              const Expanded(
+                                child: Text(
+                                  'FREE Delivery',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 8),
+                          const Text(
+                            'On orders above ₹999',
+                            style: TextStyle(color: Colors.white70, fontSize: 15),
+                          ),
+                          const SizedBox(height: 10),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(24),
                             ),
-                            child: Text(
-                              'Use code: WELCOME20',
-                              style: TextStyle(
-                                color: RumenoTheme.primaryGreen,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                              ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.local_offer_rounded, color: RumenoTheme.primaryGreen, size: 18),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Code: WELCOME20',
+                                  style: TextStyle(
+                                    color: RumenoTheme.primaryGreen,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -287,11 +286,14 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Row(
                 children: [
-                  Text('Featured Products', style: Theme.of(context).textTheme.titleLarge),
+                  const Icon(Icons.star_rounded, color: Colors.amber, size: 24),
+                  const SizedBox(width: 6),
+                  Text('Best Products', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20)),
                   const Spacer(),
-                  TextButton(
+                  TextButton.icon(
                     onPressed: () => context.go('/shop/search'),
-                    child: const Text('View All'),
+                    icon: const Text('See All'),
+                    label: const Icon(Icons.arrow_forward_rounded, size: 18),
                   ),
                 ],
               ),
@@ -299,7 +301,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
           ),
           SliverToBoxAdapter(
             child: SizedBox(
-              height: 260,
+              height: 290,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -315,8 +317,14 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
           // ─── All Products Grid ───
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Text('All Products', style: Theme.of(context).textTheme.titleLarge),
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+              child: Row(
+                children: [
+                  const Icon(Icons.grid_view_rounded, color: RumenoTheme.primaryGreen, size: 24),
+                  const SizedBox(width: 6),
+                  Text('All Products', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20)),
+                ],
+              ),
             ),
           ),
           SliverPadding(
@@ -324,7 +332,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.65,
+                childAspectRatio: 0.58,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
               ),
@@ -338,7 +346,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
             ),
           ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 80)),
+          const SliverToBoxAdapter(child: SizedBox(height: 90)),
         ],
       ),
       bottomNavigationBar: _ShopBottomBar(currentIndex: 0),
@@ -346,26 +354,45 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
   }
 }
 
-// ─── Header Icon Button ───
-class _HeaderIconButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
+// ─── Cart Icon with Badge ───
+class _CartIconWithBadge extends StatelessWidget {
+  final int count;
   final VoidCallback onTap;
-
-  const _HeaderIconButton({required this.icon, required this.label, required this.onTap});
+  const _CartIconWithBadge({required this.count, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            Icon(icon, color: Colors.white, size: 20),
-            Text(label, style: const TextStyle(color: Colors.white70, fontSize: 9)),
+            const Icon(Icons.shopping_cart_rounded, color: Colors.white, size: 26),
+            if (count > 0)
+              Positioned(
+                right: -8,
+                top: -8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: RumenoTheme.errorRed,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                  child: Text(
+                    '$count',
+                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -373,33 +400,53 @@ class _HeaderIconButton extends StatelessWidget {
   }
 }
 
-// ─── Category Chip ───
-class _CategoryChip extends StatelessWidget {
+// ─── Big Category Tile ───
+class _BigCategoryTile extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
+  final Color bgColor;
   final VoidCallback onTap;
 
-  const _CategoryChip({required this.icon, required this.label, required this.color, required this.onTap});
+  const _BigCategoryTile({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.bgColor,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
+          boxShadow: [
+            BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 8, offset: const Offset(0, 2)),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 30),
             ),
-            child: Icon(icon, color: color, size: 28),
-          ),
-          const SizedBox(height: 6),
-          Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500)),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: color),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -415,21 +462,22 @@ class _FeaturedProductCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.go('/shop/product/${product.id}'),
       child: Container(
-        width: 170,
-        margin: const EdgeInsets.symmetric(horizontal: 4),
+        width: 185,
+        margin: const EdgeInsets.symmetric(horizontal: 5),
         child: Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          elevation: 3,
+          shadowColor: Colors.black26,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Image area
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                 child: Container(
-                  height: 120,
+                  height: 140,
                   width: double.infinity,
-                  color: Colors.grey.shade100,
+                  color: Colors.grey.shade50,
                   child: Stack(
                     children: [
                       Positioned.fill(
@@ -437,36 +485,43 @@ class _FeaturedProductCard extends StatelessWidget {
                           product.imageUrl,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Center(
-                            child: Icon(_getCategoryIcon(product.category), size: 50, color: Colors.grey.shade300),
+                            child: Icon(_getCategoryIcon(product.category), size: 60, color: Colors.grey.shade300),
                           ),
                         ),
                       ),
                       if (product.isRumenoOwned)
                         Positioned(
-                          top: 6,
-                          left: 6,
+                          top: 8,
+                          left: 8,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
                               color: RumenoTheme.primaryGreen,
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(6),
                             ),
-                            child: const Text('Rumeno', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.verified, color: Colors.white, size: 12),
+                                SizedBox(width: 3),
+                                Text('Rumeno', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
                           ),
                         ),
                       if (product.discountPercent > 0)
                         Positioned(
-                          top: 6,
-                          right: 6,
+                          top: 8,
+                          right: 8,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               color: RumenoTheme.errorRed,
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               '${product.discountPercent.toStringAsFixed(0)}% OFF',
-                              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -474,59 +529,63 @@ class _FeaturedProductCard extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      product.name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(fontSize: 13),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(product.vendorName, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 11)),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Text(
-                          '₹${product.price.toStringAsFixed(0)}',
-                          style: TextStyle(
-                            color: RumenoTheme.primaryGreen,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                        if (product.mrp != null && product.mrp! > product.price) ...[
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                      ),
+                      const SizedBox(height: 4),
+                      // Star rating visual
+                      Row(
+                        children: [
+                          ...List.generate(5, (i) => Icon(
+                            i < product.rating.floor() ? Icons.star_rounded :
+                            (i < product.rating ? Icons.star_half_rounded : Icons.star_outline_rounded),
+                            color: Colors.amber,
+                            size: 16,
+                          )),
                           const SizedBox(width: 4),
+                          Text('(${product.reviewCount})', style: TextStyle(fontSize: 10, color: RumenoTheme.textGrey)),
+                        ],
+                      ),
+                      const Spacer(),
+                      // Price
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
                           Text(
-                            '₹${product.mrp!.toStringAsFixed(0)}',
+                            '₹${product.price.toStringAsFixed(0)}',
                             style: TextStyle(
-                              color: RumenoTheme.textLight,
-                              fontSize: 11,
-                              decoration: TextDecoration.lineThrough,
+                              color: RumenoTheme.primaryGreen,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
                             ),
                           ),
+                          if (product.mrp != null && product.mrp! > product.price) ...[
+                            const SizedBox(width: 4),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 2),
+                              child: Text(
+                                '₹${product.mrp!.toStringAsFixed(0)}',
+                                style: TextStyle(
+                                  color: RumenoTheme.textLight,
+                                  fontSize: 12,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(Icons.star, color: Colors.amber, size: 14),
-                        const SizedBox(width: 2),
-                        Text(
-                          '${product.rating}',
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
-                        ),
-                        Text(
-                          ' (${product.reviewCount})',
-                          style: TextStyle(fontSize: 10, color: RumenoTheme.textGrey),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -549,18 +608,19 @@ class _ProductGridCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.go('/shop/product/${product.id}'),
       child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        elevation: 3,
+        shadowColor: Colors.black26,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
               child: Container(
-                height: 110,
+                height: 120,
                 width: double.infinity,
-                color: Colors.grey.shade100,
+                color: Colors.grey.shade50,
                 child: Stack(
                   children: [
                     Positioned.fill(
@@ -568,7 +628,7 @@ class _ProductGridCard extends StatelessWidget {
                         product.imageUrl,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Center(
-                          child: Icon(_getCategoryIcon(product.category), size: 44, color: Colors.grey.shade300),
+                          child: Icon(_getCategoryIcon(product.category), size: 50, color: Colors.grey.shade300),
                         ),
                       ),
                     ),
@@ -580,20 +640,34 @@ class _ProductGridCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: RumenoTheme.primaryGreen,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text('Rumeno', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.verified, color: Colors.white, size: 10),
+                              SizedBox(width: 2),
+                              Text('Rumeno', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
                         ),
                       ),
                     if (!product.inStock)
                       Positioned.fill(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.4),
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                            color: Colors.black.withValues(alpha: 0.5),
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                           ),
                           alignment: Alignment.center,
-                          child: const Text('OUT OF STOCK', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade700,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text('OUT OF STOCK', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                          ),
                         ),
                       ),
                     if (product.discountPercent > 0 && product.inStock)
@@ -601,11 +675,11 @@ class _ProductGridCard extends StatelessWidget {
                         top: 6,
                         right: 6,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                          decoration: BoxDecoration(color: RumenoTheme.errorRed, borderRadius: BorderRadius.circular(4)),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(color: RumenoTheme.errorRed, borderRadius: BorderRadius.circular(6)),
                           child: Text(
                             '${product.discountPercent.toStringAsFixed(0)}% OFF',
-                            style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -615,7 +689,7 @@ class _ProductGridCard extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 8, 10, 6),
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -623,51 +697,71 @@ class _ProductGridCard extends StatelessWidget {
                       product.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(fontSize: 12),
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                     ),
                     const SizedBox(height: 2),
-                    Text(product.unit, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 10)),
+                    Text(product.unit, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 11)),
                     const Spacer(),
+                    // Price row
                     Row(
                       children: [
                         Text(
                           '₹${product.price.toStringAsFixed(0)}',
-                          style: TextStyle(color: RumenoTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TextStyle(color: RumenoTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         if (product.mrp != null && product.mrp! > product.price) ...[
                           const SizedBox(width: 4),
                           Text(
                             '₹${product.mrp!.toStringAsFixed(0)}',
-                            style: TextStyle(color: RumenoTheme.textLight, fontSize: 10, decoration: TextDecoration.lineThrough),
+                            style: TextStyle(color: RumenoTheme.textLight, fontSize: 11, decoration: TextDecoration.lineThrough),
                           ),
                         ],
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
+                    // Rating + Add button
                     Row(
                       children: [
-                        Icon(Icons.star, color: Colors.amber, size: 13),
-                        Text(' ${product.rating}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500)),
+                        ...List.generate(5, (i) => Icon(
+                          i < product.rating.floor() ? Icons.star_rounded :
+                          (i < product.rating ? Icons.star_half_rounded : Icons.star_outline_rounded),
+                          color: Colors.amber,
+                          size: 14,
+                        )),
                         const Spacer(),
                         if (product.inStock)
-                          SizedBox(
-                            height: 28,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                ecommerce.addToCart(product);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('${product.name} added to cart'),
-                                    duration: const Duration(seconds: 1),
-                                    behavior: SnackBarBehavior.floating,
+                          GestureDetector(
+                            onTap: () {
+                              ecommerce.addToCart(product);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                                      const SizedBox(width: 8),
+                                      Expanded(child: Text('${product.name} added!')),
+                                    ],
                                   ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                textStyle: const TextStyle(fontSize: 11),
+                                  duration: const Duration(seconds: 1),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: RumenoTheme.successGreen,
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: RumenoTheme.primaryGreen,
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Text('Add'),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.add_shopping_cart_rounded, color: Colors.white, size: 16),
+                                  SizedBox(width: 4),
+                                  Text('Add', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                                ],
+                              ),
                             ),
                           ),
                       ],
@@ -701,43 +795,150 @@ class _ShopBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final ecommerce = context.watch<EcommerceProvider>();
 
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: (idx) {
-        switch (idx) {
-          case 0:
-            context.go('/shop');
-            break;
-          case 1:
-            context.go('/shop/search');
-            break;
-          case 2:
-            context.go('/shop/cart');
-            break;
-          case 3:
-            if (auth.isAuthenticated) {
-              context.go('/shop/orders');
-            } else {
-              context.go('/login');
-            }
-            break;
-          case 4:
-            if (auth.isAuthenticated) {
-              context.go('/shop/account');
-            } else {
-              context.go('/login');
-            }
-            break;
-        }
-      },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-        BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), activeIcon: Icon(Icons.shopping_cart), label: 'Cart'),
-        BottomNavigationBarItem(icon: Icon(Icons.receipt_long_outlined), activeIcon: Icon(Icons.receipt_long), label: 'Orders'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Account'),
-      ],
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 10, offset: const Offset(0, -2)),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _BottomNavItem(
+                icon: Icons.home_rounded,
+                outlineIcon: Icons.home_outlined,
+                label: 'Home',
+                isSelected: currentIndex == 0,
+                onTap: () => context.go('/shop'),
+              ),
+              _BottomNavItem(
+                icon: Icons.search_rounded,
+                outlineIcon: Icons.search,
+                label: 'Search',
+                isSelected: currentIndex == 1,
+                onTap: () => context.go('/shop/search'),
+              ),
+              _BottomNavItem(
+                icon: Icons.shopping_cart_rounded,
+                outlineIcon: Icons.shopping_cart_outlined,
+                label: 'Cart',
+                isSelected: currentIndex == 2,
+                badge: ecommerce.cartItemCount > 0 ? ecommerce.cartItemCount : null,
+                onTap: () => context.go('/shop/cart'),
+              ),
+              _BottomNavItem(
+                icon: Icons.receipt_long_rounded,
+                outlineIcon: Icons.receipt_long_outlined,
+                label: 'Orders',
+                isSelected: currentIndex == 3,
+                onTap: () {
+                  if (auth.isAuthenticated) {
+                    context.go('/shop/orders');
+                  } else {
+                    context.go('/login');
+                  }
+                },
+              ),
+              _BottomNavItem(
+                icon: Icons.person_rounded,
+                outlineIcon: Icons.person_outline,
+                label: 'Account',
+                isSelected: currentIndex == 4,
+                onTap: () {
+                  if (auth.isAuthenticated) {
+                    context.go('/shop/account');
+                  } else {
+                    context.go('/login');
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BottomNavItem extends StatelessWidget {
+  final IconData icon;
+  final IconData outlineIcon;
+  final String label;
+  final bool isSelected;
+  final int? badge;
+  final VoidCallback onTap;
+
+  const _BottomNavItem({
+    required this.icon,
+    required this.outlineIcon,
+    required this.label,
+    required this.isSelected,
+    this.badge,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? RumenoTheme.primaryGreen.withValues(alpha: 0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  isSelected ? icon : outlineIcon,
+                  color: isSelected ? RumenoTheme.primaryGreen : RumenoTheme.textGrey,
+                  size: 26,
+                ),
+                if (badge != null)
+                  Positioned(
+                    right: -8,
+                    top: -6,
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: RumenoTheme.errorRed,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                      constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                      child: Text(
+                        '$badge',
+                        style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? RumenoTheme.primaryGreen : RumenoTheme.textGrey,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -745,12 +946,12 @@ class _ShopBottomBar extends StatelessWidget {
 IconData _getCategoryIcon(ProductCategory category) {
   switch (category) {
     case ProductCategory.animalFeed:
-      return Icons.grass;
+      return Icons.grass_rounded;
     case ProductCategory.supplements:
-      return Icons.science;
+      return Icons.science_rounded;
     case ProductCategory.veterinaryMedicines:
-      return Icons.medication;
+      return Icons.medication_rounded;
     case ProductCategory.farmEquipment:
-      return Icons.construction;
+      return Icons.construction_rounded;
   }
 }

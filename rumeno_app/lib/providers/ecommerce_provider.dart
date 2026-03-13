@@ -11,6 +11,9 @@ class EcommerceProvider extends ChangeNotifier {
   // Cart
   final List<CartItem> _cartItems = [];
 
+  // Wishlist
+  final Set<String> _wishlistProductIds = {};
+
   // Orders
   List<Order> _orders = [];
 
@@ -283,5 +286,23 @@ class EcommerceProvider extends ChangeNotifier {
 
   List<ProductReview> getReviewsForProduct(String productId) {
     return mockReviews.where((r) => r.productId == productId).toList();
+  }
+
+  // ─── Wishlist ───
+
+  Set<String> get wishlistProductIds => _wishlistProductIds;
+
+  List<Product> get wishlistProducts =>
+      _allProducts.where((p) => _wishlistProductIds.contains(p.id)).toList();
+
+  bool isInWishlist(String productId) => _wishlistProductIds.contains(productId);
+
+  void toggleWishlist(String productId) {
+    if (_wishlistProductIds.contains(productId)) {
+      _wishlistProductIds.remove(productId);
+    } else {
+      _wishlistProductIds.add(productId);
+    }
+    notifyListeners();
   }
 }
