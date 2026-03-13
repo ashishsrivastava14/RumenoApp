@@ -536,7 +536,7 @@ class _CheckoutButton extends StatelessWidget {
           child: ElevatedButton.icon(
             onPressed: () {
               if (!auth.isAuthenticated) {
-                context.go('/login');
+                context.go('/login?redirect=${Uri.encodeComponent('/shop/cart')}');
               } else {
                 context.go('/shop/checkout');
               }

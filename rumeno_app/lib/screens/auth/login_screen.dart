@@ -6,7 +6,8 @@ import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final String? redirectTo;
+  const LoginScreen({super.key, this.redirectTo});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -43,6 +44,20 @@ class _LoginScreenState extends State<LoginScreen> {
         return '🛒';
       case null:
         return '';
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-select farmProducts role when coming from shop
+    if (widget.redirectTo != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final auth = context.read<AuthProvider>();
+        if (auth.selectedRole == null) {
+          auth.selectRole(UserRole.farmProducts);
+        }
+      });
     }
   }
 
@@ -92,7 +107,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87),
-                          onPressed: () => context.go('/role-selection'),
+                          onPressed: () {
+                            if (widget.redirectTo != null) {
+                              context.go(widget.redirectTo!);
+                            } else {
+                              context.go('/role-selection');
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -231,7 +252,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                     height: 50,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        context.go('/otp');
+                                        if (widget.redirectTo != null) {
+                                          context.go('/otp?redirect=${Uri.encodeComponent(widget.redirectTo!)}');
+                                        } else {
+                                          context.go('/otp');
+                                        }
                                       },
                                       child: const Text('Enter OTP', style: TextStyle(fontSize: 16)),
                                     ),

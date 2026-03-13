@@ -83,8 +83,20 @@ GoRouter createRouter(AuthProvider authProvider) {
 
       // Auth flow
       GoRoute(path: '/role-selection', builder: (_, _) => const RoleSelectionScreen()),
-      GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
-      GoRoute(path: '/otp', builder: (_, _) => const OtpScreen()),
+      GoRoute(
+        path: '/login',
+        builder: (_, state) {
+          final redirect = state.uri.queryParameters['redirect'];
+          return LoginScreen(redirectTo: redirect);
+        },
+      ),
+      GoRoute(
+        path: '/otp',
+        builder: (_, state) {
+          final redirect = state.uri.queryParameters['redirect'];
+          return OtpScreen(redirectTo: redirect);
+        },
+      ),
 
       // ─── Shop / Ecommerce ───
       GoRoute(path: '/shop', builder: (_, _) => const ShopHomeScreen()),

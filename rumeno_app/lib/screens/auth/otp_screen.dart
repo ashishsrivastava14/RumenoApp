@@ -7,7 +7,8 @@ import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
 
 class OtpScreen extends StatefulWidget {
-  const OtpScreen({super.key});
+  final String? redirectTo;
+  const OtpScreen({super.key, this.redirectTo});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -57,6 +58,12 @@ class _OtpScreenState extends State<OtpScreen> {
         final role = auth.selectedRole ?? UserRole.farmer;
         auth.login('9876543210', role);
 
+        // If there's a redirect path, navigate back to it
+        if (widget.redirectTo != null) {
+          context.go(widget.redirectTo!);
+          return;
+        }
+
         switch (role) {
           case UserRole.farmer:
             context.go('/farmer/dashboard');
@@ -68,8 +75,7 @@ class _OtpScreenState extends State<OtpScreen> {
             context.go('/admin/dashboard');
             break;
           case UserRole.farmProducts:
-            // TODO: Navigate to farm products screen when created
-            context.go('/farmer/dashboard');
+            context.go('/shop');
             break;
         }
       });
@@ -101,7 +107,13 @@ class _OtpScreenState extends State<OtpScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87),
-          onPressed: () => context.go('/login'),
+          onPressed: () {
+            if (widget.redirectTo != null) {
+              context.go('/login?redirect=${Uri.encodeComponent(widget.redirectTo!)}');
+            } else {
+              context.go('/login');
+            }
+          },
         ),
       ),
       body: SafeArea(

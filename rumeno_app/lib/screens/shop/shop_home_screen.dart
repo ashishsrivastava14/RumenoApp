@@ -864,7 +864,7 @@ class _ShopBottomBar extends StatelessWidget {
                   if (auth.isAuthenticated) {
                     context.go('/shop/orders');
                   } else {
-                    context.go('/login');
+                    context.go('/login?redirect=${Uri.encodeComponent('/shop/orders')}');
                   }
                 },
               ),
@@ -877,7 +877,7 @@ class _ShopBottomBar extends StatelessWidget {
                   if (auth.isAuthenticated) {
                     context.go('/shop/account');
                   } else {
-                    context.go('/login');
+                    context.go('/login?redirect=${Uri.encodeComponent('/shop/account')}');
                   }
                 },
               ),
