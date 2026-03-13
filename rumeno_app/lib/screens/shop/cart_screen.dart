@@ -5,6 +5,7 @@ import '../../config/theme.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/common/marketplace_button.dart';
 import 'shop_home_screen.dart';
 
 class CartScreen extends StatelessWidget {
@@ -29,6 +30,7 @@ class CartScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => context.go('/shop'),
         ),
+        actions: const [VeterinarianButton(), FarmButton()],
       ),
       body: cartItems.isEmpty
           ? Center(

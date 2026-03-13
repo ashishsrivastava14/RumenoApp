@@ -4,6 +4,7 @@ import '../../config/theme.dart';
 import '../../widgets/common/stat_card.dart';
 import '../../widgets/charts/line_chart_widget.dart';
 import '../../widgets/charts/bar_chart_widget.dart';
+import '../../widgets/common/marketplace_button.dart';
 
 class VetEarningsScreen extends StatelessWidget {
   const VetEarningsScreen({super.key});
@@ -12,7 +13,10 @@ class VetEarningsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
-      appBar: AppBar(title: const Text('Earnings')),
+      appBar: AppBar(
+        title: const Text('Earnings'),
+        actions: const [FarmButton(), MarketplaceButton()],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

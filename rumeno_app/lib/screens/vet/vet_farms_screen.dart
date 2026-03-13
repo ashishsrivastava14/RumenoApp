@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../config/theme.dart';
 import '../../mock/mock_farmers.dart';
 import '../../models/models.dart';
+import '../../widgets/common/marketplace_button.dart';
 
 class VetFarmsScreen extends StatefulWidget {
   const VetFarmsScreen({super.key});
@@ -19,7 +20,10 @@ class _VetFarmsScreenState extends State<VetFarmsScreen> {
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
-      appBar: AppBar(title: const Text('Referred Farms')),
+      appBar: AppBar(
+        title: const Text('Referred Farms'),
+        actions: const [FarmButton(), MarketplaceButton()],
+      ),
       body: Column(
         children: [
           Padding(

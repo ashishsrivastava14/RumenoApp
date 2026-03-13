@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
+import '../../widgets/common/marketplace_button.dart';
 import 'shop_home_screen.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -89,6 +90,7 @@ class _SearchScreenState extends State<SearchScreen> {
             context.go('/shop');
           },
         ),
+        actions: const [VeterinarianButton(), FarmButton()],
       ),
       body: Column(
         children: [

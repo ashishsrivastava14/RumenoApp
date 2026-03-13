@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/ecommerce_provider.dart';
+import '../../widgets/common/marketplace_button.dart';
 import 'shop_home_screen.dart';
 
 class ShopAccountScreen extends StatelessWidget {
@@ -29,6 +30,7 @@ class ShopAccountScreen extends StatelessWidget {
             ),
           ],
         ),
+        actions: const [VeterinarianButton(), FarmButton()],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(14),

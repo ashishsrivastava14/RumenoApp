@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
+import '../../widgets/common/marketplace_button.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -31,7 +32,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     if (cartItems.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Checkout')),
+        appBar: AppBar(
+          title: const Text('Checkout'),
+          actions: const [VeterinarianButton(), FarmButton()],
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -49,6 +53,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
         title: const Text('Checkout'),
+        actions: const [VeterinarianButton(), FarmButton()],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

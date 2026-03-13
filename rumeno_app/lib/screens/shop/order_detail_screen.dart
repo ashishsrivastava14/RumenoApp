@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../config/theme.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
+import '../../widgets/common/marketplace_button.dart';
 
 class OrderDetailScreen extends StatelessWidget {
   final String orderId;
@@ -17,7 +18,10 @@ class OrderDetailScreen extends StatelessWidget {
 
     if (order == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Order Detail')),
+        appBar: AppBar(
+          title: const Text('Order Detail'),
+          actions: const [VeterinarianButton(), FarmButton()],
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -42,6 +46,7 @@ class OrderDetailScreen extends StatelessWidget {
             Text('Order #${order.id}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
           ],
         ),
+        actions: const [VeterinarianButton(), FarmButton()],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(14),

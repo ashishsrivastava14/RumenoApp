@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../config/theme.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
+import '../../widgets/common/marketplace_button.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final String productId;
@@ -62,6 +63,8 @@ class ProductDetailScreen extends StatelessWidget {
               ),
             ),
             actions: [
+              const VeterinarianButton(),
+              const FarmButton(),
               // Wishlist button
               GestureDetector(
                 onTap: () {

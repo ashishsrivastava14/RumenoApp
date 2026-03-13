@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
+import '../../widgets/common/marketplace_button.dart';
 
 class VendorRegisterScreen extends StatefulWidget {
   const VendorRegisterScreen({super.key});
@@ -56,7 +57,10 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
-      appBar: AppBar(title: const Text('Vendor Registration')),
+      appBar: AppBar(
+        title: const Text('Vendor Registration'),
+        actions: const [VeterinarianButton(), FarmButton()],
+      ),
       body: Form(
         key: _formKey,
         child: Stepper(

@@ -4,6 +4,7 @@ import '../../mock/mock_animals.dart';
 import '../../mock/mock_health.dart';
 import '../../widgets/cards/health_record_card.dart';
 import '../../widgets/cards/vaccination_card.dart';
+import '../../widgets/common/marketplace_button.dart';
 
 class VetAnimalHealthScreen extends StatefulWidget {
   const VetAnimalHealthScreen({super.key});
@@ -33,6 +34,7 @@ class _VetAnimalHealthScreenState extends State<VetAnimalHealthScreen> with Sing
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
         title: const Text('Animal Health'),
+        actions: const [FarmButton(), MarketplaceButton()],
         bottom: TabBar(
           controller: _tab,
           tabs: const [

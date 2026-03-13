@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
+import '../../widgets/common/marketplace_button.dart';
 import 'shop_home_screen.dart';
 
 class CategoryScreen extends StatelessWidget {
@@ -96,6 +97,8 @@ class CategoryScreen extends StatelessWidget {
         ),
         backgroundColor: catColor,
         actions: [
+          const VeterinarianButton(),
+          const FarmButton(),
           Stack(
             children: [
               IconButton(

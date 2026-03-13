@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../config/theme.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
+import '../../widgets/common/marketplace_button.dart';
 import 'shop_home_screen.dart';
 
 class OrdersScreen extends StatelessWidget {
@@ -31,6 +32,7 @@ class OrdersScreen extends StatelessWidget {
           ],
         ),
         leading: IconButton(icon: const Icon(Icons.arrow_back_rounded, size: 26), onPressed: () => context.go('/shop')),
+        actions: const [VeterinarianButton(), FarmButton()],
       ),
       body: orders.isEmpty
           ? Center(
