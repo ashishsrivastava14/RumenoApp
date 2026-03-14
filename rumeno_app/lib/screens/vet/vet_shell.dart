@@ -18,10 +18,9 @@ class VetShell extends StatelessWidget {
     final idx = _currentIndex(context);
     return Scaffold(
       body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: idx,
-        type: BottomNavigationBarType.fixed,
-        onTap: (i) {
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: idx,
+        onDestinationSelected: (i) {
           switch (i) {
             case 0:
               context.go('/vet/dashboard');
@@ -33,11 +32,33 @@ class VetShell extends StatelessWidget {
               context.go('/vet/earnings');
           }
         },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: 'Dashboard'),
-          BottomNavigationBarItem(icon: Icon(Icons.agriculture_rounded), label: 'Farms'),
-          BottomNavigationBarItem(icon: Icon(Icons.medical_services_rounded), label: 'Health'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet_rounded), label: 'Earnings'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        indicatorColor: const Color(0xFF5B7A2E).withValues(alpha: 0.15),
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(Icons.dashboard_rounded, color: Color(0xFF5B7A2E)),
+            label: 'Dashboard',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.agriculture_outlined),
+            selectedIcon: Icon(Icons.agriculture_rounded, color: Color(0xFF5B7A2E)),
+            label: 'Farms',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.medical_services_outlined),
+            selectedIcon: Icon(Icons.medical_services_rounded, color: Color(0xFF5B7A2E)),
+            label: 'Health',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.account_balance_wallet_outlined),
+            selectedIcon: Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF5B7A2E)),
+            label: 'Earnings',
+          ),
         ],
       ),
     );
