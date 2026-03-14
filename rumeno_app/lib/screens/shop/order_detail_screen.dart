@@ -20,6 +20,7 @@ class OrderDetailScreen extends StatelessWidget {
       return Scaffold(
         appBar: AppBar(
           title: const Text('Order Detail'),
+          leading: IconButton(icon: const Icon(Icons.arrow_back_rounded, size: 26), onPressed: () => context.go('/shop/orders')),
           actions: const [VeterinarianButton(), FarmButton()],
         ),
         body: Center(
@@ -46,6 +47,7 @@ class OrderDetailScreen extends StatelessWidget {
             Text('Order #${order.id}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
           ],
         ),
+        leading: IconButton(icon: const Icon(Icons.arrow_back_rounded, size: 26), onPressed: () => context.go('/shop/orders')),
         actions: const [VeterinarianButton(), FarmButton()],
       ),
       body: SingleChildScrollView(
