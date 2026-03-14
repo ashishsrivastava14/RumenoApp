@@ -18,16 +18,18 @@ class ProductDetailScreen extends StatelessWidget {
     final product = ecommerce.getProductById(productId);
 
     if (product == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Product')),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline_rounded, size: 80, color: RumenoTheme.textLight),
-              const SizedBox(height: 16),
-              const Text('Product not found', style: TextStyle(fontSize: 18)),
-            ],
+      return ScaffoldMessenger(
+        child: Scaffold(
+          appBar: AppBar(title: const Text('Product')),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline_rounded, size: 80, color: RumenoTheme.textLight),
+                const SizedBox(height: 16),
+                const Text('Product not found', style: TextStyle(fontSize: 18)),
+              ],
+            ),
           ),
         ),
       );
@@ -37,9 +39,11 @@ class ProductDetailScreen extends StatelessWidget {
     final isInCart = ecommerce.isInCart(productId);
     final isWishlisted = ecommerce.isInWishlist(productId);
 
-    return Scaffold(
-      backgroundColor: RumenoTheme.backgroundCream,
-      body: CustomScrollView(
+    return ScaffoldMessenger(
+      child: Builder(
+        builder: (scaffoldContext) => Scaffold(
+        backgroundColor: RumenoTheme.backgroundCream,
+        body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 300,
@@ -69,7 +73,7 @@ class ProductDetailScreen extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   ecommerce.toggleWishlist(productId);
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                     SnackBar(
                       content: Row(
                         children: [
@@ -106,7 +110,7 @@ class ProductDetailScreen extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: 'Check out ${product.name} on Rumeno Shop! https://rumeno.in/shop/product/${product.id}'));
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                     const SnackBar(
                       content: Text('Share link copied to clipboard!'),
                       duration: Duration(seconds: 1),
@@ -376,8 +380,8 @@ class ProductDetailScreen extends StatelessWidget {
                           if (await canLaunchUrl(url)) {
                             await launchUrl(url, mode: LaunchMode.externalApplication);
                           } else {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
+                            if (scaffoldContext.mounted) {
+                              ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                                 const SnackBar(
                                   content: Text('Could not open video'),
                                   behavior: SnackBarBehavior.floating,
@@ -449,7 +453,8 @@ class ProductDetailScreen extends StatelessWidget {
                         child: OutlinedButton.icon(
                           onPressed: () {
                             ecommerce.addToCart(product);
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            ScaffoldMessenger.of(scaffoldContext).clearSnackBars();
+                            ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                               SnackBar(
                                 content: Row(
                                   children: [
@@ -458,6 +463,7 @@ class ProductDetailScreen extends StatelessWidget {
                                     Expanded(child: Text('${product.name} added to cart!')),
                                   ],
                                 ),
+                                duration: const Duration(seconds: 2),
                                 behavior: SnackBarBehavior.floating,
                                 backgroundColor: RumenoTheme.successGreen,
                                 action: SnackBarAction(
@@ -513,6 +519,8 @@ class ProductDetailScreen extends StatelessWidget {
               ),
             )
           : null,
+      ),
+      ),
     );
   }
 }
