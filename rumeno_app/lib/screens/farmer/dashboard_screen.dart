@@ -6,19 +6,52 @@ import '../../config/theme.dart';
 import '../../mock/mock_health.dart';
 import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import '../../widgets/common/marketplace_button.dart';
 // VeterinarianButton is defined in marketplace_button.dart
 
-/// Simple TTS helper for accessibility – long-press any card to hear its content.
-class _DashboardTts {
-  static FlutterTts? _tts;
-  static Future<void> speak(String text) async {
-    _tts ??= FlutterTts();
-    await _tts!.setLanguage('en-IN');
-    await _tts!.setSpeechRate(0.45);
-    await _tts!.speak(text);
-  }
+// Helper function to show info dialog
+void _showInfoDialog(BuildContext context, String title, String description) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Row(
+        children: [
+          Icon(Icons.info_rounded, color: RumenoTheme.primaryGreen, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+      content: Text(
+        description,
+        style: const TextStyle(
+          fontSize: 15,
+          color: Color(0xFF424242),
+          height: 1.5,
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          style: TextButton.styleFrom(
+            foregroundColor: RumenoTheme.primaryGreen,
+          ),
+          child: const Text(
+            'Got it',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class FarmerDashboardScreen extends StatelessWidget {
@@ -411,6 +444,7 @@ class _StatsRow extends StatelessWidget {
                 colors: [Color(0xFF3D6B18), Color(0xFF7FB23A)]),
             trend: '+2',
             up: true,
+            description: 'Total number of animals currently registered in your farm. This includes all cattle types: milking cows, dry cows, heifers, calves, and bulls.',
           ),
           SizedBox(width: 10),
           _StatChip(
@@ -421,6 +455,7 @@ class _StatsRow extends StatelessWidget {
                 colors: [Color(0xFF1565C0), Color(0xFF42A5F5)]),
             trend: '+8L',
             up: true,
+            description: 'Total milk collected today from all milking sessions. The trend shows the change compared to yesterday\'s production.',
           ),
           SizedBox(width: 10),
           _StatChip(
@@ -431,6 +466,7 @@ class _StatsRow extends StatelessWidget {
                 colors: [Color(0xFFBF360C), Color(0xFFFF7043)]),
             trend: '2 urgent',
             up: false,
+            description: 'Number of pending tasks that need your attention today, including feeding schedules, vaccinations, treatments, and breeding activities.',
           ),
           SizedBox(width: 10),
           _StatChip(
@@ -441,6 +477,7 @@ class _StatsRow extends StatelessWidget {
                 colors: [Color(0xFF880E4F), Color(0xFFE91E63)]),
             trend: '3 high',
             up: false,
+            description: 'Active health alerts for animals requiring attention. This includes sick animals, animals under treatment, and scheduled medical checkups.',
           ),
         ],
       ),
@@ -455,6 +492,7 @@ class _StatChip extends StatelessWidget {
   final LinearGradient gradient;
   final String? trend;
   final bool up;
+  final String? description;
 
   const _StatChip({
     required this.title,
@@ -463,21 +501,20 @@ class _StatChip extends StatelessWidget {
     required this.gradient,
     this.trend,
     this.up = true,
+    this.description,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () => _DashboardTts.speak('$title: $value'),
-      child: Container(
-        width: 160,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: gradient,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: gradient.colors.first.withValues(alpha: 0.38),
+    return Container(
+      width: 160,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: gradient,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: gradient.colors.first.withValues(alpha: 0.38),
               blurRadius: 14,
               offset: const Offset(0, 7),
             ),
@@ -486,13 +523,30 @@ class _StatChip extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.22),
-                borderRadius: BorderRadius.circular(11),
-              ),
-              child: Icon(icon, color: Colors.white, size: 26),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.22),
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 26),
+                ),
+                if (description != null)
+                  GestureDetector(
+                    onTap: () => _showInfoDialog(context, title, description!),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      child: Icon(
+                        Icons.info_outline_rounded,
+                        color: Colors.white.withValues(alpha: 0.85),
+                        size: 20,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const Spacer(),
             Text(
@@ -534,8 +588,7 @@ class _StatChip extends StatelessWidget {
             ],
           ],
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -563,6 +616,7 @@ class _FarmOverview extends StatelessWidget {
                   value: '24',
                   icon: Icons.local_drink_outlined,
                   color: const Color(0xFF1565C0),
+                  description: 'Number of cows currently in lactation period and actively producing milk. These animals are milked daily.',
                 ),
               ),
               const SizedBox(width: 10),
@@ -572,6 +626,7 @@ class _FarmOverview extends StatelessWidget {
                   value: '4',
                   icon: Icons.favorite_rounded,
                   color: const Color(0xFF880E4F),
+                  description: 'Number of animals confirmed pregnant through examination. Track their gestation period and expected calving dates.',
                 ),
               ),
             ],
@@ -585,6 +640,7 @@ class _FarmOverview extends StatelessWidget {
                   value: '3',
                   icon: Icons.healing_rounded,
                   color: const Color(0xFFBF360C),
+                  description: 'Animals currently receiving medical treatment for illness, injury, or other health conditions. Monitor their recovery progress.',
                 ),
               ),
               const SizedBox(width: 10),
@@ -594,6 +650,7 @@ class _FarmOverview extends StatelessWidget {
                   value: '12',
                   icon: Icons.vaccines_rounded,
                   color: const Color(0xFF1B5E20),
+                  description: 'Number of animals vaccinated in the last 30 days. Regular vaccination helps prevent diseases and maintains herd health.',
                 ),
               ),
             ],
@@ -609,26 +666,26 @@ class _OverviewTile extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color color;
+  final String? description;
 
   const _OverviewTile({
     required this.label,
     required this.value,
     required this.icon,
     required this.color,
+    this.description,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () => _DashboardTts.speak('$label: $value'),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -670,10 +727,21 @@ class _OverviewTile extends StatelessWidget {
                 ],
               ),
             ),
+            if (description != null)
+              GestureDetector(
+                onTap: () => _showInfoDialog(context, label, description!),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Icon(
+                    Icons.info_outline_rounded,
+                    color: color.withValues(alpha: 0.7),
+                    size: 22,
+                  ),
+                ),
+              ),
           ],
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -701,6 +769,7 @@ class _QuickActionsSection extends StatelessWidget {
                 gradient: const LinearGradient(
                     colors: [Color(0xFF2E4A12), Color(0xFF7FB23A)]),
                 onTap: () => context.go('/farmer/animals/add'),
+                description: 'Register a new animal to your farm. Add their details like tag ID, breed, date of birth, and other important information.',
               ),
               const SizedBox(width: 12),
               _QuickBtn(
@@ -709,6 +778,7 @@ class _QuickActionsSection extends StatelessWidget {
                 gradient: const LinearGradient(
                     colors: [Color(0xFF1565C0), Color(0xFF42A5F5)]),
                 onTap: () => context.push('/farmer/milk/log'),
+                description: 'Record milk production from your milking sessions. Track quantity, quality, and individual animal contributions.',
               ),
             ],
           ),
@@ -721,6 +791,7 @@ class _QuickActionsSection extends StatelessWidget {
                 gradient: const LinearGradient(
                     colors: [Color(0xFF00695C), Color(0xFF4DB6AC)]),
                 onTap: () => context.go('/farmer/health'),
+                description: 'Access health records, schedule checkups, log treatments, and monitor the wellbeing of your animals.',
               ),
               const SizedBox(width: 12),
               _QuickBtn(
@@ -729,6 +800,7 @@ class _QuickActionsSection extends StatelessWidget {
                 gradient: const LinearGradient(
                     colors: [Color(0xFF6A1B9A), Color(0xFFCE93D8)]),
                 onTap: () => context.go('/farmer/finance'),
+                description: 'Track income from milk sales, manage expenses for feed and healthcare, and view your farm\'s financial reports.',
               ),
             ],
           ),
@@ -743,12 +815,14 @@ class _QuickBtn extends StatelessWidget {
   final String label;
   final LinearGradient gradient;
   final VoidCallback onTap;
+  final String? description;
 
   const _QuickBtn({
     required this.icon,
     required this.label,
     required this.gradient,
     required this.onTap,
+    this.description,
   });
 
   @override
@@ -756,7 +830,6 @@ class _QuickBtn extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
-        onLongPress: () => _DashboardTts.speak(label),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 20),
           decoration: BoxDecoration(
@@ -773,6 +846,21 @@ class _QuickBtn extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (description != null)
+                Align(
+                  alignment: Alignment.topRight,
+                  child: GestureDetector(
+                    onTap: () => _showInfoDialog(context, label, description!),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8, top: 4),
+                      child: Icon(
+                        Icons.info_outline_rounded,
+                        color: Colors.white.withValues(alpha: 0.85),
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ),
               Icon(icon, color: Colors.white, size: 38),
               const SizedBox(height: 8),
               Text(
@@ -821,13 +909,11 @@ class _AlertCard extends StatelessWidget {
       ),
     };
 
-    return GestureDetector(
-      onLongPress: () => _DashboardTts.speak(alert.message),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(14),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(14),
           border: Border(left: BorderSide(color: color, width: 5)),
           boxShadow: [
             BoxShadow(
@@ -863,8 +949,7 @@ class _AlertCard extends StatelessWidget {
             color: color.withValues(alpha: 0.5),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
