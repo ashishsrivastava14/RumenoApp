@@ -44,7 +44,7 @@ class ProductDetailScreen extends StatelessWidget {
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
-            backgroundColor: Colors.white,
+            backgroundColor: RumenoTheme.primaryGreen,
             leading: GestureDetector(
               onTap: () {
                 if (context.canPop()) {
