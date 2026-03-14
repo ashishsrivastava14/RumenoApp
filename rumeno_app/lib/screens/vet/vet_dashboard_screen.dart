@@ -953,6 +953,7 @@ void _showNewVisitSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     backgroundColor: Colors.transparent,
     builder: (_) => const _NewVisitSheet(),
   );
@@ -968,15 +969,22 @@ class _NewVisitSheet extends StatefulWidget {
 }
 
 class _NewVisitSheetState extends State<_NewVisitSheet> {
-  final _formKey = GlobalKey<FormState>();
   String? _selectedFarmId;
   DateTime _visitDate = DateTime.now();
-  final _purposeController = TextEditingController();
+  String? _selectedPurpose;
   final _notesController = TextEditingController();
+
+  static const _purposes = <Map<String, Object>>[
+    {'label': 'Checkup',     'icon': Icons.health_and_safety_rounded, 'color': 0xFF00ACC1},
+    {'label': 'Vaccination', 'icon': Icons.vaccines_rounded,          'color': 0xFF8E24AA},
+    {'label': 'Treatment',   'icon': Icons.medical_services_rounded,  'color': 0xFFEF6C00},
+    {'label': 'Emergency',   'icon': Icons.warning_amber_rounded,     'color': 0xFFD32F2F},
+    {'label': 'Pregnancy',   'icon': Icons.pregnant_woman,            'color': 0xFFC2185B},
+    {'label': 'Other',       'icon': Icons.more_horiz_rounded,        'color': 0xFF546E7A},
+  ];
 
   @override
   void dispose() {
-    _purposeController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -992,113 +1000,521 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
   }
 
   void _save() {
-    if (_formKey.currentState!.validate()) {
-      Navigator.of(context).pop();
+    if (_selectedFarmId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Visit scheduled successfully!'),
-          backgroundColor: Color(0xFF4CAF50),
+          content: Text('Please select a farm'),
+          backgroundColor: Colors.redAccent,
         ),
       );
+      return;
     }
+    if (_selectedPurpose == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select the reason for visit'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('✅  Visit scheduled successfully!'),
+        backgroundColor: Color(0xFF4CAF50),
+      ),
+    );
   }
+
+  // ── Build ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + keyboardHeight),
+      padding: EdgeInsets.only(bottom: keyboardHeight),
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: Color(0xFFF4F8F2),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildHeader(),
+          Flexible(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Step 1 ─ Farm
+                  _buildStepLabel('1', Icons.agriculture_rounded, 'Choose Farm', const Color(0xFF5B7A2E)),
+                  const SizedBox(height: 12),
+                  _buildFarmSelector(),
+                  const SizedBox(height: 26),
+
+                  // Step 2 ─ Date
+                  _buildStepLabel('2', Icons.calendar_month_rounded, 'When to Visit?', const Color(0xFF1E88E5)),
+                  const SizedBox(height: 12),
+                  _buildDateSelector(),
+                  const SizedBox(height: 26),
+
+                  // Step 3 ─ Purpose
+                  _buildStepLabel('3', Icons.assignment_turned_in_rounded, 'Reason for Visit', const Color(0xFF8E24AA)),
+                  const SizedBox(height: 12),
+                  _buildPurposeGrid(),
+                  const SizedBox(height: 26),
+
+                  // Step 4 ─ Notes
+                  _buildStepLabel('4', Icons.edit_note_rounded, 'Extra Notes (Optional)', Colors.grey.shade600),
+                  const SizedBox(height: 12),
+                  _buildNotesField(),
+                  const SizedBox(height: 32),
+
+                  // Submit
+                  _buildSubmitButton(),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Header ───────────────────────────────────────────────────────────────
+
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 22),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF2E5F10), Color(0xFF5B7A2E), Color(0xFF7AA040)],
+        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 44,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 18),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          Row(
             children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(16),
                 ),
+                child: const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 28),
               ),
-              const SizedBox(height: 16),
-              const Text(
-                'Schedule New Visit',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                value: _selectedFarmId,
-                decoration: const InputDecoration(
-                  labelText: 'Select Farm *',
-                  prefixIcon: Icon(Icons.agriculture_rounded),
-                ),
-                items: mockFarmers
-                    .map((f) => DropdownMenuItem(
-                          value: f.id,
-                          child: Text('${f.farmName} — ${f.name}'),
-                        ))
-                    .toList(),
-                onChanged: (v) => setState(() => _selectedFarmId = v),
-                validator: (v) =>
-                    v == null ? 'Please select a farm' : null,
-              ),
-              const SizedBox(height: 16),
-              InkWell(
-                onTap: _pickDate,
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Visit Date',
-                    prefixIcon: Icon(Icons.calendar_today_rounded),
-                  ),
-                  child:
-                      Text(DateFormat('dd MMM yyyy').format(_visitDate)),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _purposeController,
-                decoration: const InputDecoration(
-                  labelText: 'Purpose of Visit *',
-                  prefixIcon: Icon(Icons.assignment_rounded),
-                ),
-                validator: (v) => v == null || v.trim().isEmpty
-                    ? 'Please enter visit purpose'
-                    : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _notesController,
-                decoration: const InputDecoration(
-                  labelText: 'Notes (optional)',
-                  prefixIcon: Icon(Icons.notes_rounded),
-                ),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: _save,
-                  icon: const Icon(Icons.check_circle_rounded),
-                  label: const Text(
-                    'Schedule Visit',
-                    style: TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.w600),
-                  ),
+              const SizedBox(width: 14),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Schedule New Visit',
+                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Follow the 4 simple steps below',
+                      style: TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  // ── Step label ───────────────────────────────────────────────────────────
+
+  Widget _buildStepLabel(String step, IconData icon, String label, Color color) {
+    return Row(
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          child: Center(
+            child: Text(
+              step,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Icon(icon, color: color, size: 20),
+        const SizedBox(width: 8),
+        Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 15)),
+      ],
+    );
+  }
+
+  // ── Farm selector ────────────────────────────────────────────────────────
+
+  Widget _buildFarmSelector() {
+    return SizedBox(
+      height: 112,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.zero,
+        itemCount: mockFarmers.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemBuilder: (_, i) {
+          final farm = mockFarmers[i];
+          final isSelected = farm.id == _selectedFarmId;
+          final initials = farm.name
+              .split(' ')
+              .where((w) => w.isNotEmpty)
+              .map((w) => w[0].toUpperCase())
+              .take(2)
+              .join();
+          return GestureDetector(
+            onTap: () => setState(() => _selectedFarmId = farm.id),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 148,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isSelected ? const Color(0xFF5B7A2E) : Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: isSelected ? const Color(0xFF5B7A2E) : Colors.grey.shade200,
+                  width: isSelected ? 2 : 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isSelected
+                        ? const Color(0xFF5B7A2E).withValues(alpha: 0.3)
+                        : Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Colors.white.withValues(alpha: 0.25)
+                              : const Color(0xFF5B7A2E).withValues(alpha: 0.10),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            initials,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: isSelected ? Colors.white : const Color(0xFF5B7A2E),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      Icon(
+                        isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                        color: isSelected ? Colors.white : Colors.grey.shade300,
+                        size: 18,
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Text(
+                    farm.farmName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: isSelected ? Colors.white : const Color(0xFF1A1A1A),
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: [
+                      Icon(Icons.pets_rounded,
+                          size: 11, color: isSelected ? Colors.white70 : const Color(0xFF5B7A2E)),
+                      const SizedBox(width: 3),
+                      Text(
+                        '${farm.animalCount} animals',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isSelected ? Colors.white70 : Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // ── Date selector ────────────────────────────────────────────────────────
+
+  Widget _buildDateSelector() {
+    final now = DateTime.now();
+    final dayNum   = DateFormat('dd').format(_visitDate);
+    final monthAbbr = DateFormat('MMM').format(_visitDate);
+    final weekday  = DateFormat('EEEE').format(_visitDate);
+    final fullDate = DateFormat('d MMMM yyyy').format(_visitDate);
+    final isToday  = _visitDate.year == now.year && _visitDate.month == now.month && _visitDate.day == now.day;
+    final isTomorrow = _visitDate.difference(DateTime(now.year, now.month, now.day)).inDays == 1;
+    final dayLabel = isToday ? '🗓  Today' : isTomorrow ? '🗓  Tomorrow' : '🗓  $weekday';
+
+    return GestureDetector(
+      onTap: _pickDate,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF1E88E5), Color(0xFF0D47A1)],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF1E88E5).withValues(alpha: 0.35),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Day badge
+            Container(
+              width: 68,
+              height: 68,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    dayNum,
+                    style: const TextStyle(
+                      color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold, height: 1.0,
+                    ),
+                  ),
+                  Text(monthAbbr,
+                      style: const TextStyle(color: Colors.white70, fontSize: 12, letterSpacing: 1)),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(dayLabel,
+                      style: const TextStyle(
+                          color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text(fullDate,
+                      style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'Tap to change date',
+                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.edit_calendar_rounded, color: Colors.white70, size: 22),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Purpose grid ─────────────────────────────────────────────────────────
+
+  Widget _buildPurposeGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 0.95,
+      ),
+      itemCount: _purposes.length,
+      itemBuilder: (_, i) {
+        final p = _purposes[i];
+        final label = p['label'] as String;
+        final icon  = p['icon']  as IconData;
+        final color = Color(p['color'] as int);
+        final isSelected = _selectedPurpose == label;
+
+        return GestureDetector(
+          onTap: () => setState(() => _selectedPurpose = label),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: isSelected ? color : Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: isSelected ? color : Colors.grey.shade200,
+                width: isSelected ? 2 : 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: isSelected
+                      ? color.withValues(alpha: 0.35)
+                      : Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Colors.white.withValues(alpha: 0.22)
+                        : color.withValues(alpha: 0.10),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: isSelected ? Colors.white : color, size: 26),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: isSelected ? Colors.white : const Color(0xFF333333),
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ── Notes field ──────────────────────────────────────────────────────────
+
+  Widget _buildNotesField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _notesController,
+        maxLines: 3,
+        style: const TextStyle(fontSize: 14, color: Color(0xFF333333)),
+        decoration: InputDecoration(
+          hintText: 'Any special instructions or observations…',
+          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(left: 14, right: 10, top: 16),
+            child: Icon(Icons.edit_note_rounded, color: Colors.grey.shade400, size: 24),
+          ),
+          prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.fromLTRB(0, 14, 14, 14),
+        ),
+      ),
+    );
+  }
+
+  // ── Submit button ────────────────────────────────────────────────────────
+
+  Widget _buildSubmitButton() {
+    return GestureDetector(
+      onTap: _save,
+      child: Container(
+        width: double.infinity,
+        height: 58,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [Color(0xFF2E5F10), Color(0xFF5B7A2E), Color(0xFF7AA040)],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF5B7A2E).withValues(alpha: 0.45),
+              blurRadius: 16,
+              offset: const Offset(0, 7),
+            ),
+          ],
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.check_circle_rounded, color: Colors.white, size: 24),
+            SizedBox(width: 10),
+            Text(
+              'Schedule Visit',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
         ),
       ),
     );
