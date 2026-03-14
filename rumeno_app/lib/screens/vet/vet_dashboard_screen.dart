@@ -34,6 +34,13 @@ class VetDashboardScreen extends StatelessWidget {
             automaticallyImplyLeading: false,
             systemOverlayStyle: SystemUiOverlayStyle.light,
             backgroundColor: RumenoTheme.primaryDarkGreen,
+            leading: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Image.asset(
+                'assets/images/Rumeno_logo-rb.png',
+                fit: BoxFit.contain,
+              ),
+            ),
             actions: const [
               FarmButton(),
               MarketplaceButton(),
