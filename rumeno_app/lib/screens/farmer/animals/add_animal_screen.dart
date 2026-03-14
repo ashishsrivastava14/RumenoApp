@@ -77,6 +77,16 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
         title: const Text('Add New Animal'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/farmer/animals');
+            }
+          },
+        ),
         actions: const [VeterinarianButton(), MarketplaceButton()],
       ),
       body: Column(

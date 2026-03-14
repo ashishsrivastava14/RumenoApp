@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 import '../../mock/mock_farmers.dart';
 import '../../models/models.dart';
@@ -28,6 +29,16 @@ class _AdminFarmersScreenState extends State<AdminFarmersScreen> {
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
         title: const Text('Manage Farmers'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/admin');
+            }
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.download_rounded),

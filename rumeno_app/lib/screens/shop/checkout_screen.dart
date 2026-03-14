@@ -53,6 +53,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
         title: const Text('Checkout'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/shop/cart');
+            }
+          },
+        ),
         actions: const [VeterinarianButton(), FarmButton()],
       ),
       body: SingleChildScrollView(

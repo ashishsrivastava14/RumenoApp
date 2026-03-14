@@ -96,6 +96,16 @@ class CategoryScreen extends StatelessWidget {
           ],
         ),
         backgroundColor: catColor,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/shop');
+            }
+          },
+        ),
         actions: [
           const VeterinarianButton(),
           const FarmButton(),

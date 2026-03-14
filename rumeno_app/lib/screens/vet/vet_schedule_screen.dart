@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
 import '../../mock/mock_animals.dart';
@@ -33,6 +34,16 @@ class VetScheduleScreen extends StatelessWidget {
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
         title: const Text('Upcoming Schedule'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/vet');
+            }
+          },
+        ),
         actions: const [FarmButton(), MarketplaceButton()],
       ),
       body: ListView(
