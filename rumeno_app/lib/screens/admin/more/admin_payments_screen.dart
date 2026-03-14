@@ -7,13 +7,13 @@ class AdminPaymentsScreen extends StatelessWidget {
   const AdminPaymentsScreen({super.key});
 
   static final _payments = [
-    {'user': 'Rajesh Patel', 'plan': 'Pro', 'amount': '₹999', 'date': '15 Jul 2025', 'status': 'Success', 'method': 'UPI'},
-    {'user': 'Vikram Singh', 'plan': 'Starter', 'amount': '₹499', 'date': '14 Jul 2025', 'status': 'Success', 'method': 'Card'},
-    {'user': 'Amit Sharma', 'plan': 'Business', 'amount': '₹2499', 'date': '13 Jul 2025', 'status': 'Success', 'method': 'UPI'},
-    {'user': 'Priya Devi', 'plan': 'Starter', 'amount': '₹499', 'date': '12 Jul 2025', 'status': 'Failed', 'method': 'Net Banking'},
-    {'user': 'Lakshmi N.', 'plan': 'Pro', 'amount': '₹999', 'date': '11 Jul 2025', 'status': 'Success', 'method': 'UPI'},
-    {'user': 'Ramesh Kumar', 'plan': 'Starter', 'amount': '₹499', 'date': '10 Jul 2025', 'status': 'Refunded', 'method': 'Card'},
-    {'user': 'Bhim Rao', 'plan': 'Pro', 'amount': '₹999', 'date': '09 Jul 2025', 'status': 'Success', 'method': 'UPI'},
+    {'user': 'John Smith', 'plan': 'Pro', 'amount': '₹999', 'date': '15 Jul 2025', 'status': 'Success', 'method': 'UPI'},
+    {'user': 'Victor Clark', 'plan': 'Starter', 'amount': '₹499', 'date': '14 Jul 2025', 'status': 'Success', 'method': 'Card'},
+    {'user': 'James Wilson', 'plan': 'Business', 'amount': '₹2499', 'date': '13 Jul 2025', 'status': 'Success', 'method': 'UPI'},
+    {'user': 'Patricia Miller', 'plan': 'Starter', 'amount': '₹499', 'date': '12 Jul 2025', 'status': 'Failed', 'method': 'Net Banking'},
+    {'user': 'Lisa Davis', 'plan': 'Pro', 'amount': '₹999', 'date': '11 Jul 2025', 'status': 'Success', 'method': 'UPI'},
+    {'user': 'Robert Taylor', 'plan': 'Starter', 'amount': '₹499', 'date': '10 Jul 2025', 'status': 'Refunded', 'method': 'Card'},
+    {'user': 'Brian Roberts', 'plan': 'Pro', 'amount': '₹999', 'date': '09 Jul 2025', 'status': 'Success', 'method': 'UPI'},
   ];
 
   Color _statusColor(String status) {

@@ -151,7 +151,7 @@ class _OrderCard extends StatelessWidget {
                             child: Image.asset(
                               item.productImage,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Icon(Icons.shopping_bag_outlined, color: Colors.grey.shade400, size: 20),
+                              errorBuilder: (_, _, _) => Icon(Icons.shopping_bag_outlined, color: Colors.grey.shade400, size: 20),
                             ),
                           ),
                         ),

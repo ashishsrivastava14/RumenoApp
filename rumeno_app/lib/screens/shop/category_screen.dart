@@ -200,7 +200,7 @@ class _CategoryProductCard extends StatelessWidget {
                       child: Image.asset(
                         product.imageUrl,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Center(
+                        errorBuilder: (_, _, _) => Center(
                           child: Icon(Icons.image_rounded, size: 44, color: Colors.grey.shade300),
                         ),
                       ),

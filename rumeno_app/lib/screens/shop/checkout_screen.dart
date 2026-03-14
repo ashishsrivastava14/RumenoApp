@@ -245,7 +245,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               child: Image.asset(
                                 item.product.imageUrl,
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Icon(Icons.shopping_bag_rounded, color: Colors.grey.shade400, size: 20),
+                                errorBuilder: (_, _, _) => Icon(Icons.shopping_bag_rounded, color: Colors.grey.shade400, size: 20),
                               ),
                             ),
                           ),

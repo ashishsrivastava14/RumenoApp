@@ -61,12 +61,12 @@ class MoreScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Rajesh Patel',
+                            'John Smith',
                             style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Patel Dairy Farm',
+                            'Smith Dairy Farm',
                             style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 14),
                           ),
                           const SizedBox(height: 8),
@@ -248,9 +248,9 @@ class MoreScreen extends StatelessWidget {
     final languages = [
       {'name': 'English', 'native': 'English', 'flag': '🇬🇧'},
       {'name': 'Hindi', 'native': 'हिन्दी', 'flag': '🇮🇳'},
-      {'name': 'Gujarati', 'native': 'ગુજરાતી', 'flag': '🇮🇳'},
-      {'name': 'Marathi', 'native': 'मराठी', 'flag': '🇮🇳'},
-      {'name': 'Punjabi', 'native': 'ਪੰਜਾਬੀ', 'flag': '🇮🇳'},
+      // {'name': 'Gujarati', 'native': 'ગુજરાતી', 'flag': '🇮🇳'},
+      // {'name': 'Marathi', 'native': 'मराठी', 'flag': '🇮🇳'},
+      // {'name': 'Punjabi', 'native': 'ਪੰਜਾਬੀ', 'flag': '🇮🇳'},
     ];
 
     showModalBottomSheet(

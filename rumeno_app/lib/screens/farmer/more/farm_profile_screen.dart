@@ -10,12 +10,12 @@ class FarmProfileScreen extends StatefulWidget {
 }
 
 class _FarmProfileScreenState extends State<FarmProfileScreen> {
-  final _farmNameCtrl = TextEditingController(text: 'Patel Dairy Farm');
-  final _ownerNameCtrl = TextEditingController(text: 'Rajesh Patel');
+  final _farmNameCtrl = TextEditingController(text: 'Smith Dairy Farm');
+  final _ownerNameCtrl = TextEditingController(text: 'John Smith');
   final _addressCtrl = TextEditingController(text: 'Village Vadgam, Taluka Palanpur, Gujarat');
   final _gpsCtrl = TextEditingController(text: '23.0225° N, 72.5714° E');
-  final _managerCtrl = TextEditingController(text: 'Suresh Patel');
-  final _vetCtrl = TextEditingController(text: 'Dr. Anita Sharma - 9876543211');
+  final _managerCtrl = TextEditingController(text: 'Steven Harris');
+  final _vetCtrl = TextEditingController(text: 'Dr. Emily Thompson - 9876543211');
   final _youtubeCtrl = TextEditingController();
   bool _saved = false;
 
@@ -120,7 +120,7 @@ class _FarmProfileScreenState extends State<FarmProfileScreen> {
             ),
             _VisualField(
               emoji: '🛰️',
-              label: 'GPS Location',
+              label: 'Geographical Location',
               hint: 'Tap to get location',
               controller: _gpsCtrl,
               icon: Icons.my_location,

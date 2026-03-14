@@ -5,10 +5,10 @@ class AdminPartnersScreen extends StatelessWidget {
   const AdminPartnersScreen({super.key});
 
   static final _partners = [
-    {'name': 'Dr. Anita Sharma', 'type': 'Vet', 'referrals': '10', 'earned': '₹68,400', 'status': 'Active', 'code': 'VET-ANITA-2024'},
-    {'name': 'Dr. Ravi Kumar', 'type': 'Vet', 'referrals': '8', 'earned': '₹52,200', 'status': 'Active', 'code': 'VET-RAVI-2024'},
+    {'name': 'Dr. Emily Thompson', 'type': 'Vet', 'referrals': '10', 'earned': '₹68,400', 'status': 'Active', 'code': 'VET-EMILY-2024'},
+    {'name': 'Dr. Ryan Cooper', 'type': 'Vet', 'referrals': '8', 'earned': '₹52,200', 'status': 'Active', 'code': 'VET-RYAN-2024'},
     {'name': 'Pashudhan NGO', 'type': 'Partner', 'referrals': '25', 'earned': '₹1,20,000', 'status': 'Active', 'code': 'PTR-PASHU-2024'},
-    {'name': 'Dr. Meena Soni', 'type': 'Vet', 'referrals': '5', 'earned': '₹28,500', 'status': 'Active', 'code': 'VET-MEENA-2024'},
+    {'name': 'Dr. Michelle Stone', 'type': 'Vet', 'referrals': '5', 'earned': '₹28,500', 'status': 'Active', 'code': 'VET-MICHELLE-2024'},
     {'name': 'KrishiMitra', 'type': 'Partner', 'referrals': '15', 'earned': '₹75,000', 'status': 'Inactive', 'code': 'PTR-KRISHI-2024'},
   ];
 

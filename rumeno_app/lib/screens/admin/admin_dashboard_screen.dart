@@ -118,10 +118,10 @@ class AdminDashboardScreen extends StatelessWidget {
 
   List<Widget> _buildActivity(BuildContext context) {
     final activities = [
-      {'text': 'Rajesh Patel upgraded to Pro plan', 'time': '2 min ago', 'icon': Icons.upgrade_rounded, 'color': Colors.green},
-      {'text': 'New farmer registration: Meera Devi', 'time': '15 min ago', 'icon': Icons.person_add_rounded, 'color': Colors.blue},
-      {'text': 'Dr. Anita Sharma referred 2 new farms', 'time': '1 hr ago', 'icon': Icons.share_rounded, 'color': Colors.orange},
-      {'text': 'Payment received: ₹999 from Vikram Singh', 'time': '2 hrs ago', 'icon': Icons.payment_rounded, 'color': Colors.green},
+      {'text': 'John Smith upgraded to Pro plan', 'time': '2 min ago', 'icon': Icons.upgrade_rounded, 'color': Colors.green},
+      {'text': 'New farmer registration: Mary Davis', 'time': '15 min ago', 'icon': Icons.person_add_rounded, 'color': Colors.blue},
+      {'text': 'Dr. Emily Thompson referred 2 new farms', 'time': '1 hr ago', 'icon': Icons.share_rounded, 'color': Colors.orange},
+      {'text': 'Payment received: ₹999 from Victor Clark', 'time': '2 hrs ago', 'icon': Icons.payment_rounded, 'color': Colors.green},
       {'text': 'Support ticket #145 resolved', 'time': '3 hrs ago', 'icon': Icons.check_circle_rounded, 'color': Colors.teal},
     ];
     return activities.map((a) => Container(

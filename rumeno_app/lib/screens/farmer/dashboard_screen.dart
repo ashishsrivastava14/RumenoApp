@@ -205,7 +205,7 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
                           const Icon(Icons.agriculture_rounded, color: Colors.white54, size: 12),
                           const SizedBox(width: 4),
                           Text(
-                            user?.farmName ?? 'Patel Dairy Farm',
+                            user?.farmName ?? 'Smith Dairy Farm',
                             style: const TextStyle(
                               color: Colors.white60,
                               fontSize: 11,
@@ -283,7 +283,7 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
-                                user?.farmName ?? 'Patel Dairy Farm',
+                                user?.farmName ?? 'Smith Dairy Farm',
                                 style: const TextStyle(
                                   color: Colors.white54,
                                   fontSize: 11,

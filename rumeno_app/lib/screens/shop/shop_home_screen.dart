@@ -44,7 +44,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                   height: 36,
                   width: 36,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => Container(
+                  errorBuilder: (_, _, _) => Container(
                     width: 36,
                     height: 36,
                     decoration: const BoxDecoration(
@@ -493,7 +493,7 @@ class _FeaturedProductCard extends StatelessWidget {
                         child: Image.asset(
                           product.imageUrl,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Center(
+                          errorBuilder: (_, _, _) => Center(
                             child: Icon(_getCategoryIcon(product.category), size: 60, color: Colors.grey.shade300),
                           ),
                         ),
@@ -643,7 +643,7 @@ class _ProductGridCard extends StatelessWidget {
                       child: Image.asset(
                         product.imageUrl,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Center(
+                        errorBuilder: (_, _, _) => Center(
                           child: Icon(_getCategoryIcon(product.category), size: 50, color: Colors.grey.shade300),
                         ),
                       ),

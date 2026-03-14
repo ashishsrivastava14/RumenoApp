@@ -11,10 +11,10 @@ class TeamManagementScreen extends StatefulWidget {
 
 class _TeamManagementScreenState extends State<TeamManagementScreen> {
   final List<Map<String, String>> _members = [
-    {'name': 'Rajesh Patel', 'phone': '9876543210', 'role': 'Owner'},
-    {'name': 'Suresh Patel', 'phone': '9876543221', 'role': 'Manager'},
-    {'name': 'Mohan Lal', 'phone': '9876543222', 'role': 'Staff (Edit)'},
-    {'name': 'Ramu', 'phone': '9876543223', 'role': 'Staff (View)'},
+    {'name': 'John Smith', 'phone': '9876543210', 'role': 'Owner'},
+    {'name': 'Steven Harris', 'phone': '9876543221', 'role': 'Manager'},
+    {'name': 'Mark Evans', 'phone': '9876543222', 'role': 'Staff (Edit)'},
+    {'name': 'Richard Moore', 'phone': '9876543223', 'role': 'Staff (View)'},
   ];
 
   static const _roleEmojis = {

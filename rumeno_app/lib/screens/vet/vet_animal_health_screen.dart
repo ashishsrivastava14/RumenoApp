@@ -1068,7 +1068,7 @@ class _ConsultTabState extends State<_ConsultTab> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('${a.breed}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                        Text(a.breed, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                         Text('${a.speciesName}  •  ${a.tagId}', style: const TextStyle(fontSize: 11, color: RumenoTheme.textGrey)),
                       ],
                     ),

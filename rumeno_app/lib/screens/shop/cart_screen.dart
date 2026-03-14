@@ -118,7 +118,7 @@ class _CartItemCard extends StatelessWidget {
                   child: Image.asset(
                     product.imageUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Icon(_getCategoryIcon(product.category), size: 36, color: Colors.grey.shade400),
+                    errorBuilder: (_, _, _) => Icon(_getCategoryIcon(product.category), size: 36, color: Colors.grey.shade400),
                   ),
                 ),
               ),

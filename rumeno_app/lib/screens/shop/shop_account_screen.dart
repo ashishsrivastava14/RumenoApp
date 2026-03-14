@@ -376,7 +376,7 @@ class ShopAccountScreen extends StatelessWidget {
                                       child: Image.asset(
                                         product.imageUrl,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => Icon(Icons.image_rounded, size: 28, color: Colors.grey.shade300),
+                                        errorBuilder: (_, _, _) => Icon(Icons.image_rounded, size: 28, color: Colors.grey.shade300),
                                       ),
                                     ),
                                   ),
@@ -519,7 +519,7 @@ class ShopAccountScreen extends StatelessWidget {
                 'assets/images/Rumeno_logo-rb.png',
                 width: 50,
                 height: 50,
-                errorBuilder: (_, __, ___) => Icon(Icons.store_rounded, color: RumenoTheme.primaryGreen, size: 36),
+                errorBuilder: (_, _, _) => Icon(Icons.store_rounded, color: RumenoTheme.primaryGreen, size: 36),
               ),
             ),
             const SizedBox(height: 12),

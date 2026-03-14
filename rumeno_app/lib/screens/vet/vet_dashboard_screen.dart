@@ -161,7 +161,7 @@ class VetDashboardScreen extends StatelessWidget {
                           children: [
                             _InfoChip(icon: Icons.calendar_today_rounded, label: today),
                             const SizedBox(width: 8),
-                            _InfoChip(icon: Icons.badge_outlined, label: vet.referralCode ?? 'DRANITA20'),
+                            _InfoChip(icon: Icons.badge_outlined, label: vet.referralCode ?? 'DREMILY20'),
                           ],
                         ),
                       ],
@@ -333,30 +333,30 @@ class VetDashboardScreen extends StatelessWidget {
   List<Widget> _buildConsultations(BuildContext context) {
     final consults = [
       {
-        'farmer': 'Rajesh Patel',
+        'farmer': 'John Smith',
         'animal': 'Lakshmi (GIR-001)',
         'issue': 'Mastitis treatment follow-up',
         'date': '2 hours ago',
         'status': 'ongoing',
-        'initials': 'RP',
+        'initials': 'JS',
         'color': 0xFFE53935,
       },
       {
-        'farmer': 'Vikram Singh',
+        'farmer': 'Victor Clark',
         'animal': 'Nandi (MUR-005)',
         'issue': 'Vaccination schedule review',
         'date': 'Yesterday',
         'status': 'resolved',
-        'initials': 'VS',
+        'initials': 'VC',
         'color': 0xFF1E88E5,
       },
       {
-        'farmer': 'Amit Sharma',
+        'farmer': 'James Wilson',
         'animal': 'Gauri (SAH-003)',
         'issue': 'Pregnancy check — 6 months',
         'date': '2 days ago',
         'status': 'resolved',
-        'initials': 'AS',
+        'initials': 'JW',
         'color': 0xFF43A047,
       },
     ];
@@ -484,21 +484,21 @@ class VetDashboardScreen extends StatelessWidget {
   List<Widget> _buildVisits(BuildContext context) {
     final visits = [
       {
-        'farmer': 'Rajesh Patel',
+        'farmer': 'John Smith',
         'purpose': 'Monthly herd checkup',
         'day': 'TOM',
         'time': '10:00 AM',
         'fullDate': 'Tomorrow',
-        'initials': 'RP',
+        'initials': 'JS',
         'urgent': false,
       },
       {
-        'farmer': 'Priya Devi',
+        'farmer': 'Patricia Miller',
         'purpose': 'Vaccination drive — FMD',
         'day': '18',
         'time': '09:00 AM',
         'fullDate': 'Mar 18',
-        'initials': 'PD',
+        'initials': 'PM',
         'urgent': true,
       },
     ];
@@ -1193,7 +1193,7 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.zero,
         itemCount: mockFarmers.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
         itemBuilder: (_, i) {
           final farm = mockFarmers[i];
           final isSelected = farm.id == _selectedFarmId;

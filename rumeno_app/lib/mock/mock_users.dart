@@ -2,20 +2,20 @@ import '../models/models.dart';
 
 const mockFarmerUser = AppUser(
   id: 'F001',
-  name: 'Rajesh Patel',
+  name: 'John Smith',
   phone: '9876543210',
   role: UserRole.farmer,
-  farmName: 'Patel Dairy Farm',
+  farmName: 'Smith Dairy Farm',
 );
 
 const mockVetUser = AppUser(
   id: 'V001',
-  name: 'Dr. Anita Sharma',
+  name: 'Dr. Emily Thompson',
   phone: '9876543211',
   role: UserRole.vet,
   specialization: 'Large Animal Medicine',
   licenseNumber: 'VET-MH-2019-0456',
-  referralCode: 'DRANITA20',
+  referralCode: 'DREMILY20',
 );
 
 const mockAdminUser = AppUser(

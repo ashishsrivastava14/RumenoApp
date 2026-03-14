@@ -446,7 +446,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
               Switch(
                 value: _autoTag,
                 onChanged: (v) => setState(() => _autoTag = v),
-                activeColor: RumenoTheme.primaryGreen,
+                activeThumbColor: RumenoTheme.primaryGreen,
               ),
             ],
           ),
