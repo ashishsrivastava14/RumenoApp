@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 import '../../mock/mock_farmers.dart';
 import '../../models/models.dart';
@@ -128,7 +129,7 @@ class _FarmCard extends StatelessWidget {
               Text(farmer.phone, style: Theme.of(context).textTheme.bodySmall),
               const Spacer(),
               TextButton.icon(
-                onPressed: () {},
+                onPressed: () => context.go('/vet/farms/${farmer.id}'),
                 icon: const Icon(Icons.visibility_rounded, size: 16),
                 label: const Text('View Animals'),
                 style: TextButton.styleFrom(

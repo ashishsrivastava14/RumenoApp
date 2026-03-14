@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import '../../config/theme.dart';
-import '../../mock/mock_users.dart';
-import '../../widgets/common/marketplace_button.dart';
 import 'package:intl/intl.dart';
+import '../../config/theme.dart';
+import '../../mock/mock_farmers.dart';
+import '../../mock/mock_health.dart';
+import '../../mock/mock_users.dart';
+import '../../models/models.dart';
+import '../../widgets/common/marketplace_button.dart';
 
 class VetDashboardScreen extends StatelessWidget {
   const VetDashboardScreen({super.key});
@@ -13,6 +16,10 @@ class VetDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final vet = mockVetUser;
     final today = DateFormat('EEE, dd MMM yyyy').format(DateTime.now());
+    final vetFarmers = mockFarmers.where((f) => f.vetId == 'V001').toList();
+    final totalFarms = vetFarmers.length;
+    final totalAnimals = vetFarmers.fold<int>(0, (sum, f) => sum + f.animalCount);
+    final activeTreatments = mockTreatments.where((t) => t.status == TreatmentStatus.active).length;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F0),
@@ -129,14 +136,17 @@ class VetDashboardScreen extends StatelessWidget {
                               ),
                             ),
                             // Notification bell
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white.withValues(alpha: 0.15),
+                            GestureDetector(
+                              onTap: () => _showNotificationsSheet(context),
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withValues(alpha: 0.15),
+                                ),
+                                child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 20),
                               ),
-                              child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 20),
                             ),
                           ],
                         ),
@@ -171,29 +181,29 @@ class VetDashboardScreen extends StatelessWidget {
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       physics: const BouncingScrollPhysics(),
-                      children: const [
+                      children: [
                         _GradientStatCard(
                           title: 'Referred Farms',
-                          value: '10',
+                          value: '$totalFarms',
                           icon: Icons.agriculture_rounded,
-                          gradientColors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+                          gradientColors: const [Color(0xFF4CAF50), Color(0xFF2E7D32)],
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         _GradientStatCard(
-                          title: 'Active Animals',
-                          value: '156',
+                          title: 'Total Animals',
+                          value: '$totalAnimals',
                           icon: Icons.pets_rounded,
-                          gradientColors: [Color(0xFF26C6DA), Color(0xFF00838F)],
+                          gradientColors: const [Color(0xFF26C6DA), Color(0xFF00838F)],
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         _GradientStatCard(
-                          title: 'Consults Today',
-                          value: '3',
+                          title: 'Active Cases',
+                          value: '$activeTreatments',
                           icon: Icons.phone_in_talk_rounded,
-                          gradientColors: [Color(0xFFFF8A65), Color(0xFFE64A19)],
+                          gradientColors: const [Color(0xFFFF8A65), Color(0xFFE64A19)],
                         ),
-                        SizedBox(width: 12),
-                        _GradientStatCard(
+                        const SizedBox(width: 12),
+                        const _GradientStatCard(
                           title: 'Monthly Earnings',
                           value: '₹12.5K',
                           icon: Icons.currency_rupee_rounded,
@@ -214,7 +224,7 @@ class VetDashboardScreen extends StatelessWidget {
                         icon: Icons.add_circle_outline_rounded,
                         label: 'New Visit',
                         color: const Color(0xFF5B7A2E),
-                        onTap: () {},
+                        onTap: () => _showNewVisitSheet(context),
                       ),
                       const SizedBox(width: 10),
                       _QuickAction(
@@ -294,14 +304,14 @@ class VetDashboardScreen extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // ── Recent Consultations ────────────────────────────
-                  _SectionHeader(title: 'Recent Consultations', onSeeAll: () {}),
+                  _SectionHeader(title: 'Recent Consultations', onSeeAll: () => context.go('/vet/consultations')),
                   const SizedBox(height: 12),
                   ..._buildConsultations(context),
 
                   const SizedBox(height: 24),
 
                   // ── Upcoming Visits ─────────────────────────────────
-                  _SectionHeader(title: 'Upcoming Visits', onSeeAll: () {}),
+                  _SectionHeader(title: 'Upcoming Visits', onSeeAll: () => context.go('/vet/schedule')),
                   const SizedBox(height: 12),
                   ..._buildVisits(context),
 
@@ -809,6 +819,283 @@ class _SectionHeader extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ── Bottom Sheet Helpers ─────────────────────────────────────────────────────
+
+void _showNotificationsSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      maxChildSize: 0.9,
+      minChildSize: 0.3,
+      builder: (_, scrollController) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 8),
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  const Text(
+                    'Notifications',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF5B7A2E).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${mockAlerts.length}',
+                      style: const TextStyle(
+                          color: Color(0xFF5B7A2E),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Divider(height: 1),
+            Expanded(
+              child: ListView.builder(
+                controller: scrollController,
+                padding: const EdgeInsets.all(16),
+                itemCount: mockAlerts.length,
+                itemBuilder: (context, i) {
+                  final alert = mockAlerts[i];
+                  final Color alertColor;
+                  final IconData alertIcon;
+                  switch (alert.severity) {
+                    case AlertSeverity.high:
+                      alertColor = Colors.red;
+                      alertIcon = Icons.warning_rounded;
+                    case AlertSeverity.medium:
+                      alertColor = Colors.orange;
+                      alertIcon = Icons.info_rounded;
+                    case AlertSeverity.low:
+                      alertColor = Colors.green;
+                      alertIcon = Icons.check_circle_rounded;
+                  }
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: alertColor.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(12),
+                      border:
+                          Border.all(color: alertColor.withValues(alpha: 0.2)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(alertIcon, color: alertColor, size: 22),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(alert.message,
+                                  style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500)),
+                              const SizedBox(height: 2),
+                              Text(
+                                DateFormat('dd MMM').format(alert.date),
+                                style: TextStyle(
+                                    fontSize: 11, color: Colors.grey[500]),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+void _showNewVisitSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => const _NewVisitSheet(),
+  );
+}
+
+// ── New Visit Sheet ──────────────────────────────────────────────────────────
+
+class _NewVisitSheet extends StatefulWidget {
+  const _NewVisitSheet();
+
+  @override
+  State<_NewVisitSheet> createState() => _NewVisitSheetState();
+}
+
+class _NewVisitSheetState extends State<_NewVisitSheet> {
+  final _formKey = GlobalKey<FormState>();
+  String? _selectedFarmId;
+  DateTime _visitDate = DateTime.now();
+  final _purposeController = TextEditingController();
+  final _notesController = TextEditingController();
+
+  @override
+  void dispose() {
+    _purposeController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _visitDate,
+      firstDate: DateTime.now().subtract(const Duration(days: 30)),
+      lastDate: DateTime.now().add(const Duration(days: 90)),
+    );
+    if (picked != null) setState(() => _visitDate = picked);
+  }
+
+  void _save() {
+    if (_formKey.currentState!.validate()) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Visit scheduled successfully!'),
+          backgroundColor: Color(0xFF4CAF50),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + keyboardHeight),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Schedule New Visit',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              DropdownButtonFormField<String>(
+                value: _selectedFarmId,
+                decoration: const InputDecoration(
+                  labelText: 'Select Farm *',
+                  prefixIcon: Icon(Icons.agriculture_rounded),
+                ),
+                items: mockFarmers
+                    .map((f) => DropdownMenuItem(
+                          value: f.id,
+                          child: Text('${f.farmName} — ${f.name}'),
+                        ))
+                    .toList(),
+                onChanged: (v) => setState(() => _selectedFarmId = v),
+                validator: (v) =>
+                    v == null ? 'Please select a farm' : null,
+              ),
+              const SizedBox(height: 16),
+              InkWell(
+                onTap: _pickDate,
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Visit Date',
+                    prefixIcon: Icon(Icons.calendar_today_rounded),
+                  ),
+                  child:
+                      Text(DateFormat('dd MMM yyyy').format(_visitDate)),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _purposeController,
+                decoration: const InputDecoration(
+                  labelText: 'Purpose of Visit *',
+                  prefixIcon: Icon(Icons.assignment_rounded),
+                ),
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? 'Please enter visit purpose'
+                    : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _notesController,
+                decoration: const InputDecoration(
+                  labelText: 'Notes (optional)',
+                  prefixIcon: Icon(Icons.notes_rounded),
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: _save,
+                  icon: const Icon(Icons.check_circle_rounded),
+                  label: const Text(
+                    'Schedule Visit',
+                    style: TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

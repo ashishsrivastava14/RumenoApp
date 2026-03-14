@@ -89,13 +89,20 @@ class _ConsultTab extends StatefulWidget {
 
 class _ConsultTabState extends State<_ConsultTab> {
   final _notesController = TextEditingController();
+  final _diagnosisController = TextEditingController();
+  final _treatmentController = TextEditingController();
+  final _medicinesController = TextEditingController();
   String _selectedAnimal = 'Gir (C-001)';
+  String? _selectedFollowUp;
   final _symptoms = <String>[];
   final _allSymptoms = ['Fever', 'Loss of appetite', 'Lethargy', 'Lameness', 'Swelling', 'Diarrhea', 'Cough', 'Nasal discharge', 'Reduced milk'];
 
   @override
   void dispose() {
     _notesController.dispose();
+    _diagnosisController.dispose();
+    _treatmentController.dispose();
+    _medicinesController.dispose();
     super.dispose();
   }
 
@@ -139,17 +146,20 @@ class _ConsultTabState extends State<_ConsultTab> {
           const SizedBox(height: 16),
 
           // Diagnosis
-          const TextField(
-            decoration: InputDecoration(labelText: 'Diagnosis'),
+          TextField(
+            controller: _diagnosisController,
+            decoration: const InputDecoration(labelText: 'Diagnosis'),
           ),
           const SizedBox(height: 12),
-          const TextField(
-            decoration: InputDecoration(labelText: 'Treatment Prescribed'),
+          TextField(
+            controller: _treatmentController,
+            decoration: const InputDecoration(labelText: 'Treatment Prescribed'),
             maxLines: 2,
           ),
           const SizedBox(height: 12),
-          const TextField(
-            decoration: InputDecoration(labelText: 'Medicines'),
+          TextField(
+            controller: _medicinesController,
+            decoration: const InputDecoration(labelText: 'Medicines'),
           ),
           const SizedBox(height: 12),
           TextField(
@@ -163,11 +173,12 @@ class _ConsultTabState extends State<_ConsultTab> {
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
+                  value: _selectedFollowUp,
                   decoration: const InputDecoration(labelText: 'Follow-up'),
                   items: ['No follow-up', 'After 3 days', 'After 1 week', 'After 2 weeks', 'After 1 month']
                       .map((f) => DropdownMenuItem(value: f, child: Text(f)))
                       .toList(),
-                  onChanged: (_) {},
+                  onChanged: (v) => setState(() => _selectedFollowUp = v),
                 ),
               ),
             ],
@@ -179,6 +190,20 @@ class _ConsultTabState extends State<_ConsultTab> {
             height: 50,
             child: ElevatedButton.icon(
               onPressed: () {
+                if (_diagnosisController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter a diagnosis'), backgroundColor: Colors.red),
+                  );
+                  return;
+                }
+                _diagnosisController.clear();
+                _treatmentController.clear();
+                _medicinesController.clear();
+                _notesController.clear();
+                setState(() {
+                  _symptoms.clear();
+                  _selectedFollowUp = null;
+                });
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Consultation saved!'), backgroundColor: Colors.green),
                 );

@@ -51,6 +51,9 @@ import '../screens/vet/vet_dashboard_screen.dart';
 import '../screens/vet/vet_farms_screen.dart';
 import '../screens/vet/vet_animal_health_screen.dart';
 import '../screens/vet/vet_earnings_screen.dart';
+import '../screens/vet/vet_farm_detail_screen.dart';
+import '../screens/vet/vet_consultations_screen.dart';
+import '../screens/vet/vet_schedule_screen.dart';
 
 // Admin
 import '../screens/admin/admin_shell.dart';
@@ -207,6 +210,26 @@ GoRouter createRouter(AuthProvider authProvider) {
           GoRoute(path: '/vet/health', builder: (_, _) => const VetAnimalHealthScreen()),
           GoRoute(path: '/vet/earnings', builder: (_, _) => const VetEarningsScreen()),
         ],
+      ),
+
+      // ─── Vet detail routes (outside shell to get full-screen navigation) ───
+      GoRoute(
+        path: '/vet/farms/:id',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return VetFarmDetailScreen(farmerId: id);
+        },
+      ),
+      GoRoute(
+        path: '/vet/consultations',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, _) => const VetConsultationsScreen(),
+      ),
+      GoRoute(
+        path: '/vet/schedule',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, _) => const VetScheduleScreen(),
       ),
 
       // ─── Admin Shell ───
