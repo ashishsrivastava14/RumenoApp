@@ -98,14 +98,12 @@ class VetDashboardScreen extends StatelessWidget {
                                 color: Colors.white.withValues(alpha: 0.2),
                                 border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2),
                               ),
-                              child: const Center(
-                                child: Text(
-                                  'AS',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/images/vetdoctor.png',
+                                  width: 56,
+                                  height: 56,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),
