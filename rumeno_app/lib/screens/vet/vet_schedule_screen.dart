@@ -40,7 +40,7 @@ class VetScheduleScreen extends StatelessWidget {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go('/vet');
+              context.go('/vet/dashboard');
             }
           },
         ),

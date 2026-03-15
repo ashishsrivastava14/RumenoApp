@@ -35,7 +35,7 @@ class _AdminFarmersScreenState extends State<AdminFarmersScreen> {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go('/admin');
+              context.go('/admin/dashboard');
             }
           },
         ),

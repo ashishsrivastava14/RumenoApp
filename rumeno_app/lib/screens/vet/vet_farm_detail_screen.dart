@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
 import '../../mock/mock_animals.dart';
@@ -50,6 +51,16 @@ class _VetFarmDetailScreenState extends State<VetFarmDetailScreen>
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
         title: Text(farmer.farmName),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/vet/farms');
+            }
+          },
+        ),
         actions: const [FarmButton(), MarketplaceButton()],
         bottom: TabBar(
           controller: _tab,

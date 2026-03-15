@@ -38,7 +38,7 @@ class _VetConsultationsScreenState extends State<VetConsultationsScreen> {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go('/vet');
+              context.go('/vet/dashboard');
             }
           },
         ),

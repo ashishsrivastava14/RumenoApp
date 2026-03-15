@@ -59,6 +59,16 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
         title: const Text('Vendor Registration'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/shop');
+            }
+          },
+        ),
         actions: const [VeterinarianButton(), FarmButton()],
       ),
       body: Form(

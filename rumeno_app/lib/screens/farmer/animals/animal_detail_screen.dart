@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../config/theme.dart';
 import '../../../mock/mock_animals.dart';
@@ -81,6 +82,16 @@ class AnimalDetailScreen extends StatelessWidget {
                 ),
               ),
               title: Text(animal.tagId),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/farmer/animals');
+                  }
+                },
+              ),
               actions: const [VeterinarianButton(), MarketplaceButton()],
             ),
             SliverPersistentHeader(

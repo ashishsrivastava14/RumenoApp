@@ -14,7 +14,16 @@ class MoreScreen extends StatelessWidget {
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
         title: const Text('More'),
-        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/farmer/dashboard');
+            }
+          },
+        ),
         actions: const [VeterinarianButton(), MarketplaceButton()],
       ),
       body: SingleChildScrollView(

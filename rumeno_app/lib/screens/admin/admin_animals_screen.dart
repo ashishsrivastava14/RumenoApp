@@ -35,7 +35,7 @@ class _AdminAnimalsScreenState extends State<AdminAnimalsScreen> {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go('/admin');
+              context.go('/admin/dashboard');
             }
           },
         ),
