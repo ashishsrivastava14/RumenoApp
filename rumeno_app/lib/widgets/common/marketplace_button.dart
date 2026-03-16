@@ -185,7 +185,7 @@ class FarmButton extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 6, right: 1, top: 4, bottom: 4),
               child: Image.asset(
-                'assets/images/farm7.png',
+                'assets/images/farm1.png',
                 width: 46,
                 height: 46,
               ),
