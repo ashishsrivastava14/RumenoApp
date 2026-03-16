@@ -17,6 +17,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final _searchController = TextEditingController();
   ProductCategory? _filterCategory;
+  ProductAnimal? _filterAnimal;
 
   @override
   void initState() {
@@ -39,6 +40,9 @@ class _SearchScreenState extends State<SearchScreen> {
     var products = ecommerce.products;
     if (_filterCategory != null) {
       products = products.where((p) => p.category == _filterCategory).toList();
+    }
+    if (_filterAnimal != null) {
+      products = products.where((p) => (p.targetAnimals ?? <ProductAnimal>[]).contains(_filterAnimal)).toList();
     }
 
     return Scaffold(
@@ -94,12 +98,12 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: Column(
         children: [
-          // Filter chips - larger
+          // Category filter chips
           SizedBox(
-            height: 56,
+            height: 52,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               children: [
                 _FilterChip(
                   icon: Icons.grid_view_rounded,
@@ -134,6 +138,64 @@ class _SearchScreenState extends State<SearchScreen> {
                   isSelected: _filterCategory == ProductCategory.farmEquipment,
                   onTap: () => setState(() => _filterCategory = ProductCategory.farmEquipment),
                   color: const Color(0xFF2196F3),
+                ),
+              ],
+            ),
+          ),
+          // Animal filter chips
+          SizedBox(
+            height: 48,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              children: [
+                _FilterChip(
+                  icon: Icons.pets_rounded,
+                  label: 'All Animals',
+                  isSelected: _filterAnimal == null,
+                  onTap: () => setState(() => _filterAnimal = null),
+                ),
+                _FilterChip(
+                  icon: Icons.set_meal_rounded,
+                  label: 'Cattle',
+                  isSelected: _filterAnimal == ProductAnimal.cattle,
+                  onTap: () => setState(() => _filterAnimal = ProductAnimal.cattle),
+                  color: const Color(0xFF795548),
+                ),
+                _FilterChip(
+                  icon: Icons.cruelty_free_rounded,
+                  label: 'Goat',
+                  isSelected: _filterAnimal == ProductAnimal.goat,
+                  onTap: () => setState(() => _filterAnimal = ProductAnimal.goat),
+                  color: const Color(0xFF8D6E63),
+                ),
+                _FilterChip(
+                  icon: Icons.cloud_rounded,
+                  label: 'Sheep',
+                  isSelected: _filterAnimal == ProductAnimal.sheep,
+                  onTap: () => setState(() => _filterAnimal = ProductAnimal.sheep),
+                  color: const Color(0xFF90A4AE),
+                ),
+                _FilterChip(
+                  icon: Icons.egg_alt_rounded,
+                  label: 'Poultry',
+                  isSelected: _filterAnimal == ProductAnimal.poultry,
+                  onTap: () => setState(() => _filterAnimal = ProductAnimal.poultry),
+                  color: const Color(0xFFFDD835),
+                ),
+                _FilterChip(
+                  icon: Icons.cabin_rounded,
+                  label: 'Pig',
+                  isSelected: _filterAnimal == ProductAnimal.pig,
+                  onTap: () => setState(() => _filterAnimal = ProductAnimal.pig),
+                  color: const Color(0xFFF48FB1),
+                ),
+                _FilterChip(
+                  icon: Icons.directions_run_rounded,
+                  label: 'Horse',
+                  isSelected: _filterAnimal == ProductAnimal.horse,
+                  onTap: () => setState(() => _filterAnimal = ProductAnimal.horse),
+                  color: const Color(0xFF6D4C41),
                 ),
               ],
             ),

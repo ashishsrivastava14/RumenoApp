@@ -25,6 +25,7 @@ final List<Product> mockProducts = [
     weightKg: 50,
     createdAt: DateTime(2025, 1, 15),
     tags: ['cattle feed', 'dairy', 'premium'],
+    targetAnimals: [ProductAnimal.cattle],
   ),
   Product(
     id: 'P002',
@@ -46,6 +47,7 @@ final List<Product> mockProducts = [
     weightKg: 5,
     createdAt: DateTime(2025, 2, 1),
     tags: ['mineral', 'supplement', 'health'],
+    targetAnimals: [ProductAnimal.cattle, ProductAnimal.goat, ProductAnimal.sheep],
   ),
   Product(
     id: 'P003',
@@ -65,6 +67,7 @@ final List<Product> mockProducts = [
     unit: '10 bolus strip',
     createdAt: DateTime(2025, 3, 10),
     tags: ['dewormer', 'medicine', 'cattle'],
+    targetAnimals: [ProductAnimal.cattle],
   ),
   Product(
     id: 'P004',
@@ -87,6 +90,7 @@ final List<Product> mockProducts = [
     weightKg: 25,
     createdAt: DateTime(2025, 1, 20),
     tags: ['milking', 'machine', 'dairy'],
+    targetAnimals: [ProductAnimal.cattle, ProductAnimal.goat],
   ),
   Product(
     id: 'P005',
@@ -107,6 +111,7 @@ final List<Product> mockProducts = [
     weightKg: 3,
     createdAt: DateTime(2025, 4, 5),
     tags: ['urea', 'molasses', 'nutrition'],
+    targetAnimals: [ProductAnimal.cattle],
   ),
 
   // Third-party vendor products
@@ -128,6 +133,7 @@ final List<Product> mockProducts = [
     weightKg: 25,
     createdAt: DateTime(2025, 5, 1),
     tags: ['silage', 'corn', 'dairy feed'],
+    targetAnimals: [ProductAnimal.cattle],
   ),
   Product(
     id: 'P007',
@@ -146,6 +152,7 @@ final List<Product> mockProducts = [
     unit: '500 ml bottle',
     createdAt: DateTime(2025, 3, 15),
     tags: ['calcium', 'milk fever', 'dairy'],
+    targetAnimals: [ProductAnimal.cattle],
   ),
   Product(
     id: 'P008',
@@ -167,6 +174,7 @@ final List<Product> mockProducts = [
     weightKg: 85,
     createdAt: DateTime(2025, 2, 20),
     tags: ['chaff cutter', 'fodder', 'machinery'],
+    targetAnimals: [ProductAnimal.cattle, ProductAnimal.goat, ProductAnimal.sheep],
   ),
   Product(
     id: 'P009',
@@ -186,6 +194,7 @@ final List<Product> mockProducts = [
     weightKg: 25,
     createdAt: DateTime(2025, 4, 10),
     tags: ['bypass fat', 'energy', 'dairy'],
+    targetAnimals: [ProductAnimal.cattle],
   ),
   Product(
     id: 'P010',
@@ -205,6 +214,7 @@ final List<Product> mockProducts = [
     weightKg: 50,
     createdAt: DateTime(2025, 3, 1),
     tags: ['tmr', 'total mixed ration', 'complete feed'],
+    targetAnimals: [ProductAnimal.cattle],
   ),
   Product(
     id: 'P011',
@@ -223,6 +233,7 @@ final List<Product> mockProducts = [
     unit: 'Kit',
     createdAt: DateTime(2025, 5, 5),
     tags: ['mastitis', 'udder health', 'treatment'],
+    targetAnimals: [ProductAnimal.cattle],
   ),
   Product(
     id: 'P012',
@@ -242,6 +253,7 @@ final List<Product> mockProducts = [
     weightKg: 120,
     createdAt: DateTime(2025, 4, 15),
     tags: ['weighing scale', 'digital', 'livestock'],
+    targetAnimals: [ProductAnimal.cattle, ProductAnimal.goat, ProductAnimal.sheep, ProductAnimal.pig, ProductAnimal.horse],
   ),
   Product(
     id: 'P013',
@@ -261,6 +273,7 @@ final List<Product> mockProducts = [
     weightKg: 25,
     createdAt: DateTime(2025, 5, 10),
     tags: ['goat feed', 'pellet', 'nutrition'],
+    targetAnimals: [ProductAnimal.goat],
   ),
   Product(
     id: 'P014',
@@ -279,6 +292,7 @@ final List<Product> mockProducts = [
     unit: 'Box',
     createdAt: DateTime(2025, 2, 15),
     tags: ['first aid', 'emergency', 'veterinary'],
+    targetAnimals: [ProductAnimal.cattle, ProductAnimal.goat, ProductAnimal.sheep],
   ),
   Product(
     id: 'P015',
@@ -298,6 +312,7 @@ final List<Product> mockProducts = [
     weightKg: 15,
     createdAt: DateTime(2025, 6, 1),
     tags: ['water trough', 'automatic', 'stainless steel'],
+    targetAnimals: [ProductAnimal.cattle, ProductAnimal.goat, ProductAnimal.sheep],
   ),
   Product(
     id: 'P016',
@@ -316,6 +331,7 @@ final List<Product> mockProducts = [
     unit: '100 ml vial',
     createdAt: DateTime(2025, 4, 20),
     tags: ['vitamin', 'injection', 'immunity'],
+    targetAnimals: [ProductAnimal.cattle],
   ),
 ];
 

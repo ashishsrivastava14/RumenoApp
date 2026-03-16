@@ -427,6 +427,8 @@ class LabReport {
 
 enum ProductCategory { animalFeed, supplements, veterinaryMedicines, farmEquipment }
 
+enum ProductAnimal { cattle, goat, sheep, poultry, pig, horse }
+
 enum OrderStatus { pending, confirmed, packed, shipped, delivered, cancelled, returned }
 
 enum VendorStatus { pending, approved, rejected, suspended }
@@ -456,6 +458,7 @@ class Product {
   final double? weightKg;
   final DateTime createdAt;
   final List<String> tags;
+  final List<ProductAnimal> targetAnimals;
 
   const Product({
     required this.id,
@@ -477,7 +480,8 @@ class Product {
     required this.unit,
     this.weightKg,
     required this.createdAt,
-    this.tags = const [],
+    this.tags = const <String>[],
+    this.targetAnimals = const <ProductAnimal>[],
   });
 
   bool get inStock => stockQuantity > 0;
