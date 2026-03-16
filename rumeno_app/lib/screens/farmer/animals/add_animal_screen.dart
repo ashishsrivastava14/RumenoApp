@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../config/theme.dart';
 import '../../../models/models.dart';
 import '../../../widgets/common/marketplace_button.dart';
@@ -29,6 +32,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
   double _weight = 400;
   double _height = 130;
   String _selectedColor = 'Brown';
+  XFile? _animalPhoto;
   late TextEditingController _weightController;
   late TextEditingController _heightController;
 
@@ -820,38 +824,161 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
     );
   }
 
-  Widget _buildPhotoUpload() {
-    return GestureDetector(
-      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Photo upload coming soon!'))),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 28),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-              color: RumenoTheme.primaryGreen.withValues(alpha: 0.5),
-              width: 1.5),
-        ),
-        child: Column(
-          children: [
-            Icon(Icons.add_a_photo_outlined,
-                size: 52,
-                color: RumenoTheme.primaryGreen.withValues(alpha: 0.7)),
-            const SizedBox(height: 10),
-            const Text('Tap to add photo',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: RumenoTheme.primaryGreen)),
-            const SizedBox(height: 4),
-            Text('Optional – helps identify the animal',
-                style: TextStyle(
-                    color: RumenoTheme.textGrey, fontSize: 12)),
-          ],
+  Future<void> _pickPhoto(ImageSource source) async {
+    final picker = ImagePicker();
+    final file = await picker.pickImage(
+      source: source,
+      imageQuality: 85,
+      maxWidth: 1200,
+    );
+    if (file != null) {
+      setState(() => _animalPhoto = file);
+    }
+  }
+
+  void _showPhotoOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: RumenoTheme.textLight,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: RumenoTheme.primaryGreen.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.camera_alt_rounded,
+                      color: RumenoTheme.primaryGreen),
+                ),
+                title: const Text('Take a Photo',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: const Text('Use camera'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickPhoto(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: RumenoTheme.primaryGreen.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.photo_library_rounded,
+                      color: RumenoTheme.primaryGreen),
+                ),
+                title: const Text('Choose from Gallery',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: const Text('Pick an existing photo'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickPhoto(ImageSource.gallery);
+                },
+              ),
+              if (_animalPhoto != null)
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.delete_outline_rounded,
+                        color: Colors.red),
+                  ),
+                  title: const Text('Remove Photo',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600, color: Colors.red)),
+                  onTap: () {
+                    Navigator.pop(context);
+                    setState(() => _animalPhoto = null);
+                  },
+                ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPhotoUpload() {
+    return GestureDetector(
+      onTap: _showPhotoOptions,
+      child: _animalPhoto != null
+          ? Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Image.file(
+                    File(_animalPhoto!.path),
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: _showPhotoOptions,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(Icons.edit_rounded,
+                          color: Colors.white, size: 18),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 28),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                    color: RumenoTheme.primaryGreen.withValues(alpha: 0.5),
+                    width: 1.5),
+              ),
+              child: Column(
+                children: [
+                  Icon(Icons.add_a_photo_outlined,
+                      size: 52,
+                      color: RumenoTheme.primaryGreen.withValues(alpha: 0.7)),
+                  const SizedBox(height: 10),
+                  const Text('Tap to add photo',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: RumenoTheme.primaryGreen)),
+                  const SizedBox(height: 4),
+                  Text('Optional – helps identify the animal',
+                      style: TextStyle(
+                          color: RumenoTheme.textGrey, fontSize: 12)),
+                ],
+              ),
+            ),
     );
   }
 
