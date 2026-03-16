@@ -29,6 +29,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
   double _weight = 400;
   double _height = 130;
   String _selectedColor = 'Brown';
+  late TextEditingController _weightController;
+  late TextEditingController _heightController;
 
   // Step 3
   String? _fatherId;
@@ -56,6 +58,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
   @override
   void initState() {
     super.initState();
+    _weightController = TextEditingController(text: _weight.round().toString());
+    _heightController = TextEditingController(text: _height.round().toString());
     _animController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 350));
     _fadeAnim =
@@ -66,6 +70,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
   @override
   void dispose() {
     _animController.dispose();
+    _weightController.dispose();
+    _heightController.dispose();
     _breedController.dispose();
     _tagController.dispose();
     _shedController.dispose();
@@ -533,23 +539,31 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
         const SizedBox(height: 20),
         _sectionLabel('⚖️  Weight'),
         const SizedBox(height: 8),
-        _sliderCard(
-            value: _weight,
-            min: 10,
-            max: 1000,
-            unit: 'kg',
-            icon: Icons.scale,
-            onChanged: (v) => setState(() => _weight = v)),
+        _measureInputCard(
+          emoji: '⚖️',
+          label: 'Weight',
+          unit: 'kg',
+          controller: _weightController,
+          value: _weight,
+          min: 10,
+          max: 1000,
+          step: 5,
+          onChanged: (v) => setState(() => _weight = v),
+        ),
         const SizedBox(height: 20),
         _sectionLabel('📏  Height'),
         const SizedBox(height: 8),
-        _sliderCard(
-            value: _height,
-            min: 30,
-            max: 220,
-            unit: 'cm',
-            icon: Icons.height,
-            onChanged: (v) => setState(() => _height = v)),
+        _measureInputCard(
+          emoji: '📏',
+          label: 'Height',
+          unit: 'cm',
+          controller: _heightController,
+          value: _height,
+          min: 30,
+          max: 220,
+          step: 1,
+          onChanged: (v) => setState(() => _height = v),
+        ),
         const SizedBox(height: 20),
         _sectionLabel('🎨  Color / Markings'),
         const SizedBox(height: 10),
@@ -563,58 +577,171 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
     );
   }
 
-  Widget _sliderCard({
+  Widget _measureInputCard({
+    required String emoji,
+    required String label,
+    required String unit,
+    required TextEditingController controller,
     required double value,
     required double min,
     required double max,
-    required String unit,
-    required IconData icon,
+    required double step,
     required ValueChanged<double> onChanged,
   }) {
+    void _adjust(double delta) {
+      final newVal = (value + delta).clamp(min, max);
+      onChanged(newVal);
+      controller.text = newVal.round().toString();
+    }
+
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: RumenoTheme.textLight),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: RumenoTheme.primaryGreen.withValues(alpha: 0.35), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: RumenoTheme.primaryGreen.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: RumenoTheme.primaryGreen, size: 28),
-              const SizedBox(width: 10),
-              Text(
-                '${value.round()} $unit',
-                style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: RumenoTheme.primaryGreen),
-              ),
-            ],
+          // Header banner
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              color: RumenoTheme.primaryGreen.withValues(alpha: 0.1),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(17)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(emoji, style: const TextStyle(fontSize: 22)),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: RumenoTheme.primaryGreen,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 4),
-          Slider(
-            value: value,
-            min: min,
-            max: max,
-            divisions: ((max - min) / 5).round(),
-            activeColor: RumenoTheme.primaryGreen,
-            onChanged: onChanged,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('${min.round()} $unit',
-                  style: const TextStyle(
-                      color: RumenoTheme.textGrey, fontSize: 12)),
-              Text('${max.round()} $unit',
-                  style: const TextStyle(
-                      color: RumenoTheme.textGrey, fontSize: 12)),
-            ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            child: Row(
+              children: [
+                // Minus button
+                _adjustButton(
+                  icon: Icons.remove,
+                  onTap: () => _adjust(-step),
+                  enabled: value > min,
+                ),
+                const SizedBox(width: 12),
+                // Input field
+                Expanded(
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: RumenoTheme.backgroundCream,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                              color: RumenoTheme.primaryGreen.withValues(alpha: 0.5),
+                              width: 1.5),
+                        ),
+                        child: TextField(
+                          controller: controller,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                            color: RumenoTheme.primaryGreen,
+                            height: 1.1,
+                          ),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 12),
+                            suffixText: unit,
+                            suffixStyle: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: RumenoTheme.primaryGreen.withValues(alpha: 0.7),
+                            ),
+                          ),
+                          onChanged: (text) {
+                            final parsed = double.tryParse(text);
+                            if (parsed != null) {
+                              final clamped = parsed.clamp(min, max);
+                              onChanged(clamped);
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Min: ${min.round()} – Max: ${max.round()} $unit',
+                        style: const TextStyle(
+                            fontSize: 11, color: RumenoTheme.textGrey),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Plus button
+                _adjustButton(
+                  icon: Icons.add,
+                  onTap: () => _adjust(step),
+                  enabled: value < max,
+                ),
+              ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _adjustButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    required bool enabled,
+  }) {
+    return GestureDetector(
+      onTap: enabled ? onTap : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: 52,
+        height: 52,
+        decoration: BoxDecoration(
+          color: enabled
+              ? RumenoTheme.primaryGreen
+              : RumenoTheme.textLight.withValues(alpha: 0.4),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: enabled
+              ? [
+                  BoxShadow(
+                    color: RumenoTheme.primaryGreen.withValues(alpha: 0.35),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  )
+                ]
+              : [],
+        ),
+        child: Icon(
+          icon,
+          color: enabled ? Colors.white : RumenoTheme.textGrey,
+          size: 28,
+        ),
       ),
     );
   }
