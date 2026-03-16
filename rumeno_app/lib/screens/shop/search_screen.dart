@@ -170,7 +170,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   color: const Color(0xFF8D6E63),
                 ),
                 _FilterChip(
-                  icon: Icons.cloud_rounded,
+                  icon: Icons.grain_rounded,
                   label: 'Sheep',
                   isSelected: _filterAnimal == ProductAnimal.sheep,
                   onTap: () => setState(() => _filterAnimal = ProductAnimal.sheep),
@@ -184,14 +184,14 @@ class _SearchScreenState extends State<SearchScreen> {
                   color: const Color(0xFFFDD835),
                 ),
                 _FilterChip(
-                  icon: Icons.cabin_rounded,
+                  icon: Icons.sentiment_satisfied_rounded,
                   label: 'Pig',
                   isSelected: _filterAnimal == ProductAnimal.pig,
                   onTap: () => setState(() => _filterAnimal = ProductAnimal.pig),
                   color: const Color(0xFFF48FB1),
                 ),
                 _FilterChip(
-                  icon: Icons.directions_run_rounded,
+                  icon: Icons.speed_rounded,
                   label: 'Horse',
                   isSelected: _filterAnimal == ProductAnimal.horse,
                   onTap: () => setState(() => _filterAnimal = ProductAnimal.horse),
