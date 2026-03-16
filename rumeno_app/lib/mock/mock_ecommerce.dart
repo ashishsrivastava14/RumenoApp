@@ -26,6 +26,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 1, 15),
     tags: ['cattle feed', 'dairy', 'premium'],
     targetAnimals: [ProductAnimal.cattle],
+    hsnCode: '23091000',
   ),
   Product(
     id: 'P002',
@@ -48,6 +49,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 2, 1),
     tags: ['mineral', 'supplement', 'health'],
     targetAnimals: [ProductAnimal.cattle, ProductAnimal.goat, ProductAnimal.sheep],
+    hsnCode: '23099090',
   ),
   Product(
     id: 'P003',
@@ -68,6 +70,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 3, 10),
     tags: ['dewormer', 'medicine', 'cattle'],
     targetAnimals: [ProductAnimal.cattle],
+    hsnCode: '30049099',
   ),
   Product(
     id: 'P004',
@@ -91,6 +94,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 1, 20),
     tags: ['milking', 'machine', 'dairy'],
     targetAnimals: [ProductAnimal.cattle, ProductAnimal.goat],
+    hsnCode: '84341000',
   ),
   Product(
     id: 'P005',
@@ -112,6 +116,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 4, 5),
     tags: ['urea', 'molasses', 'nutrition'],
     targetAnimals: [ProductAnimal.cattle],
+    hsnCode: '23099090',
   ),
 
   // Third-party vendor products
@@ -134,6 +139,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 5, 1),
     tags: ['silage', 'corn', 'dairy feed'],
     targetAnimals: [ProductAnimal.cattle],
+    hsnCode: '23089090',
   ),
   Product(
     id: 'P007',
@@ -153,6 +159,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 3, 15),
     tags: ['calcium', 'milk fever', 'dairy'],
     targetAnimals: [ProductAnimal.cattle],
+    hsnCode: '30049099',
   ),
   Product(
     id: 'P008',
@@ -175,6 +182,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 2, 20),
     tags: ['chaff cutter', 'fodder', 'machinery'],
     targetAnimals: [ProductAnimal.cattle, ProductAnimal.goat, ProductAnimal.sheep],
+    hsnCode: '84368000',
   ),
   Product(
     id: 'P009',
@@ -195,6 +203,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 4, 10),
     tags: ['bypass fat', 'energy', 'dairy'],
     targetAnimals: [ProductAnimal.cattle],
+    hsnCode: '23099090',
   ),
   Product(
     id: 'P010',
@@ -215,6 +224,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 3, 1),
     tags: ['tmr', 'total mixed ration', 'complete feed'],
     targetAnimals: [ProductAnimal.cattle],
+    hsnCode: '23091000',
   ),
   Product(
     id: 'P011',
@@ -234,6 +244,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 5, 5),
     tags: ['mastitis', 'udder health', 'treatment'],
     targetAnimals: [ProductAnimal.cattle],
+    hsnCode: '30049099',
   ),
   Product(
     id: 'P012',
@@ -254,6 +265,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 4, 15),
     tags: ['weighing scale', 'digital', 'livestock'],
     targetAnimals: [ProductAnimal.cattle, ProductAnimal.goat, ProductAnimal.sheep, ProductAnimal.pig, ProductAnimal.horse],
+    hsnCode: '84231090',
   ),
   Product(
     id: 'P013',
@@ -274,6 +286,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 5, 10),
     tags: ['goat feed', 'pellet', 'nutrition'],
     targetAnimals: [ProductAnimal.goat],
+    hsnCode: '23091000',
   ),
   Product(
     id: 'P014',
@@ -293,6 +306,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 2, 15),
     tags: ['first aid', 'emergency', 'veterinary'],
     targetAnimals: [ProductAnimal.cattle, ProductAnimal.goat, ProductAnimal.sheep],
+    hsnCode: '30059090',
   ),
   Product(
     id: 'P015',
@@ -313,6 +327,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 6, 1),
     tags: ['water trough', 'automatic', 'stainless steel'],
     targetAnimals: [ProductAnimal.cattle, ProductAnimal.goat, ProductAnimal.sheep],
+    hsnCode: '84368000',
   ),
   Product(
     id: 'P016',
@@ -332,6 +347,7 @@ final List<Product> mockProducts = [
     createdAt: DateTime(2025, 4, 20),
     tags: ['vitamin', 'injection', 'immunity'],
     targetAnimals: [ProductAnimal.cattle],
+    hsnCode: '30049099',
   ),
 ];
 

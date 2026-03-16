@@ -261,11 +261,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: Text(
-                              '${item.product.name} x ${item.quantity}',
-                              style: const TextStyle(fontSize: 13),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${item.product.name} x ${item.quantity}',
+                                  style: const TextStyle(fontSize: 13),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                if (item.product.hsnCode != null)
+                                  Text(
+                                    'HSN: ${item.product.hsnCode}',
+                                    style: TextStyle(fontSize: 11, color: RumenoTheme.textGrey),
+                                  ),
+                              ],
                             ),
                           ),
                           Text(

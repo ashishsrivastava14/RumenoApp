@@ -459,6 +459,7 @@ class Product {
   final DateTime createdAt;
   final List<String> tags;
   final List<ProductAnimal> targetAnimals;
+  final String? hsnCode;
 
   const Product({
     required this.id,
@@ -482,6 +483,7 @@ class Product {
     required this.createdAt,
     this.tags = const <String>[],
     this.targetAnimals = const <ProductAnimal>[],
+    this.hsnCode,
   });
 
   bool get inStock => stockQuantity > 0;
