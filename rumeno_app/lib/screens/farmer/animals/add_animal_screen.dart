@@ -39,6 +39,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
   // Step 3
   String? _fatherId;
   String? _motherId;
+  final List<_ParentEntry> _customFathers = [];
+  final List<_ParentEntry> _customMothers = [];
 
   // Step 4
   final _shedController = TextEditingController(text: 'A1');
@@ -1015,6 +1017,17 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
 
   // ── Step 3 : Pedigree ────────────────────────
   Widget _buildStep3() {
+    final fatherEntries = [
+      const _ParentEntry(animalId: 'C-007'),
+      const _ParentEntry(animalId: 'B-005'),
+      ..._customFathers,
+    ];
+    final motherEntries = [
+      const _ParentEntry(animalId: 'C-001'),
+      const _ParentEntry(animalId: 'C-002'),
+      const _ParentEntry(animalId: 'C-003'),
+      ..._customMothers,
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1045,34 +1058,294 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
         _sectionLabel('🐂  Father (Bull)'),
         const SizedBox(height: 8),
         _parentSelector(
-            'Father', ['C-007', 'B-005'], _fatherId,
-            (v) => setState(() => _fatherId = v)),
+          entries: fatherEntries,
+          selected: _fatherId,
+          onChanged: (v) => setState(() => _fatherId = v),
+          onAddNew: () => _showAddParentDialog(
+            title: 'Add Father',
+            onSave: (entry) {
+              setState(() {
+                _customFathers.add(entry);
+                _fatherId = entry.animalId;
+              });
+            },
+          ),
+        ),
         const SizedBox(height: 24),
         _sectionLabel('🐄  Mother (Cow)'),
         const SizedBox(height: 8),
         _parentSelector(
-            'Mother', ['C-001', 'C-002', 'C-003'], _motherId,
-            (v) => setState(() => _motherId = v)),
+          entries: motherEntries,
+          selected: _motherId,
+          onChanged: (v) => setState(() => _motherId = v),
+          onAddNew: () => _showAddParentDialog(
+            title: 'Add Mother',
+            onSave: (entry) {
+              setState(() {
+                _customMothers.add(entry);
+                _motherId = entry.animalId;
+              });
+            },
+          ),
+        ),
         const SizedBox(height: 16),
       ],
     );
   }
 
-  Widget _parentSelector(String type, List<String> ids, String? selected,
-      Function(String?) onChanged) {
+  void _showAddParentDialog({
+    required String title,
+    required void Function(_ParentEntry) onSave,
+  }) {
+    final idCtrl = TextEditingController();
+    final locationCtrl = TextEditingController();
+    final ownerCtrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius:
+                BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: RumenoTheme.textLight,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: RumenoTheme.primaryGreen
+                              .withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.pets,
+                            color: RumenoTheme.primaryGreen, size: 22),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: RumenoTheme.textDark,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: idCtrl,
+                    textCapitalization: TextCapitalization.characters,
+                    decoration: InputDecoration(
+                      labelText: 'Animal ID *',
+                      hintText: 'e.g. C-010',
+                      prefixIcon: const Icon(Icons.tag_rounded),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      filled: true,
+                      fillColor: RumenoTheme.backgroundCream,
+                    ),
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty)
+                            ? 'Animal ID is required'
+                            : null,
+                  ),
+                  const SizedBox(height: 14),
+                  TextFormField(
+                    controller: locationCtrl,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: InputDecoration(
+                      labelText: 'Location *',
+                      hintText: 'e.g. Jaipur',
+                      prefixIcon:
+                          const Icon(Icons.location_on_outlined),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      filled: true,
+                      fillColor: RumenoTheme.backgroundCream,
+                    ),
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty)
+                            ? 'Location is required'
+                            : null,
+                  ),
+                  const SizedBox(height: 14),
+                  TextFormField(
+                    controller: ownerCtrl,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: InputDecoration(
+                      labelText: 'Previous Owner Name',
+                      hintText: 'e.g. Ramesh Kumar',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      filled: true,
+                      fillColor: RumenoTheme.backgroundCream,
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 14),
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(12)),
+                          ),
+                          child: const Text('Cancel'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              onSave(_ParentEntry(
+                                animalId: idCtrl.text.trim(),
+                                location: locationCtrl.text.trim(),
+                                ownerName: ownerCtrl.text.trim(),
+                              ));
+                              Navigator.pop(ctx);
+                            }
+                          },
+                          icon: const Icon(Icons.check_rounded),
+                          label: const Text('Save',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 14),
+                            backgroundColor:
+                                RumenoTheme.primaryGreen,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(12)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _parentSelector({
+    required List<_ParentEntry> entries,
+    required String? selected,
+    required Function(String?) onChanged,
+    required VoidCallback onAddNew,
+  }) {
     return Column(
       children: [
-        _parentTile(null, 'Don\'t know / None', Icons.do_not_disturb_alt,
-            selected, onChanged),
-        ...ids.map((id) => _parentTile(
-            id, 'Animal $id', Icons.pets, selected, onChanged)),
+        _parentTile(entry: null, selected: selected, onChanged: onChanged),
+        ...entries.map((e) => _parentTile(
+              entry: e,
+              selected: selected,
+              onChanged: onChanged,
+            )),
+        GestureDetector(
+          onTap: onAddNew,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: RumenoTheme.primaryGreen.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: RumenoTheme.primaryGreen.withValues(alpha: 0.4),
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color:
+                        RumenoTheme.primaryGreen.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.add_rounded,
+                      color: RumenoTheme.primaryGreen, size: 22),
+                ),
+                const SizedBox(width: 14),
+                const Expanded(
+                  child: Text(
+                    'Add manually (not in list)',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: RumenoTheme.primaryGreen,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios_rounded,
+                    size: 16, color: RumenoTheme.primaryGreen),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  Widget _parentTile(String? id, String label, IconData icon,
-      String? selected, Function(String?) onChanged) {
+  Widget _parentTile({
+    required _ParentEntry? entry,
+    required String? selected,
+    required Function(String?) onChanged,
+  }) {
+    final id = entry?.animalId;
     final sel = selected == id;
+    final isNone = entry == null;
+
+    final parts = <String>[];
+    if (!isNone) {
+      parts.add(entry!.animalId);
+      if (entry.location.isNotEmpty) parts.add(entry.location);
+      if (entry.ownerName.isNotEmpty) parts.add(entry.ownerName);
+    }
+    final label =
+        isNone ? "Don't know / None" : parts.join(' · ');
+    final showSubtitle = !isNone &&
+        (entry!.location.isNotEmpty || entry.ownerName.isNotEmpty);
+
     return GestureDetector(
       onTap: () => onChanged(id),
       child: AnimatedContainer(
@@ -1099,24 +1372,39 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
                     : RumenoTheme.backgroundCream,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon,
-                  color: sel
-                      ? RumenoTheme.primaryGreen
-                      : RumenoTheme.textGrey,
-                  size: 22),
+              child: Icon(
+                isNone ? Icons.do_not_disturb_alt : Icons.pets,
+                color: sel
+                    ? RumenoTheme.primaryGreen
+                    : RumenoTheme.textGrey,
+                size: 22,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontWeight:
-                      sel ? FontWeight.bold : FontWeight.normal,
-                  fontSize: 15,
-                  color: sel
-                      ? RumenoTheme.primaryGreen
-                      : RumenoTheme.textDark,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontWeight:
+                          sel ? FontWeight.bold : FontWeight.w500,
+                      fontSize: 15,
+                      color: sel
+                          ? RumenoTheme.primaryGreen
+                          : RumenoTheme.textDark,
+                    ),
+                  ),
+                  if (showSubtitle) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      'ID: ${entry!.animalId}',
+                      style: const TextStyle(
+                          fontSize: 12, color: RumenoTheme.textGrey),
+                    ),
+                  ],
+                ],
               ),
             ),
             if (sel)
@@ -1662,4 +1950,16 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
       ),
     );
   }
+}
+
+class _ParentEntry {
+  final String animalId;
+  final String location;
+  final String ownerName;
+
+  const _ParentEntry({
+    required this.animalId,
+    this.location = '',
+    this.ownerName = '',
+  });
 }
