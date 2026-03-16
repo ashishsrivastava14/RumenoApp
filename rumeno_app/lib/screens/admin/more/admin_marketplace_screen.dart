@@ -18,6 +18,30 @@ class AdminMarketplaceScreen extends StatelessWidget {
     final totalOrders = orders.length;
     final pendingOrders = orders.where((o) => o.status == OrderStatus.pending || o.status == OrderStatus.confirmed).length;
 
+    // Category stats
+    final Map<String, ProductCategory> productCategoryMap = {
+      for (final p in products) p.id: p.category,
+    };
+    final Map<ProductCategory, int> catProductCount = {
+      for (final cat in ProductCategory.values)
+        cat: products.where((p) => p.category == cat).length,
+    };
+    final Map<ProductCategory, int> catStockCount = {
+      for (final cat in ProductCategory.values)
+        cat: products.where((p) => p.category == cat).fold(0, (s, p) => s + p.stockQuantity),
+    };
+    final Map<ProductCategory, double> catRevenue = {
+      for (final cat in ProductCategory.values) cat: 0.0,
+    };
+    for (final order in orders) {
+      for (final item in order.items) {
+        final cat = productCategoryMap[item.productId];
+        if (cat != null) {
+          catRevenue[cat] = catRevenue[cat]! + item.totalPrice;
+        }
+      }
+    }
+
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(title: const Text('Marketplace')),
@@ -60,6 +84,18 @@ class AdminMarketplaceScreen extends StatelessWidget {
                 _ActionChip(icon: Icons.category, label: 'Categories', onTap: () {}),
               ],
             ),
+
+            const SizedBox(height: 20),
+
+            // Category Stats
+            Text('Categories', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 10),
+            ...ProductCategory.values.map((cat) => _CategoryStatRow(
+              category: cat,
+              productCount: catProductCount[cat] ?? 0,
+              stock: catStockCount[cat] ?? 0,
+              revenue: catRevenue[cat] ?? 0,
+            )),
 
             const SizedBox(height: 20),
 
@@ -247,6 +283,93 @@ class _ProductTile extends StatelessWidget {
       case ProductCategory.supplements: return Icons.science;
       case ProductCategory.veterinaryMedicines: return Icons.medication;
       case ProductCategory.farmEquipment: return Icons.construction;
+    }
+  }
+}
+
+class _CategoryStatRow extends StatelessWidget {
+  final ProductCategory category;
+  final int productCount;
+  final int stock;
+  final double revenue;
+
+  const _CategoryStatRow({
+    required this.category,
+    required this.productCount,
+    required this.stock,
+    required this.revenue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(_icon, color: _color, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(_label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  Text(
+                    '$productCount products · $stock in stock',
+                    style: TextStyle(color: RumenoTheme.textGrey, fontSize: 11),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '₹${(revenue / 1000).toStringAsFixed(1)}K',
+                  style: TextStyle(color: RumenoTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                Text('revenue', style: TextStyle(color: RumenoTheme.textGrey, fontSize: 10)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String get _label {
+    switch (category) {
+      case ProductCategory.animalFeed: return 'Animal Feed';
+      case ProductCategory.supplements: return 'Supplements';
+      case ProductCategory.veterinaryMedicines: return 'Veterinary Medicines';
+      case ProductCategory.farmEquipment: return 'Farm Equipment';
+    }
+  }
+
+  IconData get _icon {
+    switch (category) {
+      case ProductCategory.animalFeed: return Icons.grass;
+      case ProductCategory.supplements: return Icons.science;
+      case ProductCategory.veterinaryMedicines: return Icons.medication;
+      case ProductCategory.farmEquipment: return Icons.construction;
+    }
+  }
+
+  Color get _color {
+    switch (category) {
+      case ProductCategory.animalFeed: return const Color(0xFF4CAF50);
+      case ProductCategory.supplements: return const Color(0xFF2196F3);
+      case ProductCategory.veterinaryMedicines: return const Color(0xFFE91E63);
+      case ProductCategory.farmEquipment: return const Color(0xFFFF9800);
     }
   }
 }
