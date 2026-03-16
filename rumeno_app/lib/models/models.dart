@@ -584,6 +584,29 @@ class Order {
     this.deliveredDate,
   });
 
+  // ─── Invoice & Tax Computed Fields ───
+  String get invoiceNo => 'INV-$id';
+
+  /// Sum of each item's taxable value (price ex-GST × qty)
+  double get totalTaxableValue =>
+      items.fold(0.0, (sum, item) => sum + item.taxableValue);
+
+  /// CGST = half of each item's GST (intra-state)
+  double get totalCgst =>
+      items.fold(0.0, (sum, item) => sum + item.cgstAmount);
+
+  /// SGST = same as CGST (intra-state)
+  double get totalSgst => totalCgst;
+
+  /// Total GST (CGST + SGST)
+  double get totalTaxAmount => totalCgst + totalSgst;
+
+  /// Blended GST % for display (e.g. "12%")
+  double get blendedTaxRate {
+    if (totalTaxableValue == 0) return 0;
+    return totalTaxAmount / totalTaxableValue;
+  }
+
   String get statusLabel {
     switch (status) {
       case OrderStatus.pending:
@@ -612,6 +635,8 @@ class OrderItem {
   final double price;
   final int quantity;
   final String vendorId;
+  final String? hsnCode;
+  final double taxRate; // e.g. 0.05, 0.12, 0.18 — GST rate (tax-inclusive in price)
 
   const OrderItem({
     required this.productId,
@@ -621,9 +646,15 @@ class OrderItem {
     required this.price,
     required this.quantity,
     required this.vendorId,
+    this.hsnCode,
+    this.taxRate = 0.12,
   });
 
   double get totalPrice => price * quantity;
+  double get taxableValue => totalPrice / (1 + taxRate);
+  double get cgstAmount => taxableValue * (taxRate / 2);
+  double get sgstAmount => taxableValue * (taxRate / 2);
+  double get taxAmount => cgstAmount + sgstAmount;
 }
 
 class Vendor {

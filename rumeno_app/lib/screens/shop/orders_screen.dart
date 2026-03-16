@@ -190,6 +190,38 @@ class _OrderCard extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
+              // Invoice & View Detail row
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => context.go('/shop/order/${order.id}'),
+                      icon: const Icon(Icons.visibility_rounded, size: 16),
+                      label: const Text('View Details', style: TextStyle(fontSize: 12)),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        side: BorderSide(color: Colors.grey.shade300),
+                        foregroundColor: RumenoTheme.textGrey,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => context.go('/shop/order/${order.id}'),
+                      icon: Icon(Icons.receipt_long_rounded, size: 16, color: RumenoTheme.primaryGreen),
+                      label: Text('Invoice', style: TextStyle(fontSize: 12, color: RumenoTheme.primaryGreen)),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        side: BorderSide(color: RumenoTheme.primaryGreen.withValues(alpha: 0.5)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               if (order.status != OrderStatus.delivered && order.status != OrderStatus.cancelled) ...[
                 const SizedBox(height: 8),
                 Row(

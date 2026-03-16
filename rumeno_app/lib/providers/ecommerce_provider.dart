@@ -252,6 +252,8 @@ class EcommerceProvider extends ChangeNotifier {
                 price: c.product.price,
                 quantity: c.quantity,
                 vendorId: c.product.vendorId,
+                hsnCode: c.product.hsnCode,
+                taxRate: _gstRateForHsn(c.product.hsnCode),
               ))
           .toList(),
       address: address,
@@ -272,6 +274,18 @@ class EcommerceProvider extends ChangeNotifier {
   }
 
   // ─── Vendors ───
+
+  /// Returns GST rate for a product based on its HSN code.
+  /// HSN 2309x = Animal feed/supplements → 5%
+  /// HSN 3004x / 3005x = Vet medicines → 12%
+  /// HSN 8434x / 8436x / 8423x = Farm equipment → 18%
+  double _gstRateForHsn(String? hsn) {
+    if (hsn == null) return 0.12;
+    if (hsn.startsWith('2309') || hsn.startsWith('2308')) return 0.05;
+    if (hsn.startsWith('3004') || hsn.startsWith('3005')) return 0.12;
+    if (hsn.startsWith('8434') || hsn.startsWith('8436') || hsn.startsWith('8423')) return 0.18;
+    return 0.12;
+  }
 
   List<Vendor> get vendors => _vendors;
 
