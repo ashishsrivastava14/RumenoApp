@@ -25,6 +25,12 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final ecommerce = context.watch<EcommerceProvider>();
+    final allProducts = ecommerce.allProductsUnfiltered;
+    final feedCount = allProducts.where((p) => p.category == ProductCategory.animalFeed).length;
+    final supplementsCount = allProducts.where((p) => p.category == ProductCategory.supplements).length;
+    final medicinesCount = allProducts.where((p) => p.category == ProductCategory.veterinaryMedicines).length;
+    final equipmentCount = allProducts.where((p) => p.category == ProductCategory.farmEquipment).length;
+    final allCount = allProducts.length;
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
@@ -140,14 +146,15 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                   GridView.count(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 4,
+                    crossAxisCount: 2,
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
-                    childAspectRatio: 0.75,
+                    childAspectRatio: 2.2,
                     children: [
                       _BigCategoryTile(
                         icon: Icons.grass_rounded,
                         label: 'Feed',
+                        count: feedCount,
                         color: const Color(0xFF4CAF50),
                         bgColor: const Color(0xFFE8F5E9),
                         onTap: () => context.go('/shop/category/animalFeed'),
@@ -155,6 +162,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                       _BigCategoryTile(
                         icon: Icons.science_rounded,
                         label: 'Tonic',
+                        count: supplementsCount,
                         color: const Color(0xFFFF9800),
                         bgColor: const Color(0xFFFFF3E0),
                         onTap: () => context.go('/shop/category/supplements'),
@@ -162,6 +170,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                       _BigCategoryTile(
                         icon: Icons.medication_rounded,
                         label: 'Medicine',
+                        count: medicinesCount,
                         color: const Color(0xFFE53935),
                         bgColor: const Color(0xFFFFEBEE),
                         onTap: () => context.go('/shop/category/veterinaryMedicines'),
@@ -169,9 +178,26 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                       _BigCategoryTile(
                         icon: Icons.construction_rounded,
                         label: 'Tools',
+                        count: equipmentCount,
                         color: const Color(0xFF2196F3),
                         bgColor: const Color(0xFFE3F2FD),
                         onTap: () => context.go('/shop/category/farmEquipment'),
+                      ),
+                      _BigCategoryTile(
+                        icon: Icons.biotech_rounded,
+                        label: 'Supplements',
+                        count: supplementsCount,
+                        color: const Color(0xFF9C27B0),
+                        bgColor: const Color(0xFFF3E5F5),
+                        onTap: () => context.go('/shop/category/supplements'),
+                      ),
+                      _BigCategoryTile(
+                        icon: Icons.grid_view_rounded,
+                        label: 'All',
+                        count: allCount,
+                        color: const Color(0xFF607D8B),
+                        bgColor: const Color(0xFFECEFF1),
+                        onTap: () => context.go('/shop/search'),
                       ),
                     ],
                   ),
@@ -413,6 +439,7 @@ class _CartIconWithBadge extends StatelessWidget {
 class _BigCategoryTile extends StatelessWidget {
   final IconData icon;
   final String label;
+  final int count;
   final Color color;
   final Color bgColor;
   final VoidCallback onTap;
@@ -420,6 +447,7 @@ class _BigCategoryTile extends StatelessWidget {
   const _BigCategoryTile({
     required this.icon,
     required this.label,
+    required this.count,
     required this.color,
     required this.bgColor,
     required this.onTap,
@@ -438,23 +466,45 @@ class _BigCategoryTile extends StatelessWidget {
             BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 8, offset: const Offset(0, 2)),
           ],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 26),
               ),
-              child: Icon(icon, color: color, size: 30),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: color),
-            ),
-          ],
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: color),
+                    ),
+                    const SizedBox(height: 3),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '$count items',
+                        style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
