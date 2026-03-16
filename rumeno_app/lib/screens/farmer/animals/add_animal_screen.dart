@@ -824,6 +824,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
     );
   }
 
+  static const int _maxPhotoBytes = 5 * 1024 * 1024; // 5 MB
+
   Future<void> _pickPhoto(ImageSource source) async {
     final picker = ImagePicker();
     final file = await picker.pickImage(
@@ -831,9 +833,38 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
       imageQuality: 85,
       maxWidth: 1200,
     );
-    if (file != null) {
-      setState(() => _animalPhoto = file);
+    if (file == null) return;
+
+    final bytes = await file.length();
+    if (bytes > _maxPhotoBytes) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
+            content: const Row(
+              children: [
+                Icon(Icons.warning_amber_rounded,
+                    color: Colors.white, size: 22),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Image too large. Max size allowed is 5 MB.',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+      return;
     }
+
+    setState(() => _animalPhoto = file);
   }
 
   void _showPhotoOptions() {
