@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
@@ -54,13 +56,95 @@ void _showInfoDialog(BuildContext context, String title, String description) {
   );
 }
 
-class FarmerDashboardScreen extends StatelessWidget {
+class FarmerDashboardScreen extends StatefulWidget {
   const FarmerDashboardScreen({super.key});
+
+  @override
+  State<FarmerDashboardScreen> createState() => _FarmerDashboardScreenState();
+}
+
+class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
+  File? _farmLogoFile;
 
   static String _greeting(int hour) {
     if (hour < 12) return 'Good Morning';
     if (hour < 17) return 'Good Afternoon';
     return 'Good Evening';
+  }
+
+  Future<void> _pickImage(BuildContext ctx) async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: ctx,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        margin: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 4, 20, 8),
+              child: Text(
+                'Set Farm Logo',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              ),
+            ),
+            ListTile(
+              leading: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: RumenoTheme.primaryGreen.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.photo_library_rounded, color: RumenoTheme.primaryGreen),
+              ),
+              title: const Text('Choose from Gallery', style: TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: const Text('Select an existing photo'),
+              onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1565C0).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.camera_alt_rounded, color: Color(0xFF1565C0)),
+              ),
+              title: const Text('Take a Photo', style: TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: const Text('Use your camera'),
+              onTap: () => Navigator.pop(ctx, ImageSource.camera),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+
+    if (source == null) return;
+    final picked = await ImagePicker().pickImage(
+      source: source,
+      imageQuality: 80,
+      maxWidth: 512,
+      maxHeight: 512,
+    );
+    if (picked != null) {
+      setState(() => _farmLogoFile = File(picked.path));
+    }
   }
 
   @override
@@ -83,6 +167,8 @@ class FarmerDashboardScreen extends StatelessWidget {
                 user: user,
                 greeting: greeting,
                 topPadding: topPadding,
+                farmLogoFile: _farmLogoFile,
+                onPickLogo: () => _pickImage(context),
               ),
             ),
 
@@ -142,14 +228,18 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   final dynamic user;
   final String greeting;
   final double topPadding;
+  final File? farmLogoFile;
+  final VoidCallback onPickLogo;
 
   const _StickyHeaderDelegate({
     required this.user,
     required this.greeting,
     required this.topPadding,
+    required this.farmLogoFile,
+    required this.onPickLogo,
   });
 
-  static const double _kExpandedAdd = 210.0;
+  static const double _kExpandedAdd = 220.0;
   static const double _kCollapsedHeight = 62.0;
 
   @override
@@ -162,7 +252,8 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(_StickyHeaderDelegate old) =>
       old.user != user ||
       old.greeting != greeting ||
-      old.topPadding != topPadding;
+      old.topPadding != topPadding ||
+      old.farmLogoFile != farmLogoFile;
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
@@ -202,74 +293,146 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
           Positioned(
             left: 20,
             right: 20,
-            bottom: 18,
+            bottom: 24,
             child: Opacity(
               opacity: (1.0 - t * 2.8).clamp(0.0, 1.0),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.5),
-                        width: 2.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.35),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
+                  // ── Large tappable farm logo (left) ──
+                  GestureDetector(
+                    onTap: onPickLogo,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: 156,
+                          height: 156,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.65),
+                              width: 3.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.45),
+                                blurRadius: 20,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                            image: farmLogoFile != null
+                                ? DecorationImage(
+                                    image: FileImage(farmLogoFile!),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                            color: Colors.white.withValues(alpha: 0.12),
+                          ),
+                          child: farmLogoFile == null
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.add_a_photo_rounded,
+                                      color: Colors.white.withValues(alpha: 0.9),
+                                      size: 38,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'Add Farm Logo',
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.9),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : null,
                         ),
-                      ],
-                      image: const DecorationImage(
-                        image: AssetImage('assets/images/farm_bg.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.agriculture_rounded, color: Colors.white54, size: 12),
-                          const SizedBox(width: 4),
-                          Text(
-                            user?.farmName ?? 'Smith Dairy Farm',
-                            style: const TextStyle(
-                              color: Colors.white60,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
+                        // Edit badge when logo is set
+                        if (farmLogoFile != null)
+                          Positioned(
+                            right: 2,
+                            bottom: 4,
+                            child: Container(
+                              width: 34,
+                              height: 34,
+                              decoration: BoxDecoration(
+                                color: RumenoTheme.primaryGreen,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 2.5),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.3),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(Icons.edit_rounded, color: Colors.white, size: 16),
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        greeting,
-                        style: const TextStyle(color: Colors.white70, fontSize: 11),
-                      ),
-                      Text(
-                        user?.name ?? 'Farmer',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          height: 1.2,
-                          shadows: [
-                            Shadow(color: Colors.black45, blurRadius: 6),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(width: 18),
+
+                  // ── Text info (right) ──
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Farm name row
+                        Row(
+                          children: [
+                            const Icon(Icons.agriculture_rounded, color: Colors.white54, size: 13),
+                            const SizedBox(width: 5),
+                            Flexible(
+                              child: Text(
+                                user?.farmName ?? 'Smith Dairy Farm',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.2,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 1),
-                      Text(
-                        DateFormat('EEEE, dd MMM yyyy').format(DateTime.now()),
-                        style: const TextStyle(color: Colors.white54, fontSize: 10),
-                      ),
-                    ],
+                        const SizedBox(height: 6),
+                        // Greeting
+                        Text(
+                          greeting,
+                          style: const TextStyle(color: Colors.white54, fontSize: 12),
+                        ),
+                        // Farmer name
+                        Text(
+                          user?.name ?? 'Farmer',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            height: 1.2,
+                            shadows: [
+                              Shadow(color: Colors.black45, blurRadius: 8),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        // Date
+                        Text(
+                          DateFormat('EEEE, dd MMM yyyy').format(DateTime.now()),
+                          style: const TextStyle(color: Colors.white54, fontSize: 10),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -297,10 +460,15 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white38, width: 1.5),
-                        image: const DecorationImage(
-                          image: AssetImage('assets/images/farm_bg.png'),
-                          fit: BoxFit.cover,
-                        ),
+                        image: farmLogoFile != null
+                            ? DecorationImage(
+                                image: FileImage(farmLogoFile!),
+                                fit: BoxFit.cover,
+                              )
+                            : const DecorationImage(
+                                image: AssetImage('assets/images/farm_bg.png'),
+                                fit: BoxFit.cover,
+                              ),
                       ),
                     ),
                   ),

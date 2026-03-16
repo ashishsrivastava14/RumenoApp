@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Rumeno needs access to your photo library to set a farm logo.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Rumeno needs camera access to take a photo for your farm logo.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Rumeno needs permission to save photos to your library.</string>
 </dict>
 </plist>
