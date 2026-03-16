@@ -126,6 +126,13 @@ class _SearchScreenState extends State<SearchScreen> {
                   color: const Color(0xFFFF9800),
                 ),
                 _FilterChip(
+                  icon: Icons.science_rounded,
+                  label: 'Tonic',
+                  isSelected: _filterCategory == ProductCategory.tonic,
+                  onTap: () => setState(() => _filterCategory = ProductCategory.tonic),
+                  color: const Color(0xFFFF9800),
+                ),
+                _FilterChip(
                   icon: Icons.medication_rounded,
                   label: 'Medicine',
                   isSelected: _filterCategory == ProductCategory.veterinaryMedicines,
@@ -443,6 +450,8 @@ IconData _getCategoryIcon(ProductCategory category) {
   switch (category) {
     case ProductCategory.animalFeed:
       return Icons.grass_rounded;
+    case ProductCategory.tonic:
+      return Icons.local_drink_rounded; 
     case ProductCategory.supplements:
       return Icons.science_rounded;
     case ProductCategory.veterinaryMedicines:

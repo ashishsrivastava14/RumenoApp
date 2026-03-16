@@ -608,6 +608,8 @@ IconData _getCategoryIcon(ProductCategory category) {
   switch (category) {
     case ProductCategory.animalFeed:
       return Icons.grass_rounded;
+    case ProductCategory.tonic:
+      return Icons.local_drink_rounded;
     case ProductCategory.supplements:
       return Icons.science_rounded;
     case ProductCategory.veterinaryMedicines:

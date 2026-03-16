@@ -425,7 +425,7 @@ class LabReport {
 
 // ─── Ecommerce Models ───
 
-enum ProductCategory { animalFeed, supplements, veterinaryMedicines, farmEquipment }
+enum ProductCategory { animalFeed, tonic, supplements, veterinaryMedicines, farmEquipment }
 
 enum ProductAnimal { cattle, goat, sheep, poultry, pig, horse }
 
@@ -495,6 +495,8 @@ class Product {
     switch (category) {
       case ProductCategory.animalFeed:
         return 'Animal Feed';
+      case ProductCategory.tonic:
+        return 'Tonic';
       case ProductCategory.supplements:
         return 'Supplements';
       case ProductCategory.veterinaryMedicines:

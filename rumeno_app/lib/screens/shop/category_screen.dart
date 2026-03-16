@@ -30,8 +30,10 @@ class CategoryScreen extends StatelessWidget {
     switch (cat) {
       case ProductCategory.animalFeed:
         return 'Animal Feed';
-      case ProductCategory.supplements:
+      case ProductCategory.tonic:
         return 'Tonic';
+      case ProductCategory.supplements:
+        return 'Supplements';
       case ProductCategory.veterinaryMedicines:
         return 'Medicine';
       case ProductCategory.farmEquipment:
@@ -43,6 +45,8 @@ class CategoryScreen extends StatelessWidget {
     switch (cat) {
       case ProductCategory.animalFeed:
         return Icons.grass_rounded;
+      case ProductCategory.tonic:
+        return Icons.local_drink_rounded;
       case ProductCategory.supplements:
         return Icons.science_rounded;
       case ProductCategory.veterinaryMedicines:
@@ -56,6 +60,8 @@ class CategoryScreen extends StatelessWidget {
     switch (cat) {
       case ProductCategory.animalFeed:
         return const Color(0xFF4CAF50);
+      case ProductCategory.tonic:
+        return const Color(0xFF9C27B0);
       case ProductCategory.supplements:
         return const Color(0xFFFF9800);
       case ProductCategory.veterinaryMedicines:

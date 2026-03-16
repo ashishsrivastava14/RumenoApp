@@ -280,6 +280,7 @@ class _ProductTile extends StatelessWidget {
   IconData _categoryIcon(ProductCategory c) {
     switch (c) {
       case ProductCategory.animalFeed: return Icons.grass;
+      case ProductCategory.tonic: return Icons.local_drink;
       case ProductCategory.supplements: return Icons.science;
       case ProductCategory.veterinaryMedicines: return Icons.medication;
       case ProductCategory.farmEquipment: return Icons.construction;
@@ -349,6 +350,7 @@ class _CategoryStatRow extends StatelessWidget {
   String get _label {
     switch (category) {
       case ProductCategory.animalFeed: return 'Animal Feed';
+      case ProductCategory.tonic: return 'Tonic';
       case ProductCategory.supplements: return 'Supplements';
       case ProductCategory.veterinaryMedicines: return 'Veterinary Medicines';
       case ProductCategory.farmEquipment: return 'Farm Equipment';
@@ -358,6 +360,7 @@ class _CategoryStatRow extends StatelessWidget {
   IconData get _icon {
     switch (category) {
       case ProductCategory.animalFeed: return Icons.grass;
+      case ProductCategory.tonic: return Icons.local_drink;
       case ProductCategory.supplements: return Icons.science;
       case ProductCategory.veterinaryMedicines: return Icons.medication;
       case ProductCategory.farmEquipment: return Icons.construction;
@@ -367,6 +370,7 @@ class _CategoryStatRow extends StatelessWidget {
   Color get _color {
     switch (category) {
       case ProductCategory.animalFeed: return const Color(0xFF4CAF50);
+      case ProductCategory.tonic: return const Color(0xFF9C27B0);
       case ProductCategory.supplements: return const Color(0xFF2196F3);
       case ProductCategory.veterinaryMedicines: return const Color(0xFFE91E63);
       case ProductCategory.farmEquipment: return const Color(0xFFFF9800);
