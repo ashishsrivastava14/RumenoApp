@@ -116,7 +116,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
                 _FilterChip(
                   icon: Icons.science_rounded,
-                  label: 'Tonic',
+                  label: 'Supplements',
                   isSelected: _filterCategory == ProductCategory.supplements,
                   onTap: () => setState(() => _filterCategory = ProductCategory.supplements),
                   color: const Color(0xFFFF9800),
