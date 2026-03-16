@@ -105,7 +105,7 @@ class ShopAccountScreen extends StatelessWidget {
               items: [
                 _MenuItem(
                   icon: Icons.agriculture_rounded,
-                  label: 'Switch to Farm',
+                  label: 'Livestock Farm Management',
                   color: const Color(0xFF8BC34A),
                   onTap: () => context.go('/farmer/dashboard'),
                 ),
