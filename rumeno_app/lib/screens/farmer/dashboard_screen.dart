@@ -598,54 +598,68 @@ class _StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 196,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-        children: const [
-          _StatChip(
-            title: 'Total Animals',
-            value: '48',
-            icon: Icons.pets_rounded,
-            gradient: LinearGradient(
-                colors: [Color(0xFF3D6B18), Color(0xFF7FB23A)]),
-            trend: '+2',
-            up: true,
-            description: 'Total number of animals currently registered in your farm. This includes all cattle types: milking cows, dry cows, heifers, calves, and bulls.',
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      child: Column(
+        children: [
+          Row(
+            children: const [
+              Expanded(
+                child: _StatChip(
+                  title: 'Total Animals',
+                  value: '48',
+                  icon: Icons.pets_rounded,
+                  gradient: LinearGradient(
+                      colors: [Color(0xFF3D6B18), Color(0xFF7FB23A)]),
+                  trend: '+2',
+                  up: true,
+                  description: 'Total number of animals currently registered in your farm. This includes all cattle types: milking cows, dry cows, heifers, calves, and bulls.',
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _StatChip(
+                  title: 'Milk Today',
+                  value: '120L',
+                  icon: Icons.water_drop_rounded,
+                  gradient: LinearGradient(
+                      colors: [Color(0xFF1565C0), Color(0xFF42A5F5)]),
+                  trend: '+8L',
+                  up: true,
+                  description: 'Total milk collected today from all milking sessions. The trend shows the change compared to yesterday\'s production.',
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 10),
-          _StatChip(
-            title: 'Milk Today',
-            value: '120L',
-            icon: Icons.water_drop_rounded,
-            gradient: LinearGradient(
-                colors: [Color(0xFF1565C0), Color(0xFF42A5F5)]),
-            trend: '+8L',
-            up: true,
-            description: 'Total milk collected today from all milking sessions. The trend shows the change compared to yesterday\'s production.',
-          ),
-          SizedBox(width: 10),
-          _StatChip(
-            title: 'Tasks Due',
-            value: '3',
-            icon: Icons.task_alt_rounded,
-            gradient: LinearGradient(
-                colors: [Color(0xFFBF360C), Color(0xFFFF7043)]),
-            trend: '2 urgent',
-            up: false,
-            description: 'Number of pending tasks that need your attention today, including feeding schedules, vaccinations, treatments, and breeding activities.',
-          ),
-          SizedBox(width: 10),
-          _StatChip(
-            title: 'Health Alerts',
-            value: '5',
-            icon: Icons.health_and_safety_rounded,
-            gradient: LinearGradient(
-                colors: [Color(0xFF880E4F), Color(0xFFE91E63)]),
-            trend: '3 high',
-            up: false,
-            description: 'Active health alerts for animals requiring attention. This includes sick animals, animals under treatment, and scheduled medical checkups.',
+          const SizedBox(height: 10),
+          Row(
+            children: const [
+              Expanded(
+                child: _StatChip(
+                  title: 'Tasks Due',
+                  value: '3',
+                  icon: Icons.task_alt_rounded,
+                  gradient: LinearGradient(
+                      colors: [Color(0xFFBF360C), Color(0xFFFF7043)]),
+                  trend: '2 urgent',
+                  up: false,
+                  description: 'Number of pending tasks that need your attention today, including feeding schedules, vaccinations, treatments, and breeding activities.',
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _StatChip(
+                  title: 'Health Alerts',
+                  value: '5',
+                  icon: Icons.health_and_safety_rounded,
+                  gradient: LinearGradient(
+                      colors: [Color(0xFF880E4F), Color(0xFFE91E63)]),
+                  trend: '3 high',
+                  up: false,
+                  description: 'Active health alerts for animals requiring attention. This includes sick animals, animals under treatment, and scheduled medical checkups.',
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -675,7 +689,6 @@ class _StatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 160,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: gradient,
@@ -716,7 +729,7 @@ class _StatChip extends StatelessWidget {
                   ),
               ],
             ),
-            const Spacer(),
+            const SizedBox(height: 12),
             Text(
               value,
               style: const TextStyle(
