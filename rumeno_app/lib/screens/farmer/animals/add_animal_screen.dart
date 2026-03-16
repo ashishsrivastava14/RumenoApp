@@ -38,11 +38,19 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
   final _shedController = TextEditingController(text: 'A1');
   AnimalPurpose _purpose = AnimalPurpose.dairy;
 
+  // Step 5 – Purchase (all optional)
+  DateTime? _purchaseDate;
+  final _purchasePlaceController = TextEditingController();
+  final _ownerNameController = TextEditingController();
+  final _ownerPhoneController = TextEditingController();
+  final _toothAgeController = TextEditingController();
+
   static const _stepMeta = [
     {'icon': Icons.pets, 'title': 'Which Animal?', 'sub': 'Type & basic info'},
     {'icon': Icons.monitor_weight, 'title': 'How it looks?', 'sub': 'Size & color'},
     {'icon': Icons.family_restroom, 'title': 'Family', 'sub': 'Parents (optional)'},
     {'icon': Icons.home_work, 'title': 'Where it lives?', 'sub': 'Shed & purpose'},
+    {'icon': Icons.shopping_bag_outlined, 'title': 'Purchase', 'sub': 'Optional'},
   ];
 
   @override
@@ -61,6 +69,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
     _breedController.dispose();
     _tagController.dispose();
     _shedController.dispose();
+    _purchasePlaceController.dispose();
+    _ownerNameController.dispose();
+    _ownerPhoneController.dispose();
+    _toothAgeController.dispose();
     super.dispose();
   }
 
@@ -215,6 +227,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
         return _buildStep3();
       case 3:
         return _buildStep4();
+      case 4:
+        return _buildStep5();
       default:
         return _buildStep1();
     }
@@ -1034,6 +1048,177 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
           ],
         ),
       );
+
+  // ── Step 5 : Purchase Info ───────────────────
+  Widget _buildStep5() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _stepHeader(Icons.shopping_bag_outlined, 'Purchase Info',
+            'All fields are optional – fill if purchased'),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: RumenoTheme.accentOlive.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.info_outline,
+                  color: RumenoTheme.accentOlive),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Leave blank if the animal was born on your farm.',
+                  style: TextStyle(
+                      color: RumenoTheme.accentOlive, fontSize: 13),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        _sectionLabel('📅  Date of Purchase'),
+        const SizedBox(height: 8),
+        _buildPurchaseDatePicker(),
+        const SizedBox(height: 20),
+        _sectionLabel('📍  Purchase Location'),
+        const SizedBox(height: 8),
+        _bigTextField(
+            _purchasePlaceController,
+            'e.g. Local market, Farmer John, City…',
+            Icons.location_on_outlined),
+        const SizedBox(height: 20),
+        _sectionLabel('👤  Purchased By (Owner Name)'),
+        const SizedBox(height: 8),
+        _bigTextField(
+            _ownerNameController, 'e.g. Ravi Kumar', Icons.person_outline),
+        const SizedBox(height: 20),
+        _sectionLabel('📞  Owner Phone Number'),
+        const SizedBox(height: 8),
+        _buildPhoneField(),
+        const SizedBox(height: 20),
+        _sectionLabel('🦷  Tooth Age (Dentition)'),
+        const SizedBox(height: 8),
+        _bigTextField(
+            _toothAgeController,
+            'e.g. 2 teeth, 4 teeth, Full mouth…',
+            Icons.settings_outlined),
+        const SizedBox(height: 24),
+        _buildSummaryCard(),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildPurchaseDatePicker() {
+    final hasDate = _purchaseDate != null;
+    return GestureDetector(
+      onTap: () async {
+        final d = await showDatePicker(
+          context: context,
+          initialDate: _purchaseDate ?? DateTime.now(),
+          firstDate: DateTime(2000),
+          lastDate: DateTime.now(),
+        );
+        if (d != null) setState(() => _purchaseDate = d);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: hasDate
+                ? RumenoTheme.primaryGreen
+                : RumenoTheme.textLight,
+            width: hasDate ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: RumenoTheme.primaryGreen.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.calendar_month,
+                  color: RumenoTheme.primaryGreen, size: 28),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Date of Purchase',
+                    style: TextStyle(
+                        color: RumenoTheme.textGrey, fontSize: 12),
+                  ),
+                  Text(
+                    hasDate
+                        ? '${_purchaseDate!.day} / ${_purchaseDate!.month} / ${_purchaseDate!.year}'
+                        : 'Tap to select date (optional)',
+                    style: TextStyle(
+                      fontSize: hasDate ? 20 : 14,
+                      fontWeight: hasDate
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: hasDate
+                          ? RumenoTheme.textDark
+                          : RumenoTheme.textGrey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (hasDate)
+              GestureDetector(
+                onTap: () => setState(() => _purchaseDate = null),
+                child: const Icon(Icons.close,
+                    color: RumenoTheme.textGrey, size: 20),
+              )
+            else
+              const Icon(Icons.chevron_right,
+                  color: RumenoTheme.textGrey),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhoneField() {
+    return TextFormField(
+      controller: _ownerPhoneController,
+      keyboardType: TextInputType.phone,
+      style: const TextStyle(fontSize: 16),
+      decoration: InputDecoration(
+        hintText: 'e.g. 9876543210',
+        hintStyle:
+            const TextStyle(color: RumenoTheme.textLight),
+        prefixIcon: const Icon(Icons.phone_outlined,
+            color: RumenoTheme.primaryGreen),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide:
+                const BorderSide(color: RumenoTheme.textLight)),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide:
+                const BorderSide(color: RumenoTheme.textLight)),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(
+                color: RumenoTheme.primaryGreen, width: 2)),
+        contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16, vertical: 16),
+      ),
+    );
+  }
 
   // ── Shared helpers ───────────────────────────
   Widget _stepHeader(IconData icon, String title, String sub) {
