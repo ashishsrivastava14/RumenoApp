@@ -109,7 +109,7 @@ class VeterinarianButton extends StatelessWidget {
             _infoBadge(
               context,
               'Veterinarian',
-              'Connect with licensed veterinarians to book appointments, request farm visits, and get expert advice on your animals\' health and treatments.',
+              'Tap the icon to connect with licensed veterinarians to book appointments, request farm visits, and get expert advice on your animals\' health and treatments.',
             ),
           ],
         ),
@@ -151,7 +151,7 @@ class MarketplaceButton extends StatelessWidget {
             _infoBadge(
               context,
               'Marketplace',
-              'Browse and purchase farm supplies, animal feed, medicines, and equipment. Sell your farm produce directly to buyers through the Rumeno marketplace.',
+              'Tap the icon to browse and purchase farm supplies, animal feed, medicines, and equipment. Sell your farm produce directly to buyers through the Rumeno marketplace.',
             ),
           ],
         ),
@@ -193,7 +193,7 @@ class FarmButton extends StatelessWidget {
             _infoBadge(
               context,
               'Farm Dashboard',
-              'Return to your Farm Dashboard to manage your animals, track health records, monitor milk production, and oversee all farm operations.',
+              'Tap the icon to access your Farm Management Dashboard — the central hub for all your farming activities. Manage your livestock, track individual animal health records, monitor daily milk production, schedule feeding routines, and get a complete overview of all your farm operations in one place.',
             ),
           ],
         ),
