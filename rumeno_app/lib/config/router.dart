@@ -34,6 +34,7 @@ import '../screens/farmer/health/deworming_screen.dart';
 import '../screens/farmer/health/lab_reports_screen.dart';
 import '../screens/farmer/breeding/breeding_dashboard_screen.dart';
 import '../screens/farmer/finance/finance_dashboard_screen.dart';
+import '../screens/farmer/finance/animal_feed_calculator_screen.dart';
 import '../screens/farmer/finance/expense_list_screen.dart';
 import '../screens/farmer/finance/reports_screen.dart';
 import '../screens/farmer/milk/milk_log_screen.dart';
@@ -85,7 +86,10 @@ GoRouter createRouter(AuthProvider authProvider) {
       GoRoute(path: '/', builder: (_, _) => const SplashScreen()),
 
       // Auth flow
-      GoRoute(path: '/role-selection', builder: (_, _) => const RoleSelectionScreen()),
+      GoRoute(
+        path: '/role-selection',
+        builder: (_, _) => const RoleSelectionScreen(),
+      ),
       GoRoute(
         path: '/login',
         builder: (_, state) {
@@ -105,7 +109,10 @@ GoRouter createRouter(AuthProvider authProvider) {
       GoRoute(path: '/shop', builder: (_, _) => const ShopHomeScreen()),
       GoRoute(path: '/shop/search', builder: (_, _) => const SearchScreen()),
       GoRoute(path: '/shop/cart', builder: (_, _) => const CartScreen()),
-      GoRoute(path: '/shop/checkout', builder: (_, _) => const CheckoutScreen()),
+      GoRoute(
+        path: '/shop/checkout',
+        builder: (_, _) => const CheckoutScreen(),
+      ),
       GoRoute(
         path: '/shop/product/:id',
         builder: (_, state) {
@@ -135,20 +142,33 @@ GoRouter createRouter(AuthProvider authProvider) {
           return OrderSuccessScreen(orderId: id);
         },
       ),
-      GoRoute(path: '/shop/account', builder: (_, _) => const ShopAccountScreen()),
-      GoRoute(path: '/shop/vendor-register', builder: (_, _) => const VendorRegisterScreen()),
+      GoRoute(
+        path: '/shop/account',
+        builder: (_, _) => const ShopAccountScreen(),
+      ),
+      GoRoute(
+        path: '/shop/vendor-register',
+        builder: (_, _) => const VendorRegisterScreen(),
+      ),
 
       // ─── Farmer Shell ───
       ShellRoute(
         navigatorKey: _farmerShellKey,
         builder: (_, _, child) => FarmerShell(child: child),
         routes: [
-          GoRoute(path: '/farmer/dashboard', builder: (_, _) => const FarmerDashboardScreen()),
+          GoRoute(
+            path: '/farmer/dashboard',
+            builder: (_, _) => const FarmerDashboardScreen(),
+          ),
           GoRoute(
             path: '/farmer/animals',
             builder: (_, _) => const AnimalListScreen(),
             routes: [
-              GoRoute(path: 'add', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AddAnimalScreen()),
+              GoRoute(
+                path: 'add',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AddAnimalScreen(),
+              ),
               GoRoute(
                 path: ':id',
                 parentNavigatorKey: _rootNavigatorKey,
@@ -163,38 +183,98 @@ GoRouter createRouter(AuthProvider authProvider) {
             path: '/farmer/health',
             builder: (_, _) => const HealthDashboardScreen(),
             routes: [
-              GoRoute(path: 'vaccination', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const VaccinationScreen()),
-              GoRoute(path: 'treatment', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const TreatmentScreen()),
-              GoRoute(path: 'deworming', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const DewormingScreen()),
-              GoRoute(path: 'lab-reports', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const LabReportsScreen()),
+              GoRoute(
+                path: 'vaccination',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const VaccinationScreen(),
+              ),
+              GoRoute(
+                path: 'treatment',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const TreatmentScreen(),
+              ),
+              GoRoute(
+                path: 'deworming',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const DewormingScreen(),
+              ),
+              GoRoute(
+                path: 'lab-reports',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const LabReportsScreen(),
+              ),
             ],
           ),
           GoRoute(
             path: '/farmer/finance',
             builder: (_, _) => const FinanceDashboardScreen(),
             routes: [
-              GoRoute(path: 'expenses', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const ExpenseListScreen()),
-              GoRoute(path: 'reports', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const ReportsScreen()),
+              GoRoute(
+                path: 'feed-calculator',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AnimalFeedCalculatorScreen(),
+              ),
+              GoRoute(
+                path: 'expenses',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const ExpenseListScreen(),
+              ),
+              GoRoute(
+                path: 'reports',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const ReportsScreen(),
+              ),
             ],
           ),
           GoRoute(
             path: '/farmer/milk',
             builder: (_, _) => const MilkLogScreen(),
             routes: [
-              GoRoute(path: 'log', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const MilkLogScreen()),
+              GoRoute(
+                path: 'log',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const MilkLogScreen(),
+              ),
             ],
           ),
-          GoRoute(path: '/farmer/breeding', builder: (_, _) => const BreedingDashboardScreen()),
+          GoRoute(
+            path: '/farmer/breeding',
+            builder: (_, _) => const BreedingDashboardScreen(),
+          ),
           GoRoute(
             path: '/farmer/more',
             builder: (_, _) => const MoreScreen(),
             routes: [
-              GoRoute(path: 'profile', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const FarmProfileScreen()),
-              GoRoute(path: 'team', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const TeamManagementScreen()),
-              GoRoute(path: 'subscription', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const SubscriptionScreen()),
-              GoRoute(path: 'notifications', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const NotificationSettingsScreen()),
-              GoRoute(path: 'help', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const HelpSupportScreen()),
-              GoRoute(path: 'export', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const DataExportScreen()),
+              GoRoute(
+                path: 'profile',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const FarmProfileScreen(),
+              ),
+              GoRoute(
+                path: 'team',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const TeamManagementScreen(),
+              ),
+              GoRoute(
+                path: 'subscription',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const SubscriptionScreen(),
+              ),
+              GoRoute(
+                path: 'notifications',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const NotificationSettingsScreen(),
+              ),
+              GoRoute(
+                path: 'help',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const HelpSupportScreen(),
+              ),
+              GoRoute(
+                path: 'export',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const DataExportScreen(),
+              ),
             ],
           ),
         ],
@@ -205,10 +285,22 @@ GoRouter createRouter(AuthProvider authProvider) {
         navigatorKey: _vetShellKey,
         builder: (_, _, child) => VetShell(child: child),
         routes: [
-          GoRoute(path: '/vet/dashboard', builder: (_, _) => const VetDashboardScreen()),
-          GoRoute(path: '/vet/farms', builder: (_, _) => const VetFarmsScreen()),
-          GoRoute(path: '/vet/health', builder: (_, _) => const VetAnimalHealthScreen()),
-          GoRoute(path: '/vet/earnings', builder: (_, _) => const VetEarningsScreen()),
+          GoRoute(
+            path: '/vet/dashboard',
+            builder: (_, _) => const VetDashboardScreen(),
+          ),
+          GoRoute(
+            path: '/vet/farms',
+            builder: (_, _) => const VetFarmsScreen(),
+          ),
+          GoRoute(
+            path: '/vet/health',
+            builder: (_, _) => const VetAnimalHealthScreen(),
+          ),
+          GoRoute(
+            path: '/vet/earnings',
+            builder: (_, _) => const VetEarningsScreen(),
+          ),
         ],
       ),
 
@@ -237,22 +329,66 @@ GoRouter createRouter(AuthProvider authProvider) {
         navigatorKey: _adminShellKey,
         builder: (_, _, child) => AdminShell(child: child),
         routes: [
-          GoRoute(path: '/admin/dashboard', builder: (_, _) => const AdminDashboardScreen()),
-          GoRoute(path: '/admin/farmers', builder: (_, _) => const AdminFarmersScreen()),
-          GoRoute(path: '/admin/animals', builder: (_, _) => const AdminAnimalsScreen()),
-          GoRoute(path: '/admin/health', builder: (_, _) => const AdminHealthConfigScreen()),
+          GoRoute(
+            path: '/admin/dashboard',
+            builder: (_, _) => const AdminDashboardScreen(),
+          ),
+          GoRoute(
+            path: '/admin/farmers',
+            builder: (_, _) => const AdminFarmersScreen(),
+          ),
+          GoRoute(
+            path: '/admin/animals',
+            builder: (_, _) => const AdminAnimalsScreen(),
+          ),
+          GoRoute(
+            path: '/admin/health',
+            builder: (_, _) => const AdminHealthConfigScreen(),
+          ),
           GoRoute(
             path: '/admin/more',
             builder: (_, _) => const AdminMoreScreen(),
             routes: [
-              GoRoute(path: 'subscriptions', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminSubscriptionsScreen()),
-              GoRoute(path: 'payments', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminPaymentsScreen()),
-              GoRoute(path: 'partners', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminPartnersScreen()),
-              GoRoute(path: 'notifications', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminNotificationsScreen()),
-              GoRoute(path: 'reports', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminReportsScreen()),
-              GoRoute(path: 'settings', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminSettingsScreen()),
-              GoRoute(path: 'vendors', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminVendorsScreen()),
-              GoRoute(path: 'marketplace', parentNavigatorKey: _rootNavigatorKey, builder: (_, _) => const AdminMarketplaceScreen()),
+              GoRoute(
+                path: 'subscriptions',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminSubscriptionsScreen(),
+              ),
+              GoRoute(
+                path: 'payments',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminPaymentsScreen(),
+              ),
+              GoRoute(
+                path: 'partners',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminPartnersScreen(),
+              ),
+              GoRoute(
+                path: 'notifications',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminNotificationsScreen(),
+              ),
+              GoRoute(
+                path: 'reports',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminReportsScreen(),
+              ),
+              GoRoute(
+                path: 'settings',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminSettingsScreen(),
+              ),
+              GoRoute(
+                path: 'vendors',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminVendorsScreen(),
+              ),
+              GoRoute(
+                path: 'marketplace',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminMarketplaceScreen(),
+              ),
             ],
           ),
         ],

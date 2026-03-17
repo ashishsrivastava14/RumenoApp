@@ -170,6 +170,12 @@ class FinanceDashboardScreen extends StatelessWidget {
                   color: RumenoTheme.primaryGreen,
                   onTap: () => context.go('/farmer/finance/expenses'),
                 ),
+                _QuickActionTile(
+                  icon: Icons.calculate_rounded,
+                  label: 'Feed\nMix',
+                  color: Colors.brown,
+                  onTap: () => context.go('/farmer/finance/feed-calculator'),
+                ),
               ],
             ),
             const SizedBox(height: 24),
