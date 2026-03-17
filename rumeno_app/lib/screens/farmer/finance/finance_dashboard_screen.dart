@@ -299,6 +299,22 @@ class _FeedLineItem {
   double get total => (qty * rate) + ((qty * rate) * gst / 100);
 }
 
+class _EquipmentLineItem {
+  final String name;
+  final double qty;
+  final double rate;
+  final double gst;
+
+  const _EquipmentLineItem({
+    required this.name,
+    required this.qty,
+    required this.rate,
+    required this.gst,
+  });
+
+  double get total => (qty * rate) + ((qty * rate) * gst / 100);
+}
+
 class _AddExpenseWizardState extends State<_AddExpenseWizard> {
   int _step = 0; // 0=category, 1=amount, 2=payment, 3=details
   ExpenseCategory? _category;
@@ -316,6 +332,13 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
   final _medicineGstController = TextEditingController();
   final _medicineTotalController = TextEditingController();
   final List<_MedicineLineItem> _medicineItems = [];
+  bool _equipmentUseSingleAmount = false;
+  final _equipmentNameController = TextEditingController();
+  final _equipmentQtyController = TextEditingController();
+  final _equipmentRateController = TextEditingController();
+  final _equipmentGstController = TextEditingController();
+  final _equipmentTotalController = TextEditingController();
+  final List<_EquipmentLineItem> _equipmentItems = [];
   String _labourType = ''; // 'contractual' or 'monthly'
   final _vendorController = TextEditingController();
   final _notesController = TextEditingController();
@@ -340,6 +363,11 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
     _medicineRateController.dispose();
     _medicineGstController.dispose();
     _medicineTotalController.dispose();
+    _equipmentNameController.dispose();
+    _equipmentQtyController.dispose();
+    _equipmentRateController.dispose();
+    _equipmentGstController.dispose();
+    _equipmentTotalController.dispose();
     _vendorController.dispose();
     _notesController.dispose();
     super.dispose();
@@ -359,6 +387,9 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
 
   double get _feedItemsTotal =>
       _feedItems.fold(0, (sum, item) => sum + item.total);
+
+  double get _equipmentItemsTotal =>
+      _equipmentItems.fold(0, (sum, item) => sum + item.total);
 
   bool _isFeedDraftFilled() {
     return _feedNameController.text.trim().isNotEmpty ||
@@ -399,6 +430,42 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
         _medicineQtyController.text.trim().isNotEmpty ||
         _medicineRateController.text.trim().isNotEmpty ||
         _medicineGstController.text.trim().isNotEmpty;
+  }
+
+  bool _isEquipmentDraftFilled() {
+    return _equipmentNameController.text.trim().isNotEmpty ||
+        _equipmentQtyController.text.trim().isNotEmpty ||
+        _equipmentRateController.text.trim().isNotEmpty ||
+        _equipmentGstController.text.trim().isNotEmpty;
+  }
+
+  bool _tryAddEquipmentFromInputs({bool showError = true}) {
+    final name = _equipmentNameController.text.trim();
+    final q = _toDouble(_equipmentQtyController.text);
+    final r = _toDouble(_equipmentRateController.text);
+    final g = _toDouble(_equipmentGstController.text);
+
+    if (name.isEmpty || q <= 0 || r <= 0) {
+      if (showError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Fill equipment name, quantity and rate to add'),
+          ),
+        );
+      }
+      return false;
+    }
+
+    setState(() {
+      _equipmentItems.add(
+        _EquipmentLineItem(name: name, qty: q, rate: r, gst: g),
+      );
+      _equipmentNameController.clear();
+      _equipmentQtyController.clear();
+      _equipmentRateController.clear();
+      _equipmentGstController.clear();
+    });
+    return true;
   }
 
   bool _tryAddMedicineFromInputs({bool showError = true}) {
@@ -611,6 +678,10 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
 
     if (_category == ExpenseCategory.medicine) {
       return _buildMedicineAmountStep();
+    }
+
+    if (_category == ExpenseCategory.equipment) {
+      return _buildEquipmentAmountStep();
     }
 
     if (_category == ExpenseCategory.labour) {
@@ -1295,6 +1366,320 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
     );
   }
 
+  Widget _buildEquipmentAmountStep() {
+    final qty = _toDouble(_equipmentQtyController.text);
+    final rate = _toDouble(_equipmentRateController.text);
+    final gst = _toDouble(_equipmentGstController.text);
+    final base = qty * rate;
+    final draftTotalWithGst = base + (base * gst / 100);
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.purple.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.build_rounded, color: Colors.purple, size: 22),
+              SizedBox(width: 8),
+              Text(
+                '🔧 Equipment',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.purple,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'Add equipment expense',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Choose easy way to fill',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: RumenoTheme.textLight,
+            fontSize: 15,
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        Row(
+          children: [
+            Expanded(
+              child: _modeCard(
+                icon: Icons.list_alt_rounded,
+                emoji: '🧾',
+                title: 'Equipment details',
+                subtitle: 'Name + Qty + Rate + GST',
+                selected: !_equipmentUseSingleAmount,
+                color: Colors.purple,
+                onTap: () => setState(() => _equipmentUseSingleAmount = false),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _modeCard(
+                icon: Icons.currency_rupee_rounded,
+                emoji: '📦',
+                title: 'Other',
+                subtitle: 'Only total amount',
+                selected: _equipmentUseSingleAmount,
+                color: Colors.teal,
+                onTap: () => setState(() => _equipmentUseSingleAmount = true),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+
+        if (_equipmentUseSingleAmount) ...[
+          TextField(
+            controller: _equipmentTotalController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: const InputDecoration(
+              labelText: 'Total amount',
+              hintText: 'Example: 5000',
+              prefixIcon: Icon(Icons.currency_rupee_rounded),
+            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'If bill has only one total number, fill here.',
+              style: TextStyle(color: RumenoTheme.textGrey, fontSize: 13),
+            ),
+          ),
+        ] else ...[
+          TextField(
+            controller: _equipmentNameController,
+            onChanged: (_) => setState(() {}),
+            decoration: const InputDecoration(
+              labelText: 'Equipment name',
+              hintText: 'Example: Water pump',
+              prefixIcon: Icon(Icons.build_rounded),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _equipmentQtyController,
+                  onChanged: (_) => setState(() {}),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: const InputDecoration(
+                    labelText: 'Quantity',
+                    hintText: 'Example: 1',
+                    prefixIcon: Icon(Icons.format_list_numbered_rounded),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextField(
+                  controller: _equipmentRateController,
+                  onChanged: (_) => setState(() {}),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: const InputDecoration(
+                    labelText: 'Rate',
+                    hintText: 'Per item',
+                    prefixIcon: Icon(Icons.sell_rounded),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _equipmentGstController,
+            onChanged: (_) => setState(() {}),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: const InputDecoration(
+              labelText: 'GST %',
+              hintText: 'Example: 18',
+              prefixIcon: Icon(Icons.percent_rounded),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.purple.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.purple.withValues(alpha: 0.2)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.calculate_rounded, color: Colors.purple),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Current equipment = ₹${_prettyAmount(draftTotalWithGst)}',
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => _tryAddEquipmentFromInputs(),
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Add this equipment'),
+            ),
+          ),
+          if (_equipmentItems.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Added equipment (${_equipmentItems.length})',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 8),
+                  ..._equipmentItems.asMap().entries.map((entry) {
+                    final i = entry.key;
+                    final item = entry.value;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${item.name}  x${_prettyAmount(item.qty)}  @ ₹${_prettyAmount(item.rate)}',
+                              style: TextStyle(
+                                color: RumenoTheme.textDark,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            '₹${_prettyAmount(item.total)}',
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          IconButton(
+                            onPressed: () =>
+                                setState(() => _equipmentItems.removeAt(i)),
+                            icon: const Icon(
+                              Icons.delete_outline_rounded,
+                              size: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                'Equipment total: ₹${_prettyAmount(_equipmentItemsTotal)}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.purple,
+                ),
+              ),
+            ),
+          ],
+        ],
+
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => setState(() => _step = 0),
+                icon: const Icon(Icons.arrow_back_rounded),
+                label: const Text('Back', style: TextStyle(fontSize: 16)),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  if (_equipmentUseSingleAmount) {
+                    final total = _toDouble(_equipmentTotalController.text);
+                    if (total <= 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Enter total amount')),
+                      );
+                      return;
+                    }
+                    setState(() {
+                      _amount = _prettyAmount(total);
+                      _step = 2;
+                    });
+                    return;
+                  }
+
+                  if (_isEquipmentDraftFilled()) {
+                    final added = _tryAddEquipmentFromInputs(showError: true);
+                    if (!added) return;
+                  }
+                  if (_equipmentItems.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Add at least one equipment item'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  setState(() {
+                    _amount = _prettyAmount(_equipmentItemsTotal);
+                    _step = 2;
+                  });
+                },
+                icon: const Icon(Icons.arrow_forward_rounded),
+                label: const Text('Next', style: TextStyle(fontSize: 16)),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildLabourAmountStep() {
     return Column(
       children: [
@@ -1786,6 +2171,30 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
                     Expanded(
                       child: Text(
                         'Feed items: ${_feedItems.length} item(s)',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: RumenoTheme.textGrey,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              if (_category == ExpenseCategory.equipment &&
+                  !_equipmentUseSingleAmount &&
+                  _equipmentItems.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.build_rounded,
+                      size: 20,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Equipment: ${_equipmentItems.length} item(s)',
                         style: TextStyle(
                           fontSize: 14,
                           color: RumenoTheme.textGrey,
