@@ -316,6 +316,7 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
   final _medicineGstController = TextEditingController();
   final _medicineTotalController = TextEditingController();
   final List<_MedicineLineItem> _medicineItems = [];
+  String _labourType = ''; // 'contractual' or 'monthly'
   final _vendorController = TextEditingController();
   final _notesController = TextEditingController();
 
@@ -610,6 +611,10 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
 
     if (_category == ExpenseCategory.medicine) {
       return _buildMedicineAmountStep();
+    }
+
+    if (_category == ExpenseCategory.labour) {
+      return _buildLabourAmountStep();
     }
 
     return Column(
@@ -1290,6 +1295,129 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
     );
   }
 
+  Widget _buildLabourAmountStep() {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.orange.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.people_rounded, color: Colors.orange, size: 22),
+              SizedBox(width: 8),
+              Text(
+                '👷 Labour',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.orange,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'Add labour expense',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Select labour type',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: RumenoTheme.textLight,
+            fontSize: 15,
+          ),
+        ),
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            Expanded(
+              child: _modeCard(
+                icon: Icons.calendar_month_rounded,
+                emoji: '📅',
+                title: 'Monthly',
+                subtitle: 'Fixed monthly salary',
+                selected: _labourType == 'monthly',
+                color: Colors.orange,
+                onTap: () => setState(() => _labourType = 'monthly'),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _modeCard(
+                icon: Icons.handshake_rounded,
+                emoji: '📝',
+                title: 'Contractual',
+                subtitle: 'Per task / contract',
+                selected: _labourType == 'contractual',
+                color: Colors.deepOrange,
+                onTap: () => setState(() => _labourType = 'contractual'),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        // Big amount display
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.orange, width: 2),
+          ),
+          child: Center(
+            child: Text(
+              _amount.isEmpty ? '₹ 0' : '₹ $_amount',
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                color: _amount.isEmpty
+                    ? Colors.grey.shade400
+                    : RumenoTheme.textDark,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildNumberPad(),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => setState(() => _step = 0),
+                icon: const Icon(Icons.arrow_back_rounded),
+                label: const Text('Back', style: TextStyle(fontSize: 16)),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: ElevatedButton.icon(
+                onPressed: _amount.isNotEmpty && _labourType.isNotEmpty
+                    ? () => setState(() => _step = 2)
+                    : null,
+                icon: const Icon(Icons.arrow_forward_rounded),
+                label: const Text('Next', style: TextStyle(fontSize: 16)),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _modeCard({
     required IconData icon,
     required String emoji,
@@ -1612,6 +1740,29 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
                     Expanded(
                       child: Text(
                         'Medicines: ${_medicineItems.length} item(s)',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: RumenoTheme.textGrey,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              if (_category == ExpenseCategory.labour &&
+                  _labourType.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.people_rounded,
+                      size: 20,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Type: ${_labourType == 'monthly' ? 'Monthly' : 'Contractual'}',
                         style: TextStyle(
                           fontSize: 14,
                           color: RumenoTheme.textGrey,
