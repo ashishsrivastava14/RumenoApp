@@ -2036,11 +2036,12 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
                             onTap: () {
                               setState(() {
                                 if (key == '⌫') {
-                                  if (_amount.isNotEmpty)
+                                  if (_amount.isNotEmpty) {
                                     _amount = _amount.substring(
                                       0,
                                       _amount.length - 1,
                                     );
+                                  }
                                 } else if (key == '.') {
                                   if (!_amount.contains('.')) _amount += '.';
                                 } else {

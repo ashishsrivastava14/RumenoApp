@@ -1297,7 +1297,7 @@ class _SectionTitle extends StatelessWidget {
   final String? actionLabel;
   final VoidCallback? onAction;
 
-  const _SectionTitle({required this.title, this.icon, this.actionLabel, this.onAction});
+  const _SectionTitle({required this.title, this.icon});
 
   @override
   Widget build(BuildContext context) {

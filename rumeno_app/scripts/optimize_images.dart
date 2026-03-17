@@ -46,7 +46,7 @@ void main() async {
           final newSize = compressed.length / 1024 / 1024;
           final savings = ((originalSize - newSize) / originalSize * 100).toStringAsFixed(1);
           
-          print('  ✓ ${originalSize.toStringAsFixed(2)}MB → ${newSize.toStringAsFixed(2)}MB (${savings}% savings)');
+          print('  ✓ ${originalSize.toStringAsFixed(2)}MB → ${newSize.toStringAsFixed(2)}MB ($savings% savings)');
           print('  Created: $newPath');
         }
       } catch (e) {

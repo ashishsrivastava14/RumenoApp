@@ -750,7 +750,7 @@ class _AnimalFeedCalculatorScreenState
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _animalTypes.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
         itemBuilder: (context, index) {
           final animal = _animalTypes[index];
           final isSelected = _selectedAnimal.id == animal.id;
@@ -988,7 +988,7 @@ class _AnimalFeedCalculatorScreenState
                     ),
                     _miniStat(
                       '⚡',
-                      '${a.targetEnergy.toStringAsFixed(0)}',
+                      a.targetEnergy.toStringAsFixed(0),
                       'Energy',
                     ),
                   ],
@@ -1892,7 +1892,7 @@ class _AnimalFeedCalculatorScreenState
               ),
               _miniStat(
                 '⚡',
-                '${suggestion.expectedEnergy.toStringAsFixed(0)}',
+                suggestion.expectedEnergy.toStringAsFixed(0),
                 'Energy',
               ),
             ],

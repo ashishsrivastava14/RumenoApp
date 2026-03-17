@@ -594,7 +594,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
     required double step,
     required ValueChanged<double> onChanged,
   }) {
-    void _adjust(double delta) {
+    void adjust(double delta) {
       final newVal = (value + delta).clamp(min, max);
       onChanged(newVal);
       controller.text = newVal.round().toString();
@@ -647,7 +647,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
                 // Minus button
                 _adjustButton(
                   icon: Icons.remove,
-                  onTap: () => _adjust(-step),
+                  onTap: () => adjust(-step),
                   enabled: value > min,
                 ),
                 const SizedBox(width: 12),
@@ -706,7 +706,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
                 // Plus button
                 _adjustButton(
                   icon: Icons.add,
-                  onTap: () => _adjust(step),
+                  onTap: () => adjust(step),
                   enabled: value < max,
                 ),
               ],
@@ -1337,14 +1337,14 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
 
     final parts = <String>[];
     if (!isNone) {
-      parts.add(entry!.animalId);
+      parts.add(entry.animalId);
       if (entry.location.isNotEmpty) parts.add(entry.location);
       if (entry.ownerName.isNotEmpty) parts.add(entry.ownerName);
     }
     final label =
         isNone ? "Don't know / None" : parts.join(' · ');
     final showSubtitle = !isNone &&
-        (entry!.location.isNotEmpty || entry.ownerName.isNotEmpty);
+        (entry.location.isNotEmpty || entry.ownerName.isNotEmpty);
 
     return GestureDetector(
       onTap: () => onChanged(id),
@@ -1399,7 +1399,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
                   if (showSubtitle) ...[
                     const SizedBox(height: 2),
                     Text(
-                      'ID: ${entry!.animalId}',
+                      'ID: ${entry.animalId}',
                       style: const TextStyle(
                           fontSize: 12, color: RumenoTheme.textGrey),
                     ),
