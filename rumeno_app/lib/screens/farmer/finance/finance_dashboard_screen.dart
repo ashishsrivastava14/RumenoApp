@@ -277,11 +277,32 @@ class _MedicineLineItem {
   double get total => (qty * rate) + ((qty * rate) * gst / 100);
 }
 
+class _FeedLineItem {
+  final String name;
+  final double qty;
+  final double rate;
+  final double gst;
+
+  const _FeedLineItem({
+    required this.name,
+    required this.qty,
+    required this.rate,
+    required this.gst,
+  });
+
+  double get total => (qty * rate) + ((qty * rate) * gst / 100);
+}
+
 class _AddExpenseWizardState extends State<_AddExpenseWizard> {
   int _step = 0; // 0=category, 1=amount, 2=payment, 3=details
   ExpenseCategory? _category;
   String _amount = '';
   String _paymentMode = '';
+  final _feedNameController = TextEditingController();
+  final _feedQtyController = TextEditingController();
+  final _feedRateController = TextEditingController();
+  final _feedGstController = TextEditingController();
+  final List<_FeedLineItem> _feedItems = [];
   bool _medicineUseSingleAmount = false;
   final _medicineNameController = TextEditingController();
   final _medicineQtyController = TextEditingController();
@@ -303,6 +324,10 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
 
   @override
   void dispose() {
+    _feedNameController.dispose();
+    _feedQtyController.dispose();
+    _feedRateController.dispose();
+    _feedGstController.dispose();
     _medicineNameController.dispose();
     _medicineQtyController.dispose();
     _medicineRateController.dispose();
@@ -324,6 +349,43 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
 
   double get _medicineItemsTotal =>
       _medicineItems.fold(0, (sum, item) => sum + item.total);
+
+  double get _feedItemsTotal =>
+      _feedItems.fold(0, (sum, item) => sum + item.total);
+
+  bool _isFeedDraftFilled() {
+    return _feedNameController.text.trim().isNotEmpty ||
+        _feedQtyController.text.trim().isNotEmpty ||
+        _feedRateController.text.trim().isNotEmpty ||
+        _feedGstController.text.trim().isNotEmpty;
+  }
+
+  bool _tryAddFeedFromInputs({bool showError = true}) {
+    final name = _feedNameController.text.trim();
+    final q = _toDouble(_feedQtyController.text);
+    final r = _toDouble(_feedRateController.text);
+    final g = _toDouble(_feedGstController.text);
+
+    if (name.isEmpty || q <= 0 || r <= 0) {
+      if (showError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Fill Feed name, Quantity and Rate to add'),
+          ),
+        );
+      }
+      return false;
+    }
+
+    setState(() {
+      _feedItems.add(_FeedLineItem(name: name, qty: q, rate: r, gst: g));
+      _feedNameController.clear();
+      _feedQtyController.clear();
+      _feedRateController.clear();
+      _feedGstController.clear();
+    });
+    return true;
+  }
 
   bool _isMedicineDraftFilled() {
     return _medicineNameController.text.trim().isNotEmpty ||
@@ -536,6 +598,10 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
 
   // Step 2: Enter amount with big number pad
   Widget _buildAmountStep() {
+    if (_category == ExpenseCategory.feed) {
+      return _buildFeedAmountStep();
+    }
+
     if (_category == ExpenseCategory.medicine) {
       return _buildMedicineAmountStep();
     }
@@ -620,6 +686,280 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
                 onPressed: _amount.isNotEmpty
                     ? () => setState(() => _step = 2)
                     : null,
+                icon: const Icon(Icons.arrow_forward_rounded),
+                label: const Text('Next', style: TextStyle(fontSize: 16)),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeedAmountStep() {
+    final qty = _toDouble(_feedQtyController.text);
+    final rate = _toDouble(_feedRateController.text);
+    final gst = _toDouble(_feedGstController.text);
+    final base = qty * rate;
+    final draftTotalWithGst = base + (base * gst / 100);
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.green.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.grass_rounded, color: Colors.green, size: 22),
+              SizedBox(width: 8),
+              Text(
+                '🌾 Feed',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.green,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'Add feed bill',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Fill 4 boxes from bill',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: RumenoTheme.textLight,
+            fontSize: 15,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.green.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
+          ),
+          child: Text(
+            'See bill -> add name -> fill Qty/Rate/GST',
+            style: TextStyle(
+              color: Colors.green.shade900,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _feedNameController,
+          onChanged: (_) => setState(() {}),
+          decoration: const InputDecoration(
+            labelText: 'Feed name',
+            hintText: 'Example: Cattle Feed',
+            prefixIcon: Icon(Icons.inventory_2_rounded),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _feedQtyController,
+                onChanged: (_) => setState(() {}),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Quantity',
+                  hintText: 'Example: 10',
+                  prefixIcon: Icon(Icons.format_list_numbered_rounded),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                controller: _feedRateController,
+                onChanged: (_) => setState(() {}),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Rate',
+                  hintText: 'Per bag/kg',
+                  prefixIcon: Icon(Icons.sell_rounded),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _feedGstController,
+          onChanged: (_) => setState(() {}),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: const InputDecoration(
+            labelText: 'GST %',
+            hintText: 'Example: 5',
+            prefixIcon: Icon(Icons.percent_rounded),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.green.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.calculate_rounded, color: Colors.green),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Current feed = ₹${_prettyAmount(draftTotalWithGst)}',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green.shade800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Tip: If GST is not on bill, keep GST as 0',
+            style: TextStyle(color: RumenoTheme.textGrey, fontSize: 13),
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () => _tryAddFeedFromInputs(),
+            icon: const Icon(Icons.add_rounded),
+            label: const Text('Add this feed'),
+          ),
+        ),
+        if (_feedItems.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Added feed items (${_feedItems.length})',
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 8),
+                ..._feedItems.asMap().entries.map((entry) {
+                  final i = entry.key;
+                  final item = entry.value;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${item.name}  x${_prettyAmount(item.qty)}  @ ₹${_prettyAmount(item.rate)}',
+                            style: TextStyle(
+                              color: RumenoTheme.textDark,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '₹${_prettyAmount(item.total)}',
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        IconButton(
+                          onPressed: () =>
+                              setState(() => _feedItems.removeAt(i)),
+                          icon: const Icon(
+                            Icons.delete_outline_rounded,
+                            size: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              'Feed total: ₹${_prettyAmount(_feedItemsTotal)}',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => setState(() => _step = 0),
+                icon: const Icon(Icons.arrow_back_rounded),
+                label: const Text('Back', style: TextStyle(fontSize: 16)),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  // If user typed a line and did not tap Add, auto-add it.
+                  if (_isFeedDraftFilled()) {
+                    final added = _tryAddFeedFromInputs(showError: true);
+                    if (!added) return;
+                  }
+                  if (_feedItems.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Add at least one feed item'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  setState(() {
+                    _amount = _prettyAmount(_feedItemsTotal);
+                    _step = 2;
+                  });
+                },
                 icon: const Icon(Icons.arrow_forward_rounded),
                 label: const Text('Next', style: TextStyle(fontSize: 16)),
                 style: ElevatedButton.styleFrom(
@@ -1266,6 +1606,29 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
                     Expanded(
                       child: Text(
                         'Medicines: ${_medicineItems.length} item(s)',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: RumenoTheme.textGrey,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              if (_category == ExpenseCategory.feed &&
+                  _feedItems.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.grass_rounded,
+                      size: 20,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Feed items: ${_feedItems.length} item(s)',
                         style: TextStyle(
                           fontSize: 14,
                           color: RumenoTheme.textGrey,
