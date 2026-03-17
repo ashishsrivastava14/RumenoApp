@@ -6,6 +6,7 @@ import '../../../config/theme.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../mock/mock_health.dart';
 import '../../../models/models.dart';
+import '../../../widgets/charts/bar_chart_widget.dart';
 import '../../../widgets/charts/line_chart_widget.dart';
 import '../../../widgets/cards/vaccination_card.dart';
 import '../../../widgets/cards/health_record_card.dart';
@@ -170,6 +171,22 @@ class _OverviewTab extends StatelessWidget {
             FlSpot(0, 350), FlSpot(1, 370), FlSpot(2, 385), FlSpot(3, 400), FlSpot(4, 410), FlSpot(5, 420),
           ],
           bottomLabels: const ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'],
+        ),
+        if (animal.purpose == AnimalPurpose.dairy || animal.purpose == AnimalPurpose.mixed) ...[
+          const SizedBox(height: 16),
+          BarChartWidget(
+            title: 'Milk Performance (L/month)',
+            values: const [180, 210, 195, 225, 240, 230],
+            labels: const ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'],
+            barColor: RumenoTheme.infoBlue,
+          ),
+        ],
+        const SizedBox(height: 16),
+        BarChartWidget(
+          title: 'Kidding Performance',
+          values: const [1, 2, 1, 2, 1],
+          labels: const ['2022', '2023', '2024', '2025', '2026'],
+          barColor: RumenoTheme.warningYellow,
         ),
       ],
     );
