@@ -19,7 +19,9 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<EcommerceProvider>().resetFilters();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EcommerceProvider>().resetFilters();
+    });
   }
 
   @override
