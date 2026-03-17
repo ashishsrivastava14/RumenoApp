@@ -180,42 +180,40 @@ class VetDashboardScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 20),
 
-                  // ── Stat Cards ──────────────────────────────────────
-                  SizedBox(
-                    height: 120,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      children: [
-                        _GradientStatCard(
-                          title: 'Referred Farms',
-                          value: '$totalFarms',
-                          icon: Icons.agriculture_rounded,
-                          gradientColors: const [Color(0xFF4CAF50), Color(0xFF2E7D32)],
-                        ),
-                        const SizedBox(width: 12),
-                        _GradientStatCard(
-                          title: 'Total Animals',
-                          value: '$totalAnimals',
-                          icon: Icons.pets_rounded,
-                          gradientColors: const [Color(0xFF26C6DA), Color(0xFF00838F)],
-                        ),
-                        const SizedBox(width: 12),
-                        _GradientStatCard(
-                          title: 'Active Cases',
-                          value: '$activeTreatments',
-                          icon: Icons.phone_in_talk_rounded,
-                          gradientColors: const [Color(0xFFFF8A65), Color(0xFFE64A19)],
-                        ),
-                        const SizedBox(width: 12),
-                        const _GradientStatCard(
-                          title: 'Monthly Earnings',
-                          value: '₹12.5K',
-                          icon: Icons.currency_rupee_rounded,
-                          gradientColors: [Color(0xFFAB47BC), Color(0xFF6A1B9A)],
-                        ),
-                      ],
-                    ),
+                  // ── Stat Cards (2×2 Grid) ─────────────────────────
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 1.6,
+                    children: [
+                      _GradientStatCard(
+                        title: 'Referred Farms',
+                        value: '$totalFarms',
+                        icon: Icons.agriculture_rounded,
+                        gradientColors: const [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+                      ),
+                      _GradientStatCard(
+                        title: 'Total Animals',
+                        value: '$totalAnimals',
+                        icon: Icons.pets_rounded,
+                        gradientColors: const [Color(0xFF26C6DA), Color(0xFF00838F)],
+                      ),
+                      _GradientStatCard(
+                        title: 'Active Cases',
+                        value: '$activeTreatments',
+                        icon: Icons.phone_in_talk_rounded,
+                        gradientColors: const [Color(0xFFFF8A65), Color(0xFFE64A19)],
+                      ),
+                      const _GradientStatCard(
+                        title: 'Monthly Earnings',
+                        value: '₹12.5K',
+                        icon: Icons.currency_rupee_rounded,
+                        gradientColors: [Color(0xFFAB47BC), Color(0xFF6A1B9A)],
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 24),
@@ -667,8 +665,6 @@ class _GradientStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 130,
-      height: 120,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
