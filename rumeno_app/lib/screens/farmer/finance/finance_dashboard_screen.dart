@@ -340,6 +340,10 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
   final _equipmentTotalController = TextEditingController();
   final List<_EquipmentLineItem> _equipmentItems = [];
   String _labourType = ''; // 'contractual' or 'monthly'
+  final _transportSourceController = TextEditingController();
+  final _transportDestinationController = TextEditingController();
+  final _transportWeightController = TextEditingController();
+  final _transportGoodsNameController = TextEditingController();
   final _vendorController = TextEditingController();
   final _notesController = TextEditingController();
 
@@ -368,6 +372,10 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
     _equipmentRateController.dispose();
     _equipmentGstController.dispose();
     _equipmentTotalController.dispose();
+    _transportSourceController.dispose();
+    _transportDestinationController.dispose();
+    _transportWeightController.dispose();
+    _transportGoodsNameController.dispose();
     _vendorController.dispose();
     _notesController.dispose();
     super.dispose();
@@ -686,6 +694,10 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
 
     if (_category == ExpenseCategory.labour) {
       return _buildLabourAmountStep();
+    }
+
+    if (_category == ExpenseCategory.transport) {
+      return _buildTransportAmountStep();
     }
 
     return Column(
@@ -1807,6 +1819,142 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
     );
   }
 
+  Widget _buildTransportAmountStep() {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.teal.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.local_shipping_rounded, color: Colors.teal, size: 22),
+              SizedBox(width: 8),
+              Text(
+                '🚛 Transport',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.teal,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'Add transport expense',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Fill trip details',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: RumenoTheme.textLight,
+            fontSize: 15,
+          ),
+        ),
+        const SizedBox(height: 14),
+        TextField(
+          controller: _transportSourceController,
+          onChanged: (_) => setState(() {}),
+          decoration: const InputDecoration(
+            labelText: 'Source',
+            hintText: 'From where?',
+            prefixIcon: Icon(Icons.trip_origin_rounded),
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _transportDestinationController,
+          onChanged: (_) => setState(() {}),
+          decoration: const InputDecoration(
+            labelText: 'Destination',
+            hintText: 'To where?',
+            prefixIcon: Icon(Icons.location_on_rounded),
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _transportWeightController,
+          onChanged: (_) => setState(() {}),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: const InputDecoration(
+            labelText: 'Weight of goods (kg)',
+            hintText: 'Example: 500',
+            prefixIcon: Icon(Icons.scale_rounded),
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _transportGoodsNameController,
+          onChanged: (_) => setState(() {}),
+          decoration: const InputDecoration(
+            labelText: 'Goods name (optional)',
+            hintText: 'Example: Cattle feed bags',
+            prefixIcon: Icon(Icons.inventory_2_rounded),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Big amount display
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.teal, width: 2),
+          ),
+          child: Center(
+            child: Text(
+              _amount.isEmpty ? '₹ 0' : '₹ $_amount',
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                color: _amount.isEmpty
+                    ? Colors.grey.shade400
+                    : RumenoTheme.textDark,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildNumberPad(),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => setState(() => _step = 0),
+                icon: const Icon(Icons.arrow_back_rounded),
+                label: const Text('Back', style: TextStyle(fontSize: 16)),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: ElevatedButton.icon(
+                onPressed: _amount.isNotEmpty
+                    ? () => setState(() => _step = 2)
+                    : null,
+                icon: const Icon(Icons.arrow_forward_rounded),
+                label: const Text('Next', style: TextStyle(fontSize: 16)),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _modeCard({
     required IconData icon,
     required String emoji,
@@ -2207,6 +2355,75 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
                     ),
                   ],
                 ),
+              ],
+              if (_category == ExpenseCategory.transport) ...[
+                if (_transportSourceController.text.trim().isNotEmpty ||
+                    _transportDestinationController.text.trim().isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.route_rounded,
+                        size: 20,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${_transportSourceController.text.trim()} → ${_transportDestinationController.text.trim()}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: RumenoTheme.textGrey,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (_transportGoodsNameController.text.trim().isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.inventory_2_rounded,
+                        size: 20,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Goods: ${_transportGoodsNameController.text.trim()}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: RumenoTheme.textGrey,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (_transportWeightController.text.trim().isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.scale_rounded,
+                        size: 20,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Weight: ${_transportWeightController.text.trim()} kg',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: RumenoTheme.textGrey,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ],
           ),
