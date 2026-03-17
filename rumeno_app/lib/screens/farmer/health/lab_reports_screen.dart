@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../../../config/theme.dart';
 import '../../../mock/mock_health.dart';
@@ -37,6 +39,8 @@ class _LabReportsScreenState extends State<LabReportsScreen>
     final labNameCtrl = TextEditingController();
     final vetNameCtrl = TextEditingController();
     final notesCtrl = TextEditingController();
+    final otherTestCtrl = TextEditingController();
+    XFile? pickedFile;
 
     const testItems = [
       {'v': 'Complete Blood Count', 'e': '🩸', 'd': 'CBC'},
@@ -48,6 +52,7 @@ class _LabReportsScreenState extends State<LabReportsScreen>
       {'v': 'Pregnancy Confirmation', 'e': '🤰', 'd': 'Pregnancy'},
       {'v': 'Blood Smear', 'e': '💉', 'd': 'Blood parasites'},
       {'v': 'Urine Analysis', 'e': '🧪', 'd': 'Urinalysis'},
+      {'v': 'Other', 'e': '✏️', 'd': 'Other'},
     ];
 
     showModalBottomSheet(
@@ -138,7 +143,34 @@ class _LabReportsScreenState extends State<LabReportsScreen>
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
+                // Other test name input
+                if (selTest == 'Other') ...[
+                  TextField(
+                    controller: otherTestCtrl,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      hintText: '✏️  Enter test name',
+                      filled: true,
+                      fillColor: RumenoTheme.backgroundCream,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: RumenoTheme.textLight)),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: RumenoTheme.textLight)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                              color: RumenoTheme.warmBrown, width: 2)),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 14),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 _dialogField(animalIdCtrl, '🐄  Animal ID (e.g. C-001)',
                     TextInputType.text),
                 const SizedBox(height: 12),
@@ -150,6 +182,153 @@ class _LabReportsScreenState extends State<LabReportsScreen>
                 const SizedBox(height: 12),
                 _dialogField(notesCtrl, '📝  Notes (optional)',
                     TextInputType.text),
+                const SizedBox(height: 16),
+                // ── Upload Report ──────────────────────────
+                const Text('Upload Report (optional)',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () async {
+                    final picker = ImagePicker();
+                    final result = await showModalBottomSheet<XFile?>(
+                      context: ctx,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(20)),
+                        ),
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(2)),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text('Select Source',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 16),
+                            ListTile(
+                              leading: const CircleAvatar(
+                                  backgroundColor: RumenoTheme.backgroundCream,
+                                  child: Icon(Icons.camera_alt,
+                                      color: RumenoTheme.warmBrown)),
+                              title: const Text('Take Photo'),
+                              subtitle: const Text('Capture with camera'),
+                              onTap: () async {
+                                final f = await picker.pickImage(
+                                    source: ImageSource.camera,
+                                    imageQuality: 85);
+                                Navigator.pop(ctx, f);
+                              },
+                            ),
+                            ListTile(
+                              leading: const CircleAvatar(
+                                  backgroundColor: RumenoTheme.backgroundCream,
+                                  child: Icon(Icons.photo_library,
+                                      color: RumenoTheme.warmBrown)),
+                              title: const Text('Choose from Gallery'),
+                              subtitle: const Text('Select an existing image'),
+                              onTap: () async {
+                                final f = await picker.pickImage(
+                                    source: ImageSource.gallery,
+                                    imageQuality: 85);
+                                Navigator.pop(ctx, f);
+                              },
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
+                      ),
+                    );
+                    if (result != null) {
+                      setModalState(() => pickedFile = result);
+                    }
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: pickedFile != null
+                          ? RumenoTheme.successGreen.withValues(alpha: 0.08)
+                          : RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: pickedFile != null
+                            ? RumenoTheme.successGreen
+                            : RumenoTheme.textLight,
+                        width: pickedFile != null ? 2 : 1,
+                      ),
+                    ),
+                    child: pickedFile != null
+                        ? Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(
+                                  File(pickedFile!.path),
+                                  width: 48,
+                                  height: 48,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Report Uploaded ✅',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: RumenoTheme.successGreen,
+                                            fontSize: 13)),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      pickedFile!.name,
+                                      style: const TextStyle(
+                                          color: RumenoTheme.textGrey,
+                                          fontSize: 11),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () =>
+                                    setModalState(() => pickedFile = null),
+                                child: const Icon(Icons.close,
+                                    color: RumenoTheme.textGrey, size: 18),
+                              ),
+                            ],
+                          )
+                        : const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.upload_file,
+                                  color: RumenoTheme.warmBrown, size: 22),
+                              SizedBox(width: 8),
+                              Text('Tap to upload report image',
+                                  style: TextStyle(
+                                      color: RumenoTheme.warmBrown,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14)),
+                            ],
+                          ),
+                  ),
+                ),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
@@ -163,10 +342,21 @@ class _LabReportsScreenState extends State<LabReportsScreen>
                         );
                         return;
                       }
+                      final testName = selTest == 'Other'
+                          ? otherTestCtrl.text.trim()
+                          : selTest;
+                      if (testName.isEmpty) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                              content: Text('Please enter a test name'),
+                              backgroundColor: RumenoTheme.errorRed),
+                        );
+                        return;
+                      }
                       final record = LabReport(
                         id: 'LR_${DateTime.now().millisecondsSinceEpoch}',
                         animalId: animalIdCtrl.text.trim(),
-                        testName: selTest,
+                        testName: testName,
                         testDate: DateTime.now(),
                         labName: labNameCtrl.text.trim().isEmpty
                             ? null
