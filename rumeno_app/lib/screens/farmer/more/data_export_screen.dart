@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme.dart';
 import '../../../mock/mock_animals.dart';
-import '../../../mock/mock_health.dart';
-import '../../../mock/mock_milk.dart';
-import '../../../mock/mock_finance.dart';
 import '../../../models/models.dart';
 import '../../../widgets/common/marketplace_button.dart';
 
