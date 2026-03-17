@@ -1151,6 +1151,7 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
         ] else ...[
           TextField(
             controller: _medicineNameController,
+            onChanged: (_) => setState(() {}),
             decoration: const InputDecoration(
               labelText: 'Medicine name',
               hintText: 'Example: Dewormer',
@@ -1163,6 +1164,7 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
               Expanded(
                 child: TextField(
                   controller: _medicineQtyController,
+                  onChanged: (_) => setState(() {}),
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
@@ -1177,6 +1179,7 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
               Expanded(
                 child: TextField(
                   controller: _medicineRateController,
+                  onChanged: (_) => setState(() {}),
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
@@ -1192,6 +1195,7 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
           const SizedBox(height: 10),
           TextField(
             controller: _medicineGstController,
+            onChanged: (_) => setState(() {}),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(
               labelText: 'GST %',
