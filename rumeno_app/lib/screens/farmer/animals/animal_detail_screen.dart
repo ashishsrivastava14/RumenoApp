@@ -390,14 +390,745 @@ class _ExpenseItem extends StatelessWidget {
 
 // ─── Reproduction Tab ───
 
-class _ReproductionTab extends StatelessWidget {
+class _ReproductionTab extends StatefulWidget {
   final Animal animal;
   const _ReproductionTab({required this.animal});
 
   @override
+  State<_ReproductionTab> createState() => _ReproductionTabState();
+}
+
+class _ReproductionTabState extends State<_ReproductionTab> {
+  late List<BreedingRecord> _breedingRecords;
+  late List<_SyncRecord> _syncRecords;
+  late List<_MiscarriageRecord> _miscarriageRecords;
+  late List<_LactationRecord> _lactationHistory;
+  late List<_MastitisRecord> _mastitisHistory;
+  late int _lactationNumber;
+
+  @override
+  void initState() {
+    super.initState();
+    final animal = widget.animal;
+    _breedingRecords = mockBreedingRecords.where((b) => b.animalId == animal.id).toList();
+
+    _syncRecords = [
+      if (_breedingRecords.isNotEmpty)
+        _SyncRecord(
+          date: _breedingRecords.first.heatDate.subtract(const Duration(days: 10)),
+          protocol: 'Ovsynch',
+          status: 'Completed',
+          notes: 'GnRH + PGF2α protocol',
+        ),
+    ];
+
+    _miscarriageRecords = [
+      if (animal.id == '6')
+        _MiscarriageRecord(
+          date: DateTime(2025, 3, 15),
+          stage: '4 months',
+          cause: 'Unknown',
+          notes: 'Vet examined, no infection found',
+        ),
+    ];
+
+    _lactationNumber = animal.purpose == AnimalPurpose.dairy || animal.purpose == AnimalPurpose.mixed ? 3 : 0;
+    _lactationHistory = [
+      if (_lactationNumber > 0) ...[
+        _LactationRecord(number: 1, startDate: DateTime(2022, 5, 10), endDate: DateTime(2023, 2, 15), totalMilkLitres: 3250, daysInMilk: 281),
+        _LactationRecord(number: 2, startDate: DateTime(2023, 8, 20), endDate: DateTime(2024, 5, 10), daysInMilk: 264, totalMilkLitres: 3680),
+        _LactationRecord(number: 3, startDate: DateTime(2025, 1, 5), endDate: null, daysInMilk: null, totalMilkLitres: null),
+      ],
+    ];
+
+    _mastitisHistory = [
+      if (animal.id == '1')
+        _MastitisRecord(date: DateTime(2026, 1, 25), quarter: 'Rear Left', severity: 'Subclinical', treatment: 'Cephalexin intramammary', resolvedDate: DateTime(2026, 2, 5)),
+      if (animal.id == '2')
+        _MastitisRecord(date: DateTime(2025, 6, 10), quarter: 'Front Right', severity: 'Clinical', treatment: 'Amoxicillin + anti-inflammatory', resolvedDate: DateTime(2025, 6, 22)),
+    ];
+  }
+
+  // ── Add Synchronization ──
+  void _showAddSyncDialog() {
+    String protocol = 'Ovsynch';
+    DateTime date = DateTime.now();
+    final notesCtrl = TextEditingController();
+    final protocols = ['Ovsynch', 'Co-Synch', 'Pre-Synch', 'Double Ovsynch', 'CIDR', 'PGF2α', 'Other'];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _pillHandle(),
+                const SizedBox(height: 16),
+                const Row(children: [Text('🔄', style: TextStyle(fontSize: 26)), SizedBox(width: 10), Text('Add Synchronization', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+                const SizedBox(height: 20),
+                const Text('Protocol', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8, runSpacing: 8,
+                  children: protocols.map((p) {
+                    final sel = protocol == p;
+                    return GestureDetector(
+                      onTap: () => setModalState(() => protocol = p),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: sel ? RumenoTheme.primaryGreen : RumenoTheme.backgroundCream,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textLight, width: sel ? 2 : 1),
+                        ),
+                        child: Text(p, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: sel ? Colors.white : RumenoTheme.textDark)),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+                const Text('Date', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                _datePickerTile(ctx, date, (d) => setModalState(() => date = d)),
+                const SizedBox(height: 12),
+                _formField(notesCtrl, '📝 Notes (optional)', TextInputType.text),
+                const SizedBox(height: 24),
+                _saveButton(ctx, 'Save Synchronization', () {
+                  Navigator.pop(ctx);
+                  setState(() {
+                    _syncRecords.add(_SyncRecord(date: date, protocol: protocol, status: 'Completed', notes: notesCtrl.text.trim().isEmpty ? null : notesCtrl.text.trim()));
+                  });
+                  _showSavedSnackBar('Synchronization record added!');
+                }),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Add Heat ──
+  void _showAddHeatDialog() {
+    DateTime heatDate = DateTime.now();
+    HeatIntensity intensity = HeatIntensity.moderate;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _pillHandle(),
+                const SizedBox(height: 16),
+                const Row(children: [Text('🔥', style: TextStyle(fontSize: 26)), SizedBox(width: 10), Text('Record Heat', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+                const SizedBox(height: 20),
+                const Text('Heat Date', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                _datePickerTile(ctx, heatDate, (d) => setModalState(() => heatDate = d)),
+                const SizedBox(height: 16),
+                const Text('Intensity', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                Row(
+                  children: HeatIntensity.values.map((hi) {
+                    final sel = intensity == hi;
+                    final color = switch (hi) { HeatIntensity.strong => RumenoTheme.errorRed, HeatIntensity.moderate => RumenoTheme.warningYellow, HeatIntensity.mild => RumenoTheme.successGreen };
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => setModalState(() => intensity = hi),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: sel ? color.withValues(alpha: 0.15) : RumenoTheme.backgroundCream,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: sel ? color : RumenoTheme.textLight, width: sel ? 2 : 1),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(Icons.whatshot, color: sel ? color : RumenoTheme.textGrey, size: 24),
+                              const SizedBox(height: 4),
+                              Text(hi.name[0].toUpperCase() + hi.name.substring(1), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? color : RumenoTheme.textGrey)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 24),
+                _saveButton(ctx, 'Save Heat Record', () {
+                  Navigator.pop(ctx);
+                  setState(() {
+                    _breedingRecords.add(BreedingRecord(
+                      id: 'BR_${DateTime.now().millisecondsSinceEpoch}',
+                      animalId: widget.animal.id,
+                      heatDate: heatDate,
+                      intensity: intensity,
+                      aiDone: false,
+                      isPregnant: false,
+                      notes: 'Heat detected',
+                    ));
+                  });
+                  _showSavedSnackBar('Heat record added!');
+                }),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Add AI (with Synchronization option) ──
+  void _showAddAIDialog() {
+    DateTime aiDate = DateTime.now();
+    final bullSemenCtrl = TextEditingController();
+    final technicianCtrl = TextEditingController();
+    HeatIntensity intensity = HeatIntensity.moderate;
+    bool addSync = false;
+    String syncProtocol = 'Ovsynch';
+    DateTime syncDate = DateTime.now().subtract(const Duration(days: 10));
+    final syncNotesCtrl = TextEditingController();
+
+    final protocols = ['Ovsynch', 'Co-Synch', 'Pre-Synch', 'Double Ovsynch', 'CIDR', 'PGF2α', 'Other'];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _pillHandle(),
+                const SizedBox(height: 16),
+                const Row(children: [Text('💉', style: TextStyle(fontSize: 26)), SizedBox(width: 10), Text('Add Artificial Insemination', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+                const SizedBox(height: 20),
+                const Text('AI Date', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                _datePickerTile(ctx, aiDate, (d) => setModalState(() => aiDate = d)),
+                const SizedBox(height: 12),
+                _formField(bullSemenCtrl, '🐂 Bull / Semen ID', TextInputType.text),
+                const SizedBox(height: 12),
+                _formField(technicianCtrl, '👨‍⚕️ Technician Name', TextInputType.text),
+                const SizedBox(height: 16),
+                const Text('Heat Intensity', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                Row(
+                  children: HeatIntensity.values.map((hi) {
+                    final sel = intensity == hi;
+                    final color = switch (hi) { HeatIntensity.strong => RumenoTheme.errorRed, HeatIntensity.moderate => RumenoTheme.warningYellow, HeatIntensity.mild => RumenoTheme.successGreen };
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => setModalState(() => intensity = hi),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: sel ? color.withValues(alpha: 0.15) : RumenoTheme.backgroundCream,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: sel ? color : RumenoTheme.textLight, width: sel ? 2 : 1),
+                          ),
+                          child: Center(child: Text(hi.name[0].toUpperCase() + hi.name.substring(1), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? color : RumenoTheme.textGrey))),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+                // Synchronization toggle
+                GestureDetector(
+                  onTap: () => setModalState(() => addSync = !addSync),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: addSync ? RumenoTheme.primaryGreen.withValues(alpha: 0.08) : RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: addSync ? RumenoTheme.primaryGreen : RumenoTheme.textLight),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(addSync ? Icons.check_box : Icons.check_box_outline_blank, color: addSync ? RumenoTheme.primaryGreen : RumenoTheme.textGrey),
+                        const SizedBox(width: 10),
+                        const Expanded(child: Text('Add Synchronization Protocol', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14))),
+                      ],
+                    ),
+                  ),
+                ),
+                if (addSync) ...[
+                  const SizedBox(height: 12),
+                  const Text('Sync Protocol', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: RumenoTheme.textDark)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8, runSpacing: 8,
+                    children: protocols.map((p) {
+                      final sel = syncProtocol == p;
+                      return GestureDetector(
+                        onTap: () => setModalState(() => syncProtocol = p),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: sel ? RumenoTheme.primaryGreen : RumenoTheme.backgroundCream,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textLight),
+                          ),
+                          child: Text(p, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? Colors.white : RumenoTheme.textDark)),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text('Sync Date', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: RumenoTheme.textDark)),
+                  const SizedBox(height: 8),
+                  _datePickerTile(ctx, syncDate, (d) => setModalState(() => syncDate = d)),
+                  const SizedBox(height: 8),
+                  _formField(syncNotesCtrl, '📝 Sync Notes (optional)', TextInputType.text),
+                ],
+                const SizedBox(height: 24),
+                _saveButton(ctx, 'Save AI Record', () {
+                  if (bullSemenCtrl.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Please enter Bull / Semen ID'), backgroundColor: RumenoTheme.errorRed));
+                    return;
+                  }
+                  Navigator.pop(ctx);
+                  setState(() {
+                    _breedingRecords.add(BreedingRecord(
+                      id: 'BR_${DateTime.now().millisecondsSinceEpoch}',
+                      animalId: widget.animal.id,
+                      heatDate: aiDate,
+                      intensity: intensity,
+                      aiDone: true,
+                      bullSemenId: bullSemenCtrl.text.trim(),
+                      technicianName: technicianCtrl.text.trim().isEmpty ? null : technicianCtrl.text.trim(),
+                      matingDate: aiDate,
+                      isPregnant: false,
+                    ));
+                    if (addSync) {
+                      _syncRecords.add(_SyncRecord(date: syncDate, protocol: syncProtocol, status: 'Completed', notes: syncNotesCtrl.text.trim().isEmpty ? null : syncNotesCtrl.text.trim()));
+                    }
+                  });
+                  _showSavedSnackBar('AI record added!${addSync ? ' Sync protocol recorded.' : ''}');
+                }),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Add Miscarriage ──
+  void _showAddMiscarriageDialog() {
+    DateTime date = DateTime.now();
+    final stageCtrl = TextEditingController();
+    final causeCtrl = TextEditingController();
+    final notesCtrl = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _pillHandle(),
+                const SizedBox(height: 16),
+                const Row(children: [Text('⚠️', style: TextStyle(fontSize: 26)), SizedBox(width: 10), Text('Record Miscarriage', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+                const SizedBox(height: 20),
+                const Text('Date', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                _datePickerTile(ctx, date, (d) => setModalState(() => date = d)),
+                const SizedBox(height: 12),
+                _formField(stageCtrl, '📅 Pregnancy Stage (e.g. 4 months)', TextInputType.text),
+                const SizedBox(height: 12),
+                _formField(causeCtrl, '🔍 Cause (if known)', TextInputType.text),
+                const SizedBox(height: 12),
+                _formField(notesCtrl, '📝 Notes (optional)', TextInputType.text),
+                const SizedBox(height: 24),
+                _saveButton(ctx, 'Save Record', () {
+                  if (stageCtrl.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Please enter pregnancy stage'), backgroundColor: RumenoTheme.errorRed));
+                    return;
+                  }
+                  Navigator.pop(ctx);
+                  setState(() {
+                    _miscarriageRecords.add(_MiscarriageRecord(
+                      date: date,
+                      stage: stageCtrl.text.trim(),
+                      cause: causeCtrl.text.trim().isEmpty ? 'Unknown' : causeCtrl.text.trim(),
+                      notes: notesCtrl.text.trim().isEmpty ? null : notesCtrl.text.trim(),
+                    ));
+                  });
+                  _showSavedSnackBar('Miscarriage record added.');
+                }),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Update Pregnancy Status ──
+  void _showUpdatePregnancyDialog() {
+    bool isPregnant = true;
+    DateTime matingDate = DateTime.now().subtract(const Duration(days: 30));
+    DateTime expectedDelivery = DateTime.now().add(const Duration(days: 250));
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _pillHandle(),
+                const SizedBox(height: 16),
+                const Row(children: [Text('🤰', style: TextStyle(fontSize: 26)), SizedBox(width: 10), Text('Update Pregnancy Status', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+                const SizedBox(height: 20),
+                const Text('Status', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setModalState(() => isPregnant = true),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: isPregnant ? RumenoTheme.infoBlue.withValues(alpha: 0.12) : RumenoTheme.backgroundCream,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: isPregnant ? RumenoTheme.infoBlue : RumenoTheme.textLight, width: isPregnant ? 2 : 1),
+                          ),
+                          child: Column(children: [
+                            Icon(Icons.check_circle, color: isPregnant ? RumenoTheme.infoBlue : RumenoTheme.textGrey, size: 28),
+                            const SizedBox(height: 4),
+                            Text('Pregnant', style: TextStyle(fontWeight: FontWeight.w600, color: isPregnant ? RumenoTheme.infoBlue : RumenoTheme.textGrey)),
+                          ]),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setModalState(() => isPregnant = false),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: !isPregnant ? Colors.grey.withValues(alpha: 0.12) : RumenoTheme.backgroundCream,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: !isPregnant ? Colors.grey : RumenoTheme.textLight, width: !isPregnant ? 2 : 1),
+                          ),
+                          child: Column(children: [
+                            Icon(Icons.remove_circle_outline, color: !isPregnant ? Colors.grey : RumenoTheme.textGrey, size: 28),
+                            const SizedBox(height: 4),
+                            Text('Not Pregnant', style: TextStyle(fontWeight: FontWeight.w600, color: !isPregnant ? Colors.grey : RumenoTheme.textGrey)),
+                          ]),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (isPregnant) ...[
+                  const SizedBox(height: 16),
+                  const Text('Mating Date', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                  const SizedBox(height: 8),
+                  _datePickerTile(ctx, matingDate, (d) => setModalState(() => matingDate = d)),
+                  const SizedBox(height: 12),
+                  const Text('Expected Delivery', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                  const SizedBox(height: 8),
+                  _datePickerTile(ctx, expectedDelivery, (d) => setModalState(() => expectedDelivery = d)),
+                ],
+                const SizedBox(height: 24),
+                _saveButton(ctx, 'Update Status', () {
+                  Navigator.pop(ctx);
+                  setState(() {
+                    if (isPregnant) {
+                      _breedingRecords.add(BreedingRecord(
+                        id: 'BR_${DateTime.now().millisecondsSinceEpoch}',
+                        animalId: widget.animal.id,
+                        heatDate: matingDate,
+                        intensity: HeatIntensity.strong,
+                        aiDone: false,
+                        matingDate: matingDate,
+                        isPregnant: true,
+                        expectedDelivery: expectedDelivery,
+                      ));
+                    }
+                  });
+                  _showSavedSnackBar(isPregnant ? 'Marked as pregnant.' : 'Marked as not pregnant.');
+                }),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Add Lactation ──
+  void _showAddLactationDialog() {
+    DateTime startDate = DateTime.now();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _pillHandle(),
+                const SizedBox(height: 16),
+                const Row(children: [Text('🥛', style: TextStyle(fontSize: 26)), SizedBox(width: 10), Text('Start New Lactation', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+                const SizedBox(height: 20),
+                const Text('Lactation Start Date', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                _datePickerTile(ctx, startDate, (d) => setModalState(() => startDate = d)),
+                const SizedBox(height: 24),
+                _saveButton(ctx, 'Start Lactation', () {
+                  Navigator.pop(ctx);
+                  setState(() {
+                    _lactationNumber++;
+                    _lactationHistory.add(_LactationRecord(number: _lactationNumber, startDate: startDate));
+                  });
+                  _showSavedSnackBar('Lactation #$_lactationNumber started!');
+                }),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Add Mastitis ──
+  void _showAddMastitisDialog() {
+    DateTime date = DateTime.now();
+    String quarter = 'Rear Left';
+    String severity = 'Subclinical';
+    final treatmentCtrl = TextEditingController();
+    final quarters = ['Front Left', 'Front Right', 'Rear Left', 'Rear Right'];
+    final severities = ['Subclinical', 'Clinical', 'Acute', 'Chronic'];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _pillHandle(),
+                const SizedBox(height: 16),
+                const Row(children: [Text('🩺', style: TextStyle(fontSize: 26)), SizedBox(width: 10), Text('Record Mastitis', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+                const SizedBox(height: 20),
+                const Text('Date Detected', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                _datePickerTile(ctx, date, (d) => setModalState(() => date = d)),
+                const SizedBox(height: 16),
+                const Text('Udder Quarter', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                GridView.count(
+                  crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+                  crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 3,
+                  children: quarters.map((q) {
+                    final sel = quarter == q;
+                    return GestureDetector(
+                      onTap: () => setModalState(() => quarter = q),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        decoration: BoxDecoration(
+                          color: sel ? RumenoTheme.primaryGreen : RumenoTheme.backgroundCream,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textLight, width: sel ? 2 : 1),
+                        ),
+                        child: Center(child: Text(q, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? Colors.white : RumenoTheme.textDark))),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+                const Text('Severity', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8, runSpacing: 8,
+                  children: severities.map((s) {
+                    final sel = severity == s;
+                    return GestureDetector(
+                      onTap: () => setModalState(() => severity = s),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: sel ? RumenoTheme.warningYellow.withValues(alpha: 0.15) : RumenoTheme.backgroundCream,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: sel ? RumenoTheme.warningYellow : RumenoTheme.textLight, width: sel ? 2 : 1),
+                        ),
+                        child: Text(s, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: sel ? RumenoTheme.warmBrown : RumenoTheme.textDark)),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 12),
+                _formField(treatmentCtrl, '💊 Treatment given', TextInputType.text),
+                const SizedBox(height: 24),
+                _saveButton(ctx, 'Save Mastitis Record', () {
+                  if (treatmentCtrl.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Please enter treatment details'), backgroundColor: RumenoTheme.errorRed));
+                    return;
+                  }
+                  Navigator.pop(ctx);
+                  setState(() {
+                    _mastitisHistory.add(_MastitisRecord(date: date, quarter: quarter, severity: severity, treatment: treatmentCtrl.text.trim()));
+                  });
+                  _showSavedSnackBar('Mastitis record added.');
+                }),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Shared bottom sheet helpers ──
+  Widget _pillHandle() {
+    return Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2))));
+  }
+
+  Widget _formField(TextEditingController ctrl, String hint, TextInputType type) {
+    return TextField(
+      controller: ctrl,
+      keyboardType: type,
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: RumenoTheme.backgroundCream,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: RumenoTheme.textLight)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: RumenoTheme.textLight)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: RumenoTheme.primaryGreen, width: 2)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      ),
+    );
+  }
+
+  Widget _datePickerTile(BuildContext ctx, DateTime current, ValueChanged<DateTime> onPicked) {
+    return GestureDetector(
+      onTap: () async {
+        final d = await showDatePicker(context: ctx, initialDate: current, firstDate: DateTime(2020), lastDate: DateTime(2030));
+        if (d != null) onPicked(d);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: RumenoTheme.backgroundCream,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: RumenoTheme.textLight),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.calendar_today, size: 18, color: RumenoTheme.primaryGreen),
+            const SizedBox(width: 10),
+            Text(DateFormat('dd MMM yyyy').format(current), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+            const Spacer(),
+            const Icon(Icons.edit, size: 16, color: RumenoTheme.textGrey),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _saveButton(BuildContext ctx, String label, VoidCallback onPressed) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: const Icon(Icons.save),
+        label: Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: RumenoTheme.primaryGreen,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+      ),
+    );
+  }
+
+  void _showSavedSnackBar(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Row(children: [const Icon(Icons.check_circle, color: Colors.white), const SizedBox(width: 8), Expanded(child: Text(msg))]),
+      backgroundColor: RumenoTheme.successGreen,
+      behavior: SnackBarBehavior.floating,
+    ));
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final breedingRecords = mockBreedingRecords.where((b) => b.animalId == animal.id).toList();
-    final currentPregnancy = breedingRecords.where((b) => b.isPregnant).toList();
+    final currentPregnancy = _breedingRecords.where((b) => b.isPregnant).toList();
 
     // Calculate milk dry off date
     DateTime? milkDryOffDate;
@@ -411,129 +1142,176 @@ class _ReproductionTab extends StatelessWidget {
     final dryOffAlert = milkDryOffDate != null && milkDryOffDate.difference(now).inDays <= 7 && milkDryOffDate.isAfter(now);
     final dryOffOverdue = milkDryOffDate != null && milkDryOffDate.isBefore(now);
 
-    // Mock synchronization records
-    final syncRecords = <_SyncRecord>[
-      if (breedingRecords.isNotEmpty)
-        _SyncRecord(
-          date: breedingRecords.first.heatDate.subtract(const Duration(days: 10)),
-          protocol: 'Ovsynch',
-          status: 'Completed',
-          notes: 'GnRH + PGF2α protocol',
-        ),
-    ];
-
-    // Mock miscarriage records
-    final miscarriageRecords = <_MiscarriageRecord>[
-      if (animal.id == '6')
-        _MiscarriageRecord(
-          date: DateTime(2025, 3, 15),
-          stage: '4 months',
-          cause: 'Unknown',
-          notes: 'Vet examined, no infection found',
-        ),
-    ];
-
-    // Mock lactation data
-    final lactationNumber = animal.purpose == AnimalPurpose.dairy || animal.purpose == AnimalPurpose.mixed ? 3 : 0;
-    final lactationHistory = <_LactationRecord>[
-      if (lactationNumber > 0) ...[
-        _LactationRecord(number: 1, startDate: DateTime(2022, 5, 10), endDate: DateTime(2023, 2, 15), totalMilkLitres: 3250, daysInMilk: 281),
-        _LactationRecord(number: 2, startDate: DateTime(2023, 8, 20), endDate: DateTime(2024, 5, 10), daysInMilk: 264, totalMilkLitres: 3680),
-        _LactationRecord(number: 3, startDate: DateTime(2025, 1, 5), endDate: null, daysInMilk: null, totalMilkLitres: null),
-      ],
-    ];
-
-    // Mock mastitis history
-    final mastitisHistory = <_MastitisRecord>[
-      if (animal.id == '1') ...[
-        _MastitisRecord(date: DateTime(2026, 1, 25), quarter: 'Rear Left', severity: 'Subclinical', treatment: 'Cephalexin intramammary', resolvedDate: DateTime(2026, 2, 5)),
-      ],
-      if (animal.id == '2')
-        _MastitisRecord(date: DateTime(2025, 6, 10), quarter: 'Front Right', severity: 'Clinical', treatment: 'Amoxicillin + anti-inflammatory', resolvedDate: DateTime(2025, 6, 22)),
-    ];
-
-    return ListView(
-      padding: const EdgeInsets.all(16),
+    return Stack(
       children: [
-        // ── Synchronization Section ──
-        _ReproSectionHeader(title: 'Synchronization', icon: Icons.sync),
-        if (syncRecords.isEmpty)
-          _EmptySection(message: 'No synchronization records')
-        else
-          ...syncRecords.map((s) => _SyncCard(record: s)),
+        ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+          children: [
+            // ── Synchronization Section ──
+            _sectionHeaderWithAdd('Synchronization', Icons.sync, _showAddSyncDialog),
+            if (_syncRecords.isEmpty)
+              _EmptySection(message: 'No synchronization records')
+            else
+              ..._syncRecords.map((s) => _SyncCard(record: s)),
 
-        const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-        // ── Heat History ──
-        _ReproSectionHeader(title: 'Heat History', icon: Icons.whatshot),
-        if (breedingRecords.isEmpty)
-          _EmptySection(message: 'No heat records')
-        else
-          ...breedingRecords.map((r) => _HeatCard(record: r)),
+            // ── Heat History ──
+            _sectionHeaderWithAdd('Heat History', Icons.whatshot, _showAddHeatDialog),
+            if (_breedingRecords.isEmpty)
+              _EmptySection(message: 'No heat records')
+            else
+              ..._breedingRecords.map((r) => _HeatCard(record: r)),
 
-        const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-        // ── Miscarriage History ──
-        _ReproSectionHeader(title: 'Miscarriage History', icon: Icons.warning_amber_rounded),
-        if (miscarriageRecords.isEmpty)
-          _EmptySection(message: 'No miscarriage records')
-        else
-          ...miscarriageRecords.map((m) => _MiscarriageCard(record: m)),
+            // ── Miscarriage History ──
+            _sectionHeaderWithAdd('Miscarriage History', Icons.warning_amber_rounded, _showAddMiscarriageDialog),
+            if (_miscarriageRecords.isEmpty)
+              _EmptySection(message: 'No miscarriage records')
+            else
+              ..._miscarriageRecords.map((m) => _MiscarriageCard(record: m)),
 
-        const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-        // ── Artificial Insemination ──
-        _ReproSectionHeader(title: 'Artificial Insemination', icon: Icons.medical_services_outlined),
-        if (breedingRecords.where((b) => b.aiDone).isEmpty)
-          _EmptySection(message: 'No AI records')
-        else
-          ...breedingRecords.where((b) => b.aiDone).map((r) => _AICard(record: r)),
+            // ── Artificial Insemination ──
+            _sectionHeaderWithAdd('Artificial Insemination', Icons.medical_services_outlined, _showAddAIDialog),
+            if (_breedingRecords.where((b) => b.aiDone).isEmpty)
+              _EmptySection(message: 'No AI records')
+            else
+              ..._breedingRecords.where((b) => b.aiDone).map((r) => _AICard(record: r)),
 
-        const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-        // ── Pregnancy Status ──
-        _ReproSectionHeader(title: 'Pregnancy Status', icon: Icons.pregnant_woman),
-        _PregnancyStatusCard(
-          isPregnant: currentPregnancy.isNotEmpty,
-          record: currentPregnancy.isNotEmpty ? currentPregnancy.last : null,
+            // ── Pregnancy Status ──
+            _sectionHeaderWithAdd('Pregnancy Status', Icons.pregnant_woman, _showUpdatePregnancyDialog),
+            _PregnancyStatusCard(
+              isPregnant: currentPregnancy.isNotEmpty,
+              record: currentPregnancy.isNotEmpty ? currentPregnancy.last : null,
+            ),
+
+            const SizedBox(height: 20),
+
+            // ── Lactation ──
+            _sectionHeaderWithAdd('Lactation', Icons.water_drop_outlined, _showAddLactationDialog),
+            _InfoRow('Current Lactation Number', _lactationNumber > 0 ? '$_lactationNumber' : 'N/A'),
+            const SizedBox(height: 8),
+            if (_lactationHistory.isEmpty)
+              _EmptySection(message: 'No lactation history')
+            else
+              ..._lactationHistory.map((l) => _LactationCard(record: l)),
+
+            const SizedBox(height: 20),
+
+            // ── Mastitis History ──
+            _sectionHeaderWithAdd('Mastitis History', Icons.healing, _showAddMastitisDialog),
+            if (_mastitisHistory.isEmpty)
+              _EmptySection(message: 'No mastitis records')
+            else
+              ..._mastitisHistory.map((m) => _MastitisCard(record: m)),
+
+            const SizedBox(height: 20),
+
+            // ── Milk Dry Off Date ──
+            _ReproSectionHeader(title: 'Milk Dry Off', icon: Icons.event),
+            if (milkDryOffDate != null)
+              _MilkDryOffCard(
+                dryOffDate: milkDryOffDate,
+                expectedDelivery: expectedDelivery!,
+                isAlert: dryOffAlert,
+                isOverdue: dryOffOverdue,
+              )
+            else
+              _EmptySection(message: 'No expected delivery date to calculate dry off'),
+
+            const SizedBox(height: 24),
+          ],
         ),
-
-        const SizedBox(height: 20),
-
-        // ── Lactation ──
-        _ReproSectionHeader(title: 'Lactation', icon: Icons.water_drop_outlined),
-        _InfoRow('Current Lactation Number', lactationNumber > 0 ? '$lactationNumber' : 'N/A'),
-        const SizedBox(height: 8),
-        if (lactationHistory.isEmpty)
-          _EmptySection(message: 'No lactation history')
-        else
-          ...lactationHistory.map((l) => _LactationCard(record: l)),
-
-        const SizedBox(height: 20),
-
-        // ── Mastitis History ──
-        _ReproSectionHeader(title: 'Mastitis History', icon: Icons.healing),
-        if (mastitisHistory.isEmpty)
-          _EmptySection(message: 'No mastitis records')
-        else
-          ...mastitisHistory.map((m) => _MastitisCard(record: m)),
-
-        const SizedBox(height: 20),
-
-        // ── Milk Dry Off Date ──
-        _ReproSectionHeader(title: 'Milk Dry Off', icon: Icons.event),
-        if (milkDryOffDate != null)
-          _MilkDryOffCard(
-            dryOffDate: milkDryOffDate,
-            expectedDelivery: expectedDelivery!,
-            isAlert: dryOffAlert,
-            isOverdue: dryOffOverdue,
-          )
-        else
-          _EmptySection(message: 'No expected delivery date to calculate dry off'),
-
-        const SizedBox(height: 24),
+        // FAB
+        Positioned(
+          right: 16, bottom: 16,
+          child: FloatingActionButton.extended(
+            heroTag: 'repro_fab',
+            onPressed: () => _showAddRecordMenu(),
+            backgroundColor: RumenoTheme.primaryGreen,
+            icon: const Icon(Icons.add, color: Colors.white),
+            label: const Text('Add Record', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ),
       ],
+    );
+  }
+
+  Widget _sectionHeaderWithAdd(String title, IconData icon, VoidCallback onAdd) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: RumenoTheme.primaryGreen),
+          const SizedBox(width: 8),
+          Expanded(child: Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: RumenoTheme.primaryGreen))),
+          GestureDetector(
+            onTap: onAdd,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: RumenoTheme.primaryGreen.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add, size: 16, color: RumenoTheme.primaryGreen),
+                  SizedBox(width: 4),
+                  Text('Add', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: RumenoTheme.primaryGreen)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddRecordMenu() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.75),
+        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+        child: SingleChildScrollView(
+          child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)))),
+            const SizedBox(height: 16),
+            const Text('Add Record', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            _menuItem(ctx, '🔄', 'Synchronization', 'Add sync protocol', () { Navigator.pop(ctx); _showAddSyncDialog(); }),
+            _menuItem(ctx, '🔥', 'Heat Observation', 'Record heat detection', () { Navigator.pop(ctx); _showAddHeatDialog(); }),
+            _menuItem(ctx, '💉', 'Artificial Insemination', 'Record AI with optional sync', () { Navigator.pop(ctx); _showAddAIDialog(); }),
+            _menuItem(ctx, '⚠️', 'Miscarriage', 'Record pregnancy loss', () { Navigator.pop(ctx); _showAddMiscarriageDialog(); }),
+            _menuItem(ctx, '🤰', 'Pregnancy Status', 'Update pregnancy check', () { Navigator.pop(ctx); _showUpdatePregnancyDialog(); }),
+            _menuItem(ctx, '🥛', 'Start Lactation', 'Begin new lactation period', () { Navigator.pop(ctx); _showAddLactationDialog(); }),
+            _menuItem(ctx, '🩺', 'Mastitis', 'Record mastitis incident', () { Navigator.pop(ctx); _showAddMastitisDialog(); }),
+          ],
+        ),
+        ),
+      ),
+    );
+  }
+
+  Widget _menuItem(BuildContext ctx, String emoji, String title, String subtitle, VoidCallback onTap) {
+    return ListTile(
+      leading: Text(emoji, style: const TextStyle(fontSize: 24)),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+      subtitle: Text(subtitle, style: TextStyle(fontSize: 12, color: RumenoTheme.textGrey)),
+      trailing: const Icon(Icons.chevron_right, color: RumenoTheme.textGrey),
+      onTap: onTap,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     );
   }
 }
