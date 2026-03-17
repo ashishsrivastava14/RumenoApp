@@ -985,6 +985,19 @@ class _QuickActionsSection extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _QuickBtn(
+                icon: Icons.calculate_rounded,
+                label: 'Feed Mix',
+                gradient: const LinearGradient(
+                    colors: [Color(0xFF795548), Color(0xFFBCAAA4)]),
+                onTap: () => context.go('/farmer/finance/feed-calculator'),
+                description: 'Calculate the best feed combination for your animals based on nutrition needs and cost.',
+              ),
+            ],
+          ),
         ],
       ),
     );
