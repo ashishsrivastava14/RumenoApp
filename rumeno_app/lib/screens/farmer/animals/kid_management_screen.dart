@@ -87,7 +87,7 @@ class _KidManagementScreenState extends State<KidManagementScreen> {
   void _confirmDelete(KidRecord kid) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
         content: Column(
@@ -120,7 +120,7 @@ class _KidManagementScreenState extends State<KidManagementScreen> {
                   child: SizedBox(
                     height: 56,
                     child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(dialogCtx),
                       style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16)),
@@ -144,7 +144,7 @@ class _KidManagementScreenState extends State<KidManagementScreen> {
                             borderRadius: BorderRadius.circular(16)),
                       ),
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pop(dialogCtx);
                         setState(() =>
                             _kids.removeWhere((k) => k.id == kid.id));
                         _showSnack(
