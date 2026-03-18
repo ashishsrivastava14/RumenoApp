@@ -7,6 +7,45 @@ import '../../../models/models.dart';
 import '../../../widgets/cards/animal_card.dart';
 import '../../../widgets/common/marketplace_button.dart';
 
+enum AgeRange {
+  underOneMonth,
+  oneToThreeMonths,
+  threeToSixMonths,
+  sixToNineMonths,
+  nineToTwelveMonths,
+  twelveToEighteenMonths,
+  eighteenToTwentyFourMonths,
+  overTwentyFourMonths;
+
+  String get label {
+    switch (this) {
+      case AgeRange.underOneMonth:            return 'Under 1 month';
+      case AgeRange.oneToThreeMonths:         return '1 – 3 months';
+      case AgeRange.threeToSixMonths:         return '3 – 6 months';
+      case AgeRange.sixToNineMonths:          return '6 – 9 months';
+      case AgeRange.nineToTwelveMonths:       return '9 – 12 months';
+      case AgeRange.twelveToEighteenMonths:   return '12 – 18 months';
+      case AgeRange.eighteenToTwentyFourMonths: return '18 – 24 months';
+      case AgeRange.overTwentyFourMonths:     return '24+ months';
+    }
+  }
+
+  bool matches(DateTime dateOfBirth) {
+    final now = DateTime.now();
+    final ageInDays = now.difference(dateOfBirth).inDays;
+    switch (this) {
+      case AgeRange.underOneMonth:              return ageInDays < 30;
+      case AgeRange.oneToThreeMonths:           return ageInDays >= 30  && ageInDays < 90;
+      case AgeRange.threeToSixMonths:           return ageInDays >= 90  && ageInDays < 180;
+      case AgeRange.sixToNineMonths:            return ageInDays >= 180 && ageInDays < 270;
+      case AgeRange.nineToTwelveMonths:         return ageInDays >= 270 && ageInDays < 365;
+      case AgeRange.twelveToEighteenMonths:     return ageInDays >= 365 && ageInDays < 548;
+      case AgeRange.eighteenToTwentyFourMonths: return ageInDays >= 548 && ageInDays < 730;
+      case AgeRange.overTwentyFourMonths:       return ageInDays >= 730;
+    }
+  }
+}
+
 class AnimalListScreen extends StatefulWidget {
   const AnimalListScreen({super.key});
 
@@ -20,6 +59,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   AnimalStatus? _selectedStatus;
   Gender? _selectedGender;
   AnimalPurpose? _selectedPurpose;
+  AgeRange? _selectedAgeRange;
   String _sortBy = 'Tag';
 
   int get _activeFilterCount {
@@ -27,6 +67,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     if (_selectedStatus != null) count++;
     if (_selectedGender != null) count++;
     if (_selectedPurpose != null) count++;
+    if (_selectedAgeRange != null) count++;
     return count;
   }
 
@@ -43,6 +84,9 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     }
     if (_selectedPurpose != null) {
       list = list.where((a) => a.purpose == _selectedPurpose).toList();
+    }
+    if (_selectedAgeRange != null) {
+      list = list.where((a) => _selectedAgeRange!.matches(a.dateOfBirth)).toList();
     }
     if (_searchQuery.isNotEmpty) {
       list = list.where((a) =>
@@ -87,11 +131,13 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           selectedStatus: _selectedStatus,
           selectedGender: _selectedGender,
           selectedPurpose: _selectedPurpose,
-          onApply: (status, gender, purpose) {
+          selectedAgeRange: _selectedAgeRange,
+          onApply: (status, gender, purpose, ageRange) {
             setState(() {
               _selectedStatus = status;
               _selectedGender = gender;
               _selectedPurpose = purpose;
+              _selectedAgeRange = ageRange;
             });
           },
         );
@@ -215,11 +261,17 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                       label: _selectedPurpose!.name[0].toUpperCase() + _selectedPurpose!.name.substring(1),
                       onRemove: () => setState(() => _selectedPurpose = null),
                     ),
+                  if (_selectedAgeRange != null)
+                    _ActiveFilterTag(
+                      label: _selectedAgeRange!.label,
+                      onRemove: () => setState(() => _selectedAgeRange = null),
+                    ),
                   GestureDetector(
                     onTap: () => setState(() {
                       _selectedStatus = null;
                       _selectedGender = null;
                       _selectedPurpose = null;
+                      _selectedAgeRange = null;
                     }),
                     child: Chip(
                       label: const Text('Clear all', style: TextStyle(fontSize: 12, color: Colors.red)),
@@ -351,12 +403,14 @@ class _FilterBottomSheet extends StatefulWidget {
   final AnimalStatus? selectedStatus;
   final Gender? selectedGender;
   final AnimalPurpose? selectedPurpose;
-  final void Function(AnimalStatus?, Gender?, AnimalPurpose?) onApply;
+  final AgeRange? selectedAgeRange;
+  final void Function(AnimalStatus?, Gender?, AnimalPurpose?, AgeRange?) onApply;
 
   const _FilterBottomSheet({
     required this.selectedStatus,
     required this.selectedGender,
     required this.selectedPurpose,
+    required this.selectedAgeRange,
     required this.onApply,
   });
 
@@ -368,6 +422,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   late AnimalStatus? _status;
   late Gender? _gender;
   late AnimalPurpose? _purpose;
+  late AgeRange? _ageRange;
 
   @override
   void initState() {
@@ -375,6 +430,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
     _status = widget.selectedStatus;
     _gender = widget.selectedGender;
     _purpose = widget.selectedPurpose;
+    _ageRange = widget.selectedAgeRange;
   }
 
   @override
@@ -406,6 +462,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                   _status = null;
                   _gender = null;
                   _purpose = null;
+                  _ageRange = null;
                 }),
                 child: const Text('Reset'),
               ),
@@ -467,6 +524,30 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
               );
             }).toList(),
           ),
+          const SizedBox(height: 16),
+
+          // Age range filter
+          Text('Age', style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            children: AgeRange.values.map((range) {
+              final isSelected = _ageRange == range;
+              return ChoiceChip(
+                label: Text(
+                  range.label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isSelected ? Colors.white : RumenoTheme.textDark,
+                  ),
+                ),
+                selected: isSelected,
+                selectedColor: RumenoTheme.primaryGreen,
+                onSelected: (sel) => setState(() => _ageRange = sel ? range : null),
+              );
+            }).toList(),
+          ),
           const SizedBox(height: 24),
 
           // Apply button
@@ -474,7 +555,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
             width: double.infinity,
             child: FilledButton(
               onPressed: () {
-                widget.onApply(_status, _gender, _purpose);
+                widget.onApply(_status, _gender, _purpose, _ageRange);
                 Navigator.pop(context);
               },
               child: const Text('Apply Filters'),
