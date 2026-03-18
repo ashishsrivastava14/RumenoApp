@@ -34,6 +34,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     final treatmentCtrl = TextEditingController();
     final vetCtrl = TextEditingController();
     final withdrawalCtrl = TextEditingController();
+    final otherSymptomsCtrl = TextEditingController();
     final selectedSymptoms = <String>{};
 
     const symptomItems = [
@@ -150,6 +151,28 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                     );
                   }).toList(),
                 ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: otherSymptomsCtrl,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    hintText: '✏️  Other symptoms (e.g. Swollen leg, Trembling)',
+                    filled: true,
+                    fillColor: RumenoTheme.backgroundCream,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: RumenoTheme.textLight)),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: RumenoTheme.textLight)),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                            color: RumenoTheme.primaryGreen, width: 2)),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  ),
+                ),
                 const SizedBox(height: 16),
                 _dialogField(
                     diagnosisCtrl,
@@ -208,9 +231,12 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                       final record = TreatmentRecord(
                         id: 'TR_${DateTime.now().millisecondsSinceEpoch}',
                         animalId: animalIdCtrl.text.trim(),
-                        symptoms: selectedSymptoms.isEmpty
-                            ? ['General illness']
-                            : selectedSymptoms.toList(),
+                        symptoms: () {
+                          final extra = otherSymptomsCtrl.text.trim();
+                          final all = <String>{...selectedSymptoms};
+                          if (extra.isNotEmpty) all.add(extra);
+                          return all.isEmpty ? ['General illness'] : all.toList();
+                        }(),
                         diagnosis: diagnosisCtrl.text.trim(),
                         treatment: treatmentCtrl.text.trim().isEmpty
                             ? 'Treatment pending'

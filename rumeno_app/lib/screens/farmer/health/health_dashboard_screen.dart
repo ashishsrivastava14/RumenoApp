@@ -174,6 +174,14 @@ class HealthDashboardScreen extends StatelessWidget {
         'c': RumenoTheme.warmBrown,
         'r': '/farmer/health/lab-reports'
       },
+      {
+        'e': '🦶',
+        'l': 'Hoof Cutting',
+        's': 'Trim & schedule',
+        'c': const Color(0xFF8D6E63),
+        'r': null,
+        'action': 'hoof'
+      },
     ];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -188,7 +196,9 @@ class HealthDashboardScreen extends StatelessWidget {
           final col = a['c'] as Color;
           return GestureDetector(
             onTap: () {
-              if (a['r'] != null) {
+              if (a['action'] == 'hoof') {
+                _showHoofCuttingSheet(context);
+              } else if (a['r'] != null) {
                 context.go(a['r'] as String);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -284,6 +294,364 @@ class HealthDashboardScreen extends StatelessWidget {
           ),
         );
       }).toList(),
+    );
+  }
+
+  void _showHoofCuttingSheet(BuildContext context) {
+    final animalIdCtrl = TextEditingController();
+    String? selectedAnimal;
+    DateTime? cuttingDate;
+    DateTime? nextScheduleDate;
+
+    const animalOptions = [
+      {'emoji': '🐄', 'label': 'Cow'},
+      {'emoji': '🐃', 'label': 'Buffalo'},
+      {'emoji': '🐐', 'label': 'Goat'},
+      {'emoji': '🐑', 'label': 'Sheep'},
+      {'emoji': '🐖', 'label': 'Pig'},
+      {'emoji': '🐴', 'label': 'Horse'},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: EdgeInsets.fromLTRB(
+              20, 12, 20, MediaQuery.of(ctx).viewInsets.bottom + 20),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Pill handle
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Title
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF8D6E63).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text('🦶', style: TextStyle(fontSize: 28)),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Hoof Cutting',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                          Text('Record hoof trimming details',
+                              style: TextStyle(
+                                  fontSize: 13, color: RumenoTheme.textGrey)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // ─── Animal Type ───
+                _hoofLabel('🐾', 'Which animal?'),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: animalOptions.map((a) {
+                    final label = a['label'] as String;
+                    final emoji = a['emoji'] as String;
+                    final isSelected = selectedAnimal == label;
+                    return GestureDetector(
+                      onTap: () => setModalState(() => selectedAnimal = label),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? const Color(0xFF8D6E63).withValues(alpha: 0.15)
+                              : RumenoTheme.backgroundCream,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                              color: isSelected
+                                  ? const Color(0xFF8D6E63)
+                                  : RumenoTheme.textLight,
+                              width: isSelected ? 2 : 1),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(emoji, style: const TextStyle(fontSize: 28)),
+                            const SizedBox(height: 4),
+                            Text(label,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: isSelected
+                                      ? const Color(0xFF8D6E63)
+                                      : RumenoTheme.textDark,
+                                )),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 20),
+
+                // ─── Animal ID ───
+                _hoofLabel('🏷️', 'Animal ID / Tag'),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: animalIdCtrl,
+                  keyboardType: TextInputType.text,
+                  style: const TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    hintText: 'e.g. C-001, G-005, H-002',
+                    hintStyle: const TextStyle(color: RumenoTheme.textLight),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.only(left: 12, right: 8),
+                      child: Text(
+                        selectedAnimal != null
+                            ? animalOptions.firstWhere(
+                                (a) => a['label'] == selectedAnimal)['emoji'] as String
+                            : '🏷️',
+                        style: const TextStyle(fontSize: 22),
+                      ),
+                    ),
+                    prefixIconConstraints:
+                        const BoxConstraints(minWidth: 0, minHeight: 0),
+                    filled: true,
+                    fillColor: RumenoTheme.backgroundCream,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: RumenoTheme.textLight)),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: RumenoTheme.textLight)),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(
+                            color: Color(0xFF8D6E63), width: 2)),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // ─── Date (when it was done) ───
+                _hoofLabel('📅', 'When was it done?'),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: ctx,
+                      initialDate: cuttingDate ?? DateTime.now(),
+                      firstDate: DateTime(2024),
+                      lastDate: DateTime.now(),
+                      helpText: 'PICK THE DATE',
+                      confirmText: 'DONE ✅',
+                      cancelText: 'CANCEL ❌',
+                    );
+                    if (picked != null) {
+                      setModalState(() => cuttingDate = picked);
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: cuttingDate != null
+                          ? const Color(0xFF8D6E63).withValues(alpha: 0.08)
+                          : RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                          color: cuttingDate != null
+                              ? const Color(0xFF8D6E63)
+                              : RumenoTheme.textLight,
+                          width: cuttingDate != null ? 2 : 1),
+                    ),
+                    child: Row(
+                      children: [
+                        const Text('📅', style: TextStyle(fontSize: 22)),
+                        const SizedBox(width: 10),
+                        Text(
+                          cuttingDate != null
+                              ? '${cuttingDate!.day.toString().padLeft(2, '0')} / '
+                                '${cuttingDate!.month.toString().padLeft(2, '0')} / '
+                                '${cuttingDate!.year}'
+                              : 'Tap to pick date',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: cuttingDate != null
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                            color: cuttingDate != null
+                                ? RumenoTheme.textDark
+                                : RumenoTheme.textLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // ─── Next Schedule ───
+                _hoofLabel('🗓️', 'Next hoof cutting date?'),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: ctx,
+                      initialDate: nextScheduleDate ??
+                          DateTime.now().add(const Duration(days: 60)),
+                      firstDate: DateTime.now(),
+                      lastDate:
+                          DateTime.now().add(const Duration(days: 365)),
+                      helpText: 'PICK NEXT DATE',
+                      confirmText: 'DONE ✅',
+                      cancelText: 'CANCEL ❌',
+                    );
+                    if (picked != null) {
+                      setModalState(() => nextScheduleDate = picked);
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: nextScheduleDate != null
+                          ? RumenoTheme.successGreen.withValues(alpha: 0.08)
+                          : RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                          color: nextScheduleDate != null
+                              ? RumenoTheme.successGreen
+                              : RumenoTheme.textLight,
+                          width: nextScheduleDate != null ? 2 : 1),
+                    ),
+                    child: Row(
+                      children: [
+                        const Text('🗓️', style: TextStyle(fontSize: 22)),
+                        const SizedBox(width: 10),
+                        Text(
+                          nextScheduleDate != null
+                              ? '${nextScheduleDate!.day.toString().padLeft(2, '0')} / '
+                                '${nextScheduleDate!.month.toString().padLeft(2, '0')} / '
+                                '${nextScheduleDate!.year}'
+                              : 'Tap to pick date',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: nextScheduleDate != null
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                            color: nextScheduleDate != null
+                                ? RumenoTheme.textDark
+                                : RumenoTheme.textLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 28),
+
+                // ─── Save Button ───
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      if (selectedAnimal == null) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                              content: Text('Please select animal type'),
+                              backgroundColor: RumenoTheme.errorRed),
+                        );
+                        return;
+                      }
+                      if (animalIdCtrl.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                              content: Text('Please enter Animal ID'),
+                              backgroundColor: RumenoTheme.errorRed),
+                        );
+                        return;
+                      }
+                      if (cuttingDate == null) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                              content:
+                                  Text('Please pick the hoof cutting date'),
+                              backgroundColor: RumenoTheme.errorRed),
+                        );
+                        return;
+                      }
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Row(children: [
+                            Icon(Icons.check_circle, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text('Hoof cutting record saved! ✅'),
+                          ]),
+                          backgroundColor: RumenoTheme.successGreen,
+                        ),
+                      );
+                    },
+                    icon: const Text('✅', style: TextStyle(fontSize: 20)),
+                    label: const Text('Save Record',
+                        style: TextStyle(
+                            fontSize: 17, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF8D6E63),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _hoofLabel(String emoji, String text) {
+    return Row(
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 20)),
+        const SizedBox(width: 8),
+        Text(text,
+            style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: RumenoTheme.textDark)),
+      ],
     );
   }
 
