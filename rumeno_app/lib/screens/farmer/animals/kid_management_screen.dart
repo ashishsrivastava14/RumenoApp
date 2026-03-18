@@ -50,9 +50,6 @@ class _KidManagementScreenState extends State<KidManagementScreen> {
 
   void _resetPage() => setState(() => _currentPage = 0);
 
-  // ─── Stats ──────────────────────────────────
-  int get _medicineDueCount => _kids.where((k) => k.coccidisostatDue).length;
-
   // ─── Add / Edit ─────────────────────────────
   void _openForm({KidRecord? existing}) {
     showModalBottomSheet(
@@ -214,16 +211,6 @@ class _KidManagementScreenState extends State<KidManagementScreen> {
       ),
       body: Column(
         children: [
-          // ── Alert banner ──
-          if (_medicineDueCount > 0)
-            _AlertBanner(
-              count: _medicineDueCount,
-              onTap: () {
-                setState(() => _filter = _KidFilter.medicineDue);
-                _resetPage();
-              },
-            ),
-
           // ── Big visual filter buttons ──
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -330,72 +317,6 @@ class _KidManagementScreenState extends State<KidManagementScreen> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 enum _KidFilter { all, notWeaned, weaned, medicineDue }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Alert Banner — big, visual, easy to understand
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _AlertBanner extends StatelessWidget {
-  final int count;
-  final VoidCallback onTap;
-
-  const _AlertBanner({required this.count, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: RumenoTheme.errorRed.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-              color: RumenoTheme.errorRed.withValues(alpha: 0.5), width: 2),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: RumenoTheme.errorRed.withValues(alpha: 0.18),
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: Text('⚠️', style: TextStyle(fontSize: 30)),
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '💊  $count Kid${count > 1 ? 's' : ''} — Medicine!',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: RumenoTheme.errorRed,
-                        fontSize: 18),
-                  ),
-                  const SizedBox(height: 2),
-                  const Text(
-                    'Tap here to see 👆',
-                    style: TextStyle(
-                        color: RumenoTheme.errorRed, fontSize: 14),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right_rounded,
-                color: RumenoTheme.errorRed, size: 32),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Big Filter Button — large touch target, icon-centric
