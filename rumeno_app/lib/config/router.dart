@@ -45,6 +45,7 @@ import '../screens/farmer/more/subscription_screen.dart';
 import '../screens/farmer/more/notification_settings_screen.dart';
 import '../screens/farmer/more/help_support_screen.dart';
 import '../screens/farmer/more/data_export_screen.dart';
+import '../screens/farmer/more/farm_sanitization_screen.dart';
 
 // Vet
 import '../screens/vet/vet_shell.dart';
@@ -274,6 +275,11 @@ GoRouter createRouter(AuthProvider authProvider) {
                 path: 'export',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (_, _) => const DataExportScreen(),
+              ),
+              GoRoute(
+                path: 'sanitization',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const FarmSanitizationScreen(),
               ),
             ],
           ),

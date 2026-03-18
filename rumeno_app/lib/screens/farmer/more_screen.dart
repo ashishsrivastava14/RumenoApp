@@ -167,6 +167,13 @@ class MoreScreen extends StatelessWidget {
                   onTap: () => context.go('/farmer/more/export'),
                 ),
                 _BigMenuTile(
+                  emoji: '🧹',
+                  label: 'Sanitization',
+                  sublabel: 'Farm Cleaning',
+                  color: const Color(0xFF2196F3),
+                  onTap: () => context.go('/farmer/more/sanitization'),
+                ),
+                _BigMenuTile(
                   emoji: '❓',
                   label: 'Help',
                   sublabel: 'Support',
