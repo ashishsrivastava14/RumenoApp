@@ -399,6 +399,95 @@ class DewormingRecord {
   });
 }
 
+// ─── Kid Management ───
+
+/// Represents a young goat / lamb (kid) with its care tracking data.
+class KidRecord {
+  final String id;
+  /// Visible tag e.g. K-001
+  final String kidId;
+  /// Optional link to the mother's animal record
+  final String? motherId;
+  final DateTime? dateOfBirth;
+
+  // Coccidiostat (anti-coccidiosis medication)
+  final String? coccidisostatName;
+  final String? coccidisostatSaltName;
+  final DateTime? coccidisostatGivenDate;
+  final DateTime? coccidisostatNextDate;
+
+  // Weaning
+  final DateTime? weaningDate;
+
+  // Weight (average tracked over time)
+  final double? averageWeightKg;
+
+  // Milk Replacer
+  final DateTime? milkReplacerStartDate;
+
+  final String farmerId;
+  final String? notes;
+
+  const KidRecord({
+    required this.id,
+    required this.kidId,
+    this.motherId,
+    this.dateOfBirth,
+    this.coccidisostatName,
+    this.coccidisostatSaltName,
+    this.coccidisostatGivenDate,
+    this.coccidisostatNextDate,
+    this.weaningDate,
+    this.averageWeightKg,
+    this.milkReplacerStartDate,
+    required this.farmerId,
+    this.notes,
+  });
+
+  /// True if the kid has already been weaned
+  bool get isWeaned {
+    if (weaningDate == null) return false;
+    return DateTime.now().isAfter(weaningDate!);
+  }
+
+  /// True if coccidiostat next-dose is due today or overdue
+  bool get coccidisostatDue {
+    if (coccidisostatNextDate == null) return false;
+    return !DateTime.now().isBefore(coccidisostatNextDate!);
+  }
+
+  /// Returns a KidRecord with updated fields
+  KidRecord copyWith({
+    String? kidId,
+    String? motherId,
+    DateTime? dateOfBirth,
+    String? coccidisostatName,
+    String? coccidisostatSaltName,
+    DateTime? coccidisostatGivenDate,
+    DateTime? coccidisostatNextDate,
+    DateTime? weaningDate,
+    double? averageWeightKg,
+    DateTime? milkReplacerStartDate,
+    String? notes,
+  }) {
+    return KidRecord(
+      id: id,
+      kidId: kidId ?? this.kidId,
+      motherId: motherId ?? this.motherId,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      coccidisostatName: coccidisostatName ?? this.coccidisostatName,
+      coccidisostatSaltName: coccidisostatSaltName ?? this.coccidisostatSaltName,
+      coccidisostatGivenDate: coccidisostatGivenDate ?? this.coccidisostatGivenDate,
+      coccidisostatNextDate: coccidisostatNextDate ?? this.coccidisostatNextDate,
+      weaningDate: weaningDate ?? this.weaningDate,
+      averageWeightKg: averageWeightKg ?? this.averageWeightKg,
+      milkReplacerStartDate: milkReplacerStartDate ?? this.milkReplacerStartDate,
+      farmerId: farmerId,
+      notes: notes ?? this.notes,
+    );
+  }
+}
+
 enum LabReportStatus { pending, completed }
 
 class LabReport {

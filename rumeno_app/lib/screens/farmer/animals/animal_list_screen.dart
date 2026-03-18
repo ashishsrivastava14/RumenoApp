@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../config/theme.dart';
 import '../../../mock/mock_animals.dart';
+import '../../../mock/mock_kids.dart';
 import '../../../models/models.dart';
 import '../../../widgets/cards/animal_card.dart';
 import '../../../widgets/common/marketplace_button.dart';
@@ -284,6 +285,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
               ),
             ),
           if (_activeFilterCount > 0) const SizedBox(height: 4),
+          // ── Kid Management quick access ──
+          _KidManagementBanner(onTap: () => context.go('/farmer/kids')),
           // Animal count
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -317,6 +320,89 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     );
   }
 }
+
+// ── Kid Management Banner ───────────────────────────────────────────────────
+
+class _KidManagementBanner extends StatelessWidget {
+  final VoidCallback onTap;
+  const _KidManagementBanner({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final kidCount = mockKids.length;
+    final medDue = mockKids.where((k) => k.coccidisostatDue).length;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF6B9E3E), Color(0xFF4A7A28)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+                color: RumenoTheme.primaryGreen.withValues(alpha: 0.25),
+                blurRadius: 10,
+                offset: const Offset(0, 4)),
+          ],
+        ),
+        child: Row(
+          children: [
+            const Text('🐐', style: TextStyle(fontSize: 32)),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Kid Management',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    '$kidCount kid${kidCount != 1 ? 's' : ''} registered'
+                    '${medDue > 0 ? '  •  ⚠️ $medDue need medicine' : ''}',
+                    style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Row(
+                children: [
+                  Text('View',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13)),
+                  SizedBox(width: 4),
+                  Icon(Icons.arrow_forward_rounded,
+                      color: Colors.white, size: 16),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Filter Chip ─────────────────────────────────────────────────────────────
 
 class _FilterChip extends StatelessWidget {
   final String label;

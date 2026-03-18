@@ -1,0 +1,77 @@
+import '../models/models.dart';
+
+final List<KidRecord> mockKids = [
+  KidRecord(
+    id: 'kid_1',
+    kidId: 'K-001',
+    motherId: '14', // G-001 Jamunapari goat
+    dateOfBirth: DateTime(2026, 1, 10),
+    coccidisostatName: 'Amprolium',
+    coccidisostatSaltName: 'Amprolium HCl',
+    coccidisostatGivenDate: DateTime(2026, 1, 20),
+    coccidisostatNextDate: DateTime(2026, 2, 20),
+    weaningDate: DateTime(2026, 4, 10),
+    averageWeightKg: 6.2,
+    milkReplacerStartDate: DateTime(2026, 1, 15),
+    farmerId: 'F001',
+    notes: 'Healthy, good growth',
+  ),
+  KidRecord(
+    id: 'kid_2',
+    kidId: 'K-002',
+    motherId: '16', // G-003 Sirohi goat
+    dateOfBirth: DateTime(2026, 2, 5),
+    coccidisostatName: 'Toltrazuril',
+    coccidisostatSaltName: 'Toltrazuril 5%',
+    coccidisostatGivenDate: DateTime(2026, 2, 19),
+    coccidisostatNextDate: DateTime(2026, 3, 19),
+    weaningDate: DateTime(2026, 5, 5),
+    averageWeightKg: 4.8,
+    milkReplacerStartDate: DateTime(2026, 2, 10),
+    farmerId: 'F001',
+  ),
+  KidRecord(
+    id: 'kid_3',
+    kidId: 'K-003',
+    motherId: '17', // G-012 Beetal goat
+    dateOfBirth: DateTime(2026, 2, 28),
+    coccidisostatName: 'Diclazuril',
+    coccidisostatSaltName: 'Diclazuril 0.5%',
+    coccidisostatGivenDate: DateTime(2026, 3, 5),
+    coccidisostatNextDate: DateTime(2026, 4, 5),
+    weaningDate: DateTime(2026, 5, 28),
+    averageWeightKg: 3.9,
+    milkReplacerStartDate: null,
+    farmerId: 'F001',
+    notes: 'Weak at birth, monitoring closely',
+  ),
+  KidRecord(
+    id: 'kid_4',
+    kidId: 'K-004',
+    motherId: '18', // S-001 Marwari sheep
+    dateOfBirth: DateTime(2026, 3, 1),
+    coccidisostatName: null,
+    coccidisostatSaltName: null,
+    coccidisostatGivenDate: null,
+    coccidisostatNextDate: null,
+    weaningDate: DateTime(2026, 6, 1),
+    averageWeightKg: 5.5,
+    milkReplacerStartDate: DateTime(2026, 3, 10),
+    farmerId: 'F001',
+  ),
+  KidRecord(
+    id: 'kid_5',
+    kidId: 'K-005',
+    motherId: '14', // G-001 Jamunapari goat (twin)
+    dateOfBirth: DateTime(2026, 1, 10),
+    coccidisostatName: 'Amprolium',
+    coccidisostatSaltName: 'Amprolium HCl',
+    coccidisostatGivenDate: DateTime(2026, 1, 20),
+    coccidisostatNextDate: DateTime(2026, 2, 20),
+    weaningDate: DateTime(2026, 4, 10),
+    averageWeightKg: 5.7,
+    milkReplacerStartDate: DateTime(2026, 1, 15),
+    farmerId: 'F001',
+    notes: 'Twin of K-001',
+  ),
+];

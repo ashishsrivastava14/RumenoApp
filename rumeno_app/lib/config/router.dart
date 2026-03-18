@@ -27,6 +27,7 @@ import '../screens/farmer/dashboard_screen.dart';
 import '../screens/farmer/animals/animal_list_screen.dart';
 import '../screens/farmer/animals/add_animal_screen.dart';
 import '../screens/farmer/animals/animal_detail_screen.dart';
+import '../screens/farmer/animals/kid_management_screen.dart';
 import '../screens/farmer/health/health_dashboard_screen.dart';
 import '../screens/farmer/health/vaccination_screen.dart';
 import '../screens/farmer/health/treatment_screen.dart';
@@ -237,6 +238,10 @@ GoRouter createRouter(AuthProvider authProvider) {
                 builder: (_, _) => const MilkLogScreen(),
               ),
             ],
+          ),
+          GoRoute(
+            path: '/farmer/kids',
+            builder: (_, _) => const KidManagementScreen(),
           ),
           GoRoute(
             path: '/farmer/breeding',
