@@ -1381,6 +1381,8 @@ class _DataExportScreenState extends State<DataExportScreen> {
         return {'emoji': '💊', 'label': 'Treatment'};
       case AnimalStatus.quarantine:
         return {'emoji': '🔒', 'label': 'Quarantine'};
+      case AnimalStatus.deceased:
+        return {'emoji': '💀', 'label': 'Deceased'};
     }
   }
 
@@ -1398,6 +1400,8 @@ class _DataExportScreenState extends State<DataExportScreen> {
         return const Color(0xFFFF5722);
       case AnimalStatus.quarantine:
         return const Color(0xFF795548);
+      case AnimalStatus.deceased:
+        return const Color(0xFF616161);
     }
   }
 

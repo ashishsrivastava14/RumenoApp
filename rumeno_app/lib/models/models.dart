@@ -26,7 +26,7 @@ class AppUser {
 
 enum Species { cow, buffalo, goat, sheep, pig, horse }
 
-enum AnimalStatus { active, pregnant, dry, sick, underTreatment, quarantine }
+enum AnimalStatus { active, pregnant, dry, sick, underTreatment, quarantine, deceased }
 
 enum Gender { male, female }
 
@@ -52,6 +52,13 @@ class Animal {
   final double? purchasePrice;
   final String farmerId;
 
+  // Mortality
+  final DateTime? mortalityDate;
+  final String? mortalityReason;
+
+  // Castration
+  final DateTime? castrationDate;
+
   const Animal({
     required this.id,
     required this.tagId,
@@ -71,6 +78,9 @@ class Animal {
     this.purchaseDate,
     this.purchasePrice,
     required this.farmerId,
+    this.mortalityDate,
+    this.mortalityReason,
+    this.castrationDate,
   });
 
   int get ageInMonths {
@@ -119,7 +129,20 @@ class Animal {
         return 'Under Treatment';
       case AnimalStatus.quarantine:
         return 'Quarantine';
+      case AnimalStatus.deceased:
+        return 'Deceased';
     }
+  }
+
+  bool get isDead => status == AnimalStatus.deceased;
+  bool get isCastrated => castrationDate != null;
+
+  String? get ageAtDeath {
+    if (mortalityDate == null) return null;
+    final days = mortalityDate!.difference(dateOfBirth).inDays;
+    if (days < 30) return '$days days';
+    if (days < 365) return '${days ~/ 30}m ${days % 30}d';
+    return '${days ~/ 365}y ${(days % 365) ~/ 30}m';
   }
 }
 

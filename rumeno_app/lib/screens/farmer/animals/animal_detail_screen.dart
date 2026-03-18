@@ -150,15 +150,404 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(covariant _TabBarDelegate oldDelegate) => false;
 }
 
-class _OverviewTab extends StatelessWidget {
+class _OverviewTab extends StatefulWidget {
   final Animal animal;
   const _OverviewTab({required this.animal});
 
   @override
+  State<_OverviewTab> createState() => _OverviewTabState();
+}
+
+class _OverviewTabState extends State<_OverviewTab> {
+  late DateTime? _mortalityDate;
+  late String? _mortalityReason;
+  late DateTime? _castrationDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _mortalityDate = widget.animal.mortalityDate;
+    _mortalityReason = widget.animal.mortalityReason;
+    _castrationDate = widget.animal.castrationDate;
+  }
+
+  // ── Mortality reasons — big emoji presets for illiterate users ──
+  static const _mortalityReasons = [
+    {'emoji': '🤒', 'label': 'Disease'},
+    {'emoji': '🫁', 'label': 'Pneumonia'},
+    {'emoji': '💧', 'label': 'Diarrhea'},
+    {'emoji': '🐍', 'label': 'Snake Bite'},
+    {'emoji': '🐺', 'label': 'Predator'},
+    {'emoji': '🥶', 'label': 'Cold'},
+    {'emoji': '🍽️', 'label': 'Not Eating'},
+    {'emoji': '🤰', 'label': 'Birth Complication'},
+    {'emoji': '⚡', 'label': 'Sudden Death'},
+    {'emoji': '❓', 'label': 'Unknown'},
+  ];
+
+  void _showRecordMortalitySheet() {
+    DateTime deathDate = DateTime.now();
+    String? reason;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Pill handle
+                Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)))),
+                const SizedBox(height: 16),
+                const Row(children: [
+                  Text('💀', style: TextStyle(fontSize: 30)),
+                  SizedBox(width: 10),
+                  Expanded(child: Text('Record Death', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+                ]),
+                const SizedBox(height: 6),
+                Text('${widget.animal.tagId} — ${widget.animal.breed}', style: const TextStyle(fontSize: 14, color: RumenoTheme.textGrey)),
+                const SizedBox(height: 20),
+
+                // Date picker
+                const Text('📅  When did it die?', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () async {
+                    final d = await showDatePicker(
+                      context: ctx,
+                      initialDate: deathDate,
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime.now(),
+                      builder: (_, child) => Theme(data: Theme.of(ctx).copyWith(colorScheme: const ColorScheme.light(primary: RumenoTheme.primaryGreen, onPrimary: Colors.white, surface: Colors.white)), child: child!),
+                    );
+                    if (d != null) setModalState(() => deathDate = d);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: RumenoTheme.primaryGreen.withValues(alpha: 0.6)),
+                    ),
+                    child: Row(children: [
+                      const Text('📅', style: TextStyle(fontSize: 24)),
+                      const SizedBox(width: 12),
+                      Text(DateFormat('dd MMM yyyy').format(deathDate), style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                      const Spacer(),
+                      const Icon(Icons.calendar_today_rounded, color: RumenoTheme.primaryGreen, size: 22),
+                    ]),
+                  ),
+                ),
+                const SizedBox(height: 22),
+
+                // Reason — big emoji tiles
+                const Text('😞  Why did it die?', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: _mortalityReasons.map((r) {
+                    final sel = reason == r['label'];
+                    return GestureDetector(
+                      onTap: () => setModalState(() => reason = r['label'] as String),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: sel ? RumenoTheme.errorRed.withValues(alpha: 0.12) : RumenoTheme.backgroundCream,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: sel ? RumenoTheme.errorRed : RumenoTheme.textLight, width: sel ? 2.5 : 1),
+                        ),
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          Text(r['emoji'] as String, style: const TextStyle(fontSize: 24)),
+                          const SizedBox(width: 8),
+                          Text(r['label'] as String, style: TextStyle(fontSize: 15, fontWeight: sel ? FontWeight.bold : FontWeight.w500, color: sel ? RumenoTheme.errorRed : RumenoTheme.textDark)),
+                        ]),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 28),
+
+                // Save
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      if (reason == null) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Please select a reason'), backgroundColor: RumenoTheme.errorRed, behavior: SnackBarBehavior.floating));
+                        return;
+                      }
+                      Navigator.pop(ctx);
+                      setState(() {
+                        _mortalityDate = deathDate;
+                        _mortalityReason = reason;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Row(children: [const Icon(Icons.check_circle, color: Colors.white), const SizedBox(width: 8), Text('${widget.animal.tagId} marked as deceased')]),
+                        backgroundColor: RumenoTheme.successGreen,
+                        behavior: SnackBarBehavior.floating,
+                      ));
+                    },
+                    icon: const Text('💀', style: TextStyle(fontSize: 22)),
+                    label: const Text('Confirm Death', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade800,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showRecordCastrationSheet() {
+    DateTime castDate = DateTime.now();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Pill handle
+                Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)))),
+                const SizedBox(height: 16),
+                const Row(children: [
+                  Text('✂️', style: TextStyle(fontSize: 30)),
+                  SizedBox(width: 10),
+                  Expanded(child: Text('Record Castration', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+                ]),
+                const SizedBox(height: 6),
+                Text('${widget.animal.tagId} — ${widget.animal.breed}', style: const TextStyle(fontSize: 14, color: RumenoTheme.textGrey)),
+                const SizedBox(height: 20),
+
+                // Animal info summary
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: RumenoTheme.backgroundCream,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Column(children: [
+                    Row(children: [
+                      const Text('🏷️', style: TextStyle(fontSize: 20)),
+                      const SizedBox(width: 10),
+                      const Text('Animal ID', style: TextStyle(fontSize: 13, color: RumenoTheme.textGrey)),
+                      const Spacer(),
+                      Text(widget.animal.tagId, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ]),
+                    const SizedBox(height: 8),
+                    Row(children: [
+                      const Text('🎂', style: TextStyle(fontSize: 20)),
+                      const SizedBox(width: 10),
+                      const Text('Date of Birth', style: TextStyle(fontSize: 13, color: RumenoTheme.textGrey)),
+                      const Spacer(),
+                      Text(DateFormat('dd MMM yyyy').format(widget.animal.dateOfBirth), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ]),
+                  ]),
+                ),
+                const SizedBox(height: 20),
+
+                // Date picker
+                const Text('✂️  Castration Date', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () async {
+                    final d = await showDatePicker(
+                      context: ctx,
+                      initialDate: castDate,
+                      firstDate: widget.animal.dateOfBirth,
+                      lastDate: DateTime.now(),
+                      builder: (_, child) => Theme(data: Theme.of(ctx).copyWith(colorScheme: const ColorScheme.light(primary: RumenoTheme.primaryGreen, onPrimary: Colors.white, surface: Colors.white)), child: child!),
+                    );
+                    if (d != null) setModalState(() => castDate = d);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: RumenoTheme.primaryGreen.withValues(alpha: 0.6)),
+                    ),
+                    child: Row(children: [
+                      const Text('📅', style: TextStyle(fontSize: 24)),
+                      const SizedBox(width: 12),
+                      Text(DateFormat('dd MMM yyyy').format(castDate), style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                      const Spacer(),
+                      const Icon(Icons.calendar_today_rounded, color: RumenoTheme.primaryGreen, size: 22),
+                    ]),
+                  ),
+                ),
+                const SizedBox(height: 28),
+
+                // Save
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      setState(() => _castrationDate = castDate);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Row(children: [const Icon(Icons.check_circle, color: Colors.white), const SizedBox(width: 8), Text('${widget.animal.tagId} castration recorded')]),
+                        backgroundColor: RumenoTheme.successGreen,
+                        behavior: SnackBarBehavior.floating,
+                      ));
+                    },
+                    icon: const Text('✂️', style: TextStyle(fontSize: 22)),
+                    label: const Text('Save Castration', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: RumenoTheme.warningYellow,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final animal = widget.animal;
+    final isDead = _mortalityDate != null;
+    final isCastrated = _castrationDate != null;
+
+    String? ageAtDeath;
+    if (_mortalityDate != null) {
+      final days = _mortalityDate!.difference(animal.dateOfBirth).inDays;
+      if (days < 30) {
+        ageAtDeath = '$days days';
+      } else if (days < 365) {
+        ageAtDeath = '${days ~/ 30}m ${days % 30}d';
+      } else {
+        ageAtDeath = '${days ~/ 365}y ${(days % 365) ~/ 30}m';
+      }
+    }
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        // ── Deceased Banner ──
+        if (isDead) ...[
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade900,
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Column(children: [
+              const Text('💀', style: TextStyle(fontSize: 48)),
+              const SizedBox(height: 8),
+              const Text('DECEASED', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              const SizedBox(height: 12),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                _MortalityInfoChip(emoji: '📅', label: 'Date', value: DateFormat('dd MMM yyyy').format(_mortalityDate!)),
+                const SizedBox(width: 10),
+                if (ageAtDeath != null)
+                  _MortalityInfoChip(emoji: '⏳', label: 'Age', value: ageAtDeath),
+              ]),
+              if (_mortalityReason != null) ...[
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: RumenoTheme.errorRed.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Text('❓', style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Text('Reason: ${_mortalityReason!}', style: const TextStyle(color: Colors.redAccent, fontSize: 15, fontWeight: FontWeight.w600)),
+                  ]),
+                ),
+              ],
+            ]),
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // ── Castration Banner ──
+        if (isCastrated) ...[
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: RumenoTheme.warningYellow.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: RumenoTheme.warningYellow, width: 1.5),
+            ),
+            child: Row(children: [
+              const Text('✂️', style: TextStyle(fontSize: 32)),
+              const SizedBox(width: 14),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text('Castrated', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: RumenoTheme.textDark)),
+                const SizedBox(height: 4),
+                Text('Date: ${DateFormat('dd MMM yyyy').format(_castrationDate!)}', style: const TextStyle(fontSize: 14, color: RumenoTheme.textGrey)),
+              ])),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(color: RumenoTheme.warningYellow.withValues(alpha: 0.2), shape: BoxShape.circle),
+                child: const Icon(Icons.check, color: RumenoTheme.warmBrown, size: 22),
+              ),
+            ]),
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // ── Action Buttons — Record Mortality / Castration ──
+        if (!isDead || !isCastrated) ...[
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              if (!isDead)
+                _BigActionButton(
+                  emoji: '💀',
+                  label: 'Record\nDeath',
+                  color: Colors.grey.shade700,
+                  onTap: _showRecordMortalitySheet,
+                ),
+              if (!isCastrated && animal.gender == Gender.male)
+                _BigActionButton(
+                  emoji: '✂️',
+                  label: 'Record\nCastration',
+                  color: RumenoTheme.warningYellow,
+                  onTap: _showRecordCastrationSheet,
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // ── Standard Info Rows ──
         _InfoRow('Tag ID', animal.tagId),
         _InfoRow('Species', animal.speciesName),
         _InfoRow('Breed', animal.breed),
@@ -193,6 +582,65 @@ class _OverviewTab extends StatelessWidget {
           barColor: RumenoTheme.warningYellow,
         ),
       ],
+    );
+  }
+}
+
+// ── Big Action Button for illiterate-friendly mortality/castration actions ──
+class _BigActionButton extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _BigActionButton({required this.emoji, required this.label, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 120,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
+        ),
+        child: Column(children: [
+          Text(emoji, style: const TextStyle(fontSize: 36)),
+          const SizedBox(height: 6),
+          Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: color), textAlign: TextAlign.center),
+        ]),
+      ),
+    );
+  }
+}
+
+// ── Info chip used in mortality banner ──
+class _MortalityInfoChip extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final String value;
+
+  const _MortalityInfoChip({required this.emoji, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Text(emoji, style: const TextStyle(fontSize: 18)),
+        const SizedBox(width: 6),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label, style: TextStyle(fontSize: 10, color: Colors.white.withValues(alpha: 0.7))),
+          Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+        ]),
+      ]),
     );
   }
 }

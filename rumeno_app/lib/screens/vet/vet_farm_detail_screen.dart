@@ -227,6 +227,8 @@ class _AnimalsTab extends StatelessWidget {
         return Colors.purple;
       case AnimalStatus.quarantine:
         return Colors.brown;
+      case AnimalStatus.deceased:
+        return Colors.grey;
     }
   }
 

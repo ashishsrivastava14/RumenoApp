@@ -30,6 +30,8 @@ class AnimalCard extends StatelessWidget {
         return Colors.orange;
       case AnimalStatus.quarantine:
         return Colors.purple;
+      case AnimalStatus.deceased:
+        return Colors.grey.shade700;
     }
   }
 
@@ -139,11 +141,41 @@ class AnimalCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        '${animal.weightKg}kg • Shed: ${animal.shedNumber ?? "-"}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: RumenoTheme.textLight,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${animal.weightKg}kg • Shed: ${animal.shedNumber ?? "-"}',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: RumenoTheme.textLight,
+                                  ),
                             ),
+                          ),
+                          if (animal.isDead)
+                            Container(
+                              margin: const EdgeInsets.only(left: 6),
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade800,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                                Text('💀', style: TextStyle(fontSize: 11)),
+                                SizedBox(width: 3),
+                                Text('Dead', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                              ]),
+                            ),
+                          if (animal.isCastrated)
+                            Container(
+                              margin: const EdgeInsets.only(left: 6),
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: RumenoTheme.warningYellow.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text('✂️', style: TextStyle(fontSize: 11)),
+                            ),
+                        ],
                       ),
                     ],
                   ),
