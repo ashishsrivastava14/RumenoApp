@@ -51,13 +51,7 @@ class _KidManagementScreenState extends State<KidManagementScreen> {
   void _resetPage() => setState(() => _currentPage = 0);
 
   // ─── Stats ──────────────────────────────────
-  int get _totalKids => _kids.length;
-  int get _weanedCount => _kids.where((k) => k.isWeaned).length;
   int get _medicineDueCount => _kids.where((k) => k.coccidisostatDue).length;
-  int get _onMilkCount =>
-      _kids
-          .where((k) => k.milkReplacerStartDate != null && !k.isWeaned)
-          .length;
 
   // ─── Add / Edit ─────────────────────────────
   void _openForm({KidRecord? existing}) {
@@ -230,35 +224,6 @@ class _KidManagementScreenState extends State<KidManagementScreen> {
               },
             ),
 
-          // ── Stat tiles — big emoji + number ──
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 14, 12, 0),
-            child: Row(
-              children: [
-                _StatTile(
-                    emoji: '🐐',
-                    count: _totalKids,
-                    color: RumenoTheme.primaryGreen),
-                const SizedBox(width: 8),
-                _StatTile(
-                    emoji: '🍼',
-                    count: _onMilkCount,
-                    color: RumenoTheme.infoBlue),
-                const SizedBox(width: 8),
-                _StatTile(
-                    emoji: '✅',
-                    count: _weanedCount,
-                    color: RumenoTheme.successGreen),
-                const SizedBox(width: 8),
-                _StatTile(
-                    emoji: '💊',
-                    count: _medicineDueCount,
-                    color: RumenoTheme.errorRed),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
           // ── Big visual filter buttons ──
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -425,51 +390,6 @@ class _AlertBanner extends StatelessWidget {
             ),
             const Icon(Icons.chevron_right_rounded,
                 color: RumenoTheme.errorRed, size: 32),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Stat Tile — big emoji + number only (no text label)
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _StatTile extends StatelessWidget {
-  final String emoji;
-  final int count;
-  final Color color;
-
-  const _StatTile({
-    required this.emoji,
-    required this.count,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withValues(alpha: 0.25)),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04), blurRadius: 6)
-          ],
-        ),
-        child: Column(
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 28)),
-            const SizedBox(height: 4),
-            Text('$count',
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: color)),
           ],
         ),
       ),
