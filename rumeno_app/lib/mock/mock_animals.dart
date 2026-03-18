@@ -2,13 +2,13 @@ import '../models/models.dart';
 
 final List<Animal> mockAnimals = [
   // 8 Cows
-  Animal(id: '1', tagId: 'C-001', species: Species.cow, breed: 'Gir', dateOfBirth: DateTime(2020, 3, 15), gender: Gender.female, status: AnimalStatus.active, purpose: AnimalPurpose.dairy, weightKg: 420, heightCm: 130, color: 'Reddish Brown', shedNumber: 'A1', farmerId: 'F001'),
-  Animal(id: '2', tagId: 'C-002', species: Species.cow, breed: 'Sahiwal', dateOfBirth: DateTime(2019, 7, 22), gender: Gender.female, status: AnimalStatus.pregnant, purpose: AnimalPurpose.dairy, weightKg: 450, heightCm: 135, color: 'Light Brown', shedNumber: 'A1', farmerId: 'F001'),
-  Animal(id: '3', tagId: 'C-003', species: Species.cow, breed: 'Holstein Friesian', dateOfBirth: DateTime(2021, 1, 10), gender: Gender.female, status: AnimalStatus.active, purpose: AnimalPurpose.dairy, weightKg: 550, heightCm: 145, color: 'Black & White', shedNumber: 'A2', farmerId: 'F001'),
+  Animal(id: '1', tagId: 'C-001', species: Species.cow, breed: 'Gir', dateOfBirth: DateTime(2020, 3, 15), gender: Gender.female, status: AnimalStatus.active, purpose: AnimalPurpose.dairy, weightKg: 420, heightCm: 130, color: 'Reddish Brown', shedNumber: 'A1', fatherId: '7', motherId: '2', numberOfSiblings: 2, farmerId: 'F001'),
+  Animal(id: '2', tagId: 'C-002', species: Species.cow, breed: 'Sahiwal', dateOfBirth: DateTime(2019, 7, 22), gender: Gender.female, status: AnimalStatus.pregnant, purpose: AnimalPurpose.dairy, weightKg: 450, heightCm: 135, color: 'Light Brown', shedNumber: 'A1', fatherId: '23', motherId: '24', farmerId: 'F001'),
+  Animal(id: '3', tagId: 'C-003', species: Species.cow, breed: 'Holstein Friesian', dateOfBirth: DateTime(2021, 1, 10), gender: Gender.female, status: AnimalStatus.active, purpose: AnimalPurpose.dairy, weightKg: 550, heightCm: 145, color: 'Black & White', shedNumber: 'A2', fatherId: '7', numberOfSiblings: 2, farmerId: 'F001'),
   Animal(id: '4', tagId: 'C-004', species: Species.cow, breed: 'Jersey', dateOfBirth: DateTime(2020, 11, 5), gender: Gender.female, status: AnimalStatus.dry, purpose: AnimalPurpose.dairy, weightKg: 380, heightCm: 125, color: 'Fawn', shedNumber: 'A2', farmerId: 'F001'),
-  Animal(id: '5', tagId: 'C-005', species: Species.cow, breed: 'Red Sindhi', dateOfBirth: DateTime(2022, 5, 18), gender: Gender.female, status: AnimalStatus.active, purpose: AnimalPurpose.dairy, weightKg: 350, heightCm: 120, color: 'Red', shedNumber: 'A3', farmerId: 'F001'),
+  Animal(id: '5', tagId: 'C-005', species: Species.cow, breed: 'Red Sindhi', dateOfBirth: DateTime(2022, 5, 18), gender: Gender.female, status: AnimalStatus.active, purpose: AnimalPurpose.dairy, weightKg: 350, heightCm: 120, color: 'Red', shedNumber: 'A3', fatherId: '7', numberOfSiblings: 2, farmerId: 'F001'),
   Animal(id: '6', tagId: 'C-006', species: Species.cow, breed: 'Tharparkar', dateOfBirth: DateTime(2018, 8, 30), gender: Gender.female, status: AnimalStatus.pregnant, purpose: AnimalPurpose.mixed, weightKg: 400, heightCm: 128, color: 'White', shedNumber: 'A3', farmerId: 'F001'),
-  Animal(id: '7', tagId: 'C-007', species: Species.cow, breed: 'Gir', dateOfBirth: DateTime(2023, 2, 14), gender: Gender.male, status: AnimalStatus.active, purpose: AnimalPurpose.breeding, weightKg: 500, heightCm: 140, color: 'Dark Red', shedNumber: 'B1', farmerId: 'F001'),
+  Animal(id: '7', tagId: 'C-007', species: Species.cow, breed: 'Gir', dateOfBirth: DateTime(2015, 6, 10), gender: Gender.male, status: AnimalStatus.active, purpose: AnimalPurpose.breeding, weightKg: 500, heightCm: 140, color: 'Dark Red', shedNumber: 'B1', fatherId: '21', motherId: '22', farmerId: 'F001'),
   Animal(id: '8', tagId: 'C-008', species: Species.cow, breed: 'Sahiwal', dateOfBirth: DateTime(2021, 9, 7), gender: Gender.female, status: AnimalStatus.sick, purpose: AnimalPurpose.dairy, weightKg: 410, heightCm: 132, color: 'Brown', shedNumber: 'A1', farmerId: 'F001'),
 
   // 5 Buffalos
@@ -30,6 +30,12 @@ final List<Animal> mockAnimals = [
 
   // 1 Pig
   Animal(id: '20', tagId: 'P-001', species: Species.pig, breed: 'Large White Yorkshire', dateOfBirth: DateTime(2024, 2, 1), gender: Gender.female, status: AnimalStatus.active, purpose: AnimalPurpose.meat, weightKg: 85, heightCm: 60, color: 'Pink-White', shedNumber: 'G1', farmerId: 'F001'),
+
+  // Grandparent animals (ancestors for pedigree demo)
+  Animal(id: '21', tagId: 'C-010', species: Species.cow, breed: 'Gir', dateOfBirth: DateTime(2008, 4, 12), gender: Gender.male, status: AnimalStatus.active, purpose: AnimalPurpose.breeding, weightKg: 560, heightCm: 148, color: 'Dark Reddish Brown', shedNumber: 'B2', farmerId: 'F001'), // C-007's father (paternal grandfather)
+  Animal(id: '22', tagId: 'C-011', species: Species.cow, breed: 'Gir', dateOfBirth: DateTime(2010, 9, 5), gender: Gender.female, status: AnimalStatus.active, purpose: AnimalPurpose.dairy, weightKg: 415, heightCm: 129, color: 'Reddish Brown', shedNumber: 'A4', farmerId: 'F001'), // C-007's mother (paternal grandmother)
+  Animal(id: '23', tagId: 'C-012', species: Species.cow, breed: 'Sahiwal', dateOfBirth: DateTime(2009, 2, 18), gender: Gender.male, status: AnimalStatus.active, purpose: AnimalPurpose.breeding, weightKg: 520, heightCm: 142, color: 'Light Brown', shedNumber: 'B3', farmerId: 'F001'), // C-002's father (maternal grandfather)
+  Animal(id: '24', tagId: 'C-013', species: Species.cow, breed: 'Sahiwal', dateOfBirth: DateTime(2011, 11, 30), gender: Gender.female, status: AnimalStatus.active, purpose: AnimalPurpose.dairy, weightKg: 440, heightCm: 133, color: 'Brown', shedNumber: 'A4', farmerId: 'F001'), // C-002's mother (maternal grandmother)
 ];
 
 List<Animal> getAnimalsBySpecies(Species species) {
@@ -50,4 +56,17 @@ Animal? getAnimalByTag(String tagId) {
   } catch (_) {
     return null;
   }
+}
+
+List<Animal> getChildrenOf(String animalId) {
+  return mockAnimals.where((a) => a.fatherId == animalId || a.motherId == animalId).toList();
+}
+
+List<Animal> getSiblingsOf(Animal animal) {
+  return mockAnimals.where((a) {
+    if (a.id == animal.id) return false;
+    if (animal.fatherId != null && a.fatherId == animal.fatherId) return true;
+    if (animal.motherId != null && a.motherId == animal.motherId) return true;
+    return false;
+  }).toList();
 }

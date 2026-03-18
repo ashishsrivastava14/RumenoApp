@@ -47,6 +47,7 @@ class Animal {
   final String? shedNumber;
   final String? fatherId;
   final String? motherId;
+  final int? numberOfSiblings;
   final DateTime? purchaseDate;
   final double? purchasePrice;
   final String farmerId;
@@ -66,6 +67,7 @@ class Animal {
     this.shedNumber,
     this.fatherId,
     this.motherId,
+    this.numberOfSiblings,
     this.purchaseDate,
     this.purchasePrice,
     required this.farmerId,

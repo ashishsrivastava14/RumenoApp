@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../config/theme.dart';
+import '../../../mock/mock_animals.dart';
 import '../../../models/models.dart';
 import '../../../widgets/common/marketplace_button.dart';
 
@@ -39,6 +40,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
   // Step 3
   String? _fatherId;
   String? _motherId;
+  int _numberOfSiblings = 0;
   final List<_ParentEntry> _customFathers = [];
   final List<_ParentEntry> _customMothers = [];
 
@@ -1088,8 +1090,156 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
             },
           ),
         ),
+        const SizedBox(height: 24),
+        _sectionLabel('👶  Number of Siblings at Birth'),
+        const SizedBox(height: 8),
+        _buildSiblingsCounter(),
         const SizedBox(height: 16),
       ],
+    );
+  }
+
+  Widget _buildSiblingsCounter() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: RumenoTheme.textLight),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: RumenoTheme.primaryGreen.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.people_outline, color: RumenoTheme.primaryGreen, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Siblings', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                Text(
+                  _numberOfSiblings == 0 ? 'No siblings / unknown' : '$_numberOfSiblings sibling${_numberOfSiblings > 1 ? "s" : ""} in litter',
+                  style: TextStyle(fontSize: 12, color: RumenoTheme.textGrey),
+                ),
+              ],
+            ),
+          ),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: _numberOfSiblings > 0 ? () => setState(() => _numberOfSiblings--) : null,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  width: 36, height: 36,
+                  decoration: BoxDecoration(
+                    color: _numberOfSiblings > 0 ? RumenoTheme.primaryGreen : RumenoTheme.backgroundCream,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.remove, color: _numberOfSiblings > 0 ? Colors.white : RumenoTheme.textLight, size: 20),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                '$_numberOfSiblings',
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: RumenoTheme.textDark),
+              ),
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: () => setState(() => _numberOfSiblings++),
+                child: Container(
+                  width: 36, height: 36,
+                  decoration: BoxDecoration(
+                    color: RumenoTheme.primaryGreen,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.add, color: Colors.white, size: 20),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showParentChildrenSheet(Animal parent) {
+    final children = getChildrenOf(parent.id);
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.7),
+        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)))),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: RumenoTheme.warningYellow.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
+                  child: const Icon(Icons.warning_amber_rounded, color: RumenoTheme.warningYellow, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Offspring of ${parent.tagId}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                      const Text('Check to avoid inbreeding', style: TextStyle(fontSize: 12, color: RumenoTheme.textGrey)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (children.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(child: Text('No recorded offspring yet', style: TextStyle(color: RumenoTheme.textGrey))),
+              )
+            else
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: children.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (ctx, i) {
+                    final child = children[i];
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                      leading: Container(
+                        width: 44, height: 44,
+                        decoration: BoxDecoration(color: RumenoTheme.primaryGreen.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                        child: Center(child: Text(child.gender == Gender.male ? '♂' : '♀', style: const TextStyle(fontSize: 20))),
+                      ),
+                      title: Text(child.tagId, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text('${child.breed} • ${child.ageString}', style: const TextStyle(fontSize: 12)),
+                      trailing: TextButton(
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          context.go('/farmer/animals/${child.id}');
+                        },
+                        child: const Text('View', style: TextStyle(color: RumenoTheme.primaryGreen)),
+                      ),
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -1335,86 +1485,138 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
     final sel = selected == id;
     final isNone = entry == null;
 
+    // Lookup actual farm animal by tag if available
+    final farmAnimal = (!isNone) ? getAnimalByTag(entry.animalId) : null;
+
     final parts = <String>[];
     if (!isNone) {
       parts.add(entry.animalId);
-      if (entry.location.isNotEmpty) parts.add(entry.location);
-      if (entry.ownerName.isNotEmpty) parts.add(entry.ownerName);
+      if (farmAnimal != null) {
+        parts.add(farmAnimal.breed);
+        parts.add(farmAnimal.ageString);
+      } else {
+        if (entry.location.isNotEmpty) parts.add(entry.location);
+        if (entry.ownerName.isNotEmpty) parts.add(entry.ownerName);
+      }
     }
-    final label =
-        isNone ? "Don't know / None" : parts.join(' · ');
-    final showSubtitle = !isNone &&
-        (entry.location.isNotEmpty || entry.ownerName.isNotEmpty);
+    final label = isNone ? "Don't know / None" : parts.join(' · ');
 
-    return GestureDetector(
-      onTap: () => onChanged(id),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: sel
-              ? RumenoTheme.primaryGreen.withValues(alpha: 0.08)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-              color:
-                  sel ? RumenoTheme.primaryGreen : RumenoTheme.textLight,
-              width: sel ? 2 : 1),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: sel
-                    ? RumenoTheme.primaryGreen.withValues(alpha: 0.15)
-                    : RumenoTheme.backgroundCream,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                isNone ? Icons.do_not_disturb_alt : Icons.pets,
-                color: sel
-                    ? RumenoTheme.primaryGreen
-                    : RumenoTheme.textGrey,
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: sel ? RumenoTheme.primaryGreen.withValues(alpha: 0.08) : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textLight, width: sel ? 2 : 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: () => onChanged(id),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
                 children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontWeight:
-                          sel ? FontWeight.bold : FontWeight.w500,
-                      fontSize: 15,
-                      color: sel
-                          ? RumenoTheme.primaryGreen
-                          : RumenoTheme.textDark,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: sel ? RumenoTheme.primaryGreen.withValues(alpha: 0.15) : RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      isNone ? Icons.do_not_disturb_alt : Icons.pets,
+                      color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textGrey,
+                      size: 22,
                     ),
                   ),
-                  if (showSubtitle) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      'ID: ${entry.animalId}',
-                      style: const TextStyle(
-                          fontSize: 12, color: RumenoTheme.textGrey),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          label,
+                          style: TextStyle(
+                            fontWeight: sel ? FontWeight.bold : FontWeight.w500,
+                            fontSize: 15,
+                            color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textDark,
+                          ),
+                        ),
+                        if (farmAnimal != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            '${farmAnimal.gender == Gender.male ? "♂ Male" : "♀ Female"} • ${farmAnimal.speciesName}',
+                            style: const TextStyle(fontSize: 12, color: RumenoTheme.textGrey),
+                          ),
+                        ],
+                      ],
                     ),
-                  ],
+                  ),
+                  if (sel)
+                    const Icon(Icons.check_circle, color: RumenoTheme.primaryGreen, size: 22)
+                  else
+                    const Icon(Icons.radio_button_unchecked, color: RumenoTheme.textLight, size: 22),
                 ],
               ),
             ),
-            if (sel)
-              const Icon(Icons.check_circle,
-                  color: RumenoTheme.primaryGreen, size: 22)
-            else
-              const Icon(Icons.radio_button_unchecked,
-                  color: RumenoTheme.textLight, size: 22),
+          ),
+          // Action buttons shown when selected and a known farm animal
+          if (sel && farmAnimal != null) ...[
+            const Divider(height: 1, indent: 14, endIndent: 14),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => context.go('/farmer/animals/${farmAnimal.id}'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: RumenoTheme.infoBlue.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.open_in_new_rounded, size: 14, color: RumenoTheme.infoBlue),
+                            SizedBox(width: 6),
+                            Text('View Details', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: RumenoTheme.infoBlue)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => _showParentChildrenSheet(farmAnimal),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: RumenoTheme.warningYellow.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.family_restroom, size: 14, color: RumenoTheme.warmBrown),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${getChildrenOf(farmAnimal.id).length} Offspring',
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: RumenoTheme.warmBrown),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
-        ),
+        ],
       ),
     );
   }

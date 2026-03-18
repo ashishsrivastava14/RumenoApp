@@ -27,7 +27,7 @@ class AnimalDetailScreen extends StatelessWidget {
     }
 
     return DefaultTabController(
-      length: 7,
+      length: 8,
       child: Scaffold(
         backgroundColor: RumenoTheme.backgroundCream,
         body: NestedScrollView(
@@ -109,6 +109,7 @@ class AnimalDetailScreen extends StatelessWidget {
                     Tab(text: 'Reproduction'),
                     Tab(text: 'Production'),
                     Tab(text: 'Finance'),
+                    Tab(text: 'Family'),
                   ],
                 ),
               ),
@@ -123,6 +124,7 @@ class AnimalDetailScreen extends StatelessWidget {
               _ReproductionTab(animal: animal),
               _ProductionTab(animal: animal),
               _FinanceTab(animalId: animal.id),
+              _FamilyTab(animal: animal),
             ],
           ),
         ),
@@ -1734,6 +1736,242 @@ class _MilkDryOffCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ─── Family Tab ──────────────────────────────
+
+class _FamilyTab extends StatelessWidget {
+  final Animal animal;
+  const _FamilyTab({required this.animal});
+
+  void _navigateToAnimal(BuildContext context, String animalId) {
+    context.push('/farmer/animals/$animalId');
+  }
+
+  Widget _animalChip(BuildContext context, Animal a, {bool isWarning = false}) {
+    return GestureDetector(
+      onTap: () => _navigateToAnimal(context, a.id),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isWarning
+              ? RumenoTheme.warningYellow.withValues(alpha: 0.1)
+              : RumenoTheme.primaryGreen.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isWarning
+                ? RumenoTheme.warningYellow.withValues(alpha: 0.4)
+                : RumenoTheme.primaryGreen.withValues(alpha: 0.3),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(a.gender == Gender.male ? '♂' : '♀', style: const TextStyle(fontSize: 14)),
+            const SizedBox(width: 6),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(a.tagId, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: isWarning ? RumenoTheme.warmBrown : RumenoTheme.primaryGreen)),
+                Text(a.breed, style: const TextStyle(fontSize: 11, color: RumenoTheme.textGrey)),
+              ],
+            ),
+            const SizedBox(width: 6),
+            Icon(Icons.arrow_forward_ios_rounded, size: 12, color: isWarning ? RumenoTheme.warmBrown : RumenoTheme.primaryGreen),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _parentBlock(BuildContext context, Animal? parent, String role, IconData icon, Color color) {
+    final grandpa = parent?.fatherId != null ? getAnimalById(parent!.fatherId!) : null;
+    final grandma = parent?.motherId != null ? getAnimalById(parent!.motherId!) : null;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8)],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
+                child: Icon(icon, color: color, size: 20),
+              ),
+              const SizedBox(width: 10),
+              Text(role, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: RumenoTheme.textDark)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (parent == null)
+            const Text('Unknown', style: TextStyle(color: RumenoTheme.textGrey, fontStyle: FontStyle.italic))
+          else ...[
+            _animalChip(context, parent),
+            const SizedBox(height: 12),
+            // Grandparents
+            if (grandpa != null || grandma != null) ...[
+              Text(
+                'Parents of ${parent.tagId}',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: RumenoTheme.textGrey),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (grandpa != null)
+                    _grandparentChip(context, grandpa, role.contains('Father') ? 'Paternal Grandfather' : 'Maternal Grandfather'),
+                  if (grandma != null)
+                    _grandparentChip(context, grandma, role.contains('Father') ? 'Paternal Grandmother' : 'Maternal Grandmother'),
+                ],
+              ),
+            ] else
+              const Text('Grandparents unknown', style: TextStyle(fontSize: 12, color: RumenoTheme.textGrey, fontStyle: FontStyle.italic)),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _grandparentChip(BuildContext context, Animal gp, String label) {
+    return GestureDetector(
+      onTap: () => _navigateToAnimal(context, gp.id),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        decoration: BoxDecoration(
+          color: RumenoTheme.backgroundCream,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: RumenoTheme.textLight),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.account_tree_outlined, size: 13, color: RumenoTheme.textGrey),
+            const SizedBox(width: 5),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: const TextStyle(fontSize: 10, color: RumenoTheme.textGrey)),
+                Text(gp.tagId, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: RumenoTheme.textDark)),
+                Text(gp.breed, style: const TextStyle(fontSize: 10, color: RumenoTheme.textGrey)),
+              ],
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.open_in_new_rounded, size: 11, color: RumenoTheme.textGrey),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final father = animal.fatherId != null ? getAnimalById(animal.fatherId!) : null;
+    final mother = animal.motherId != null ? getAnimalById(animal.motherId!) : null;
+    final siblings = getSiblingsOf(animal);
+    final children = getChildrenOf(animal.id);
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // ── Father block ──
+        _parentBlock(context, father, 'Father', Icons.male, const Color(0xFF1565C0)),
+        const SizedBox(height: 14),
+
+        // ── Mother block ──
+        _parentBlock(context, mother, 'Mother', Icons.female, const Color(0xFFC2185B)),
+        const SizedBox(height: 20),
+
+        // ── Siblings ──
+        Row(
+          children: [
+            const Icon(Icons.people_alt_outlined, color: RumenoTheme.primaryGreen, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              'Siblings (${siblings.isEmpty ? "None" : "${siblings.length} found"})',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        if (animal.numberOfSiblings != null && animal.numberOfSiblings! > 0)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              '${animal.numberOfSiblings} sibling${animal.numberOfSiblings! > 1 ? "s" : ""} recorded at birth',
+              style: const TextStyle(fontSize: 12, color: RumenoTheme.textGrey),
+            ),
+          ),
+        const SizedBox(height: 8),
+        if (siblings.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
+            child: const Text('No siblings found in farm records', style: TextStyle(color: RumenoTheme.textGrey, fontStyle: FontStyle.italic)),
+          )
+        else
+          Wrap(
+            spacing: 8, runSpacing: 8,
+            children: siblings.map((s) => _animalChip(context, s)).toList(),
+          ),
+        const SizedBox(height: 20),
+
+        // ── Children / Offspring ──
+        Row(
+          children: [
+            const Icon(Icons.child_friendly, color: RumenoTheme.accentOlive, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              'Offspring (${children.isEmpty ? "None" : "${children.length} found"})',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (children.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
+            child: const Text('No recorded offspring in farm', style: TextStyle(color: RumenoTheme.textGrey, fontStyle: FontStyle.italic)),
+          )
+        else
+          Column(
+            children: children.map((c) {
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 6)]),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                  leading: Container(
+                    width: 44, height: 44,
+                    decoration: BoxDecoration(color: RumenoTheme.primaryGreen.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                    child: Center(child: Text(c.gender == Gender.male ? '♂' : '♀', style: const TextStyle(fontSize: 20))),
+                  ),
+                  title: Text(c.tagId, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  subtitle: Text(
+                    '${c.breed} • ${c.ageString} • ${c.statusLabel}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: RumenoTheme.primaryGreen),
+                    onPressed: () => _navigateToAnimal(context, c.id),
+                  ),
+                  onTap: () => _navigateToAnimal(context, c.id),
+                ),
+              );
+            }).toList(),
+          ),
+        const SizedBox(height: 16),
+      ],
     );
   }
 }
