@@ -93,15 +93,41 @@ class AnimalCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // Avatar
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(28),
-                  child: Image.asset(
-                    _speciesImage(animal.species),
-                    width: 56,
-                    height: 56,
-                    fit: BoxFit.cover,
-                  ),
+                // Avatar with gender badge
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(28),
+                      child: Image.asset(
+                        _speciesImage(animal.species),
+                        width: 56,
+                        height: 56,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      right: -4,
+                      bottom: -4,
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: animal.gender == Gender.male
+                              ? Colors.blue.shade600
+                              : Colors.pink.shade400,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: Icon(
+                          animal.gender == Gender.male
+                              ? Icons.male_rounded
+                              : Icons.female_rounded,
+                          size: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(width: 14),
                 // Info
@@ -136,9 +162,26 @@ class AnimalCard extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        '${animal.breed} • ${animal.gender == Gender.male ? "♂" : "♀"} • ${animal.ageString}',
-                        style: Theme.of(context).textTheme.bodySmall,
+                      Row(
+                        children: [
+                          Text(
+                            '${animal.breed} • ',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          Icon(
+                            animal.gender == Gender.male
+                                ? Icons.male_rounded
+                                : Icons.female_rounded,
+                            size: 16,
+                            color: animal.gender == Gender.male
+                                ? Colors.blue.shade600
+                                : Colors.pink.shade400,
+                          ),
+                          Text(
+                            ' • ${animal.ageString}',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 2),
                       Row(
