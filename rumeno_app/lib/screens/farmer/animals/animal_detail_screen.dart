@@ -979,6 +979,7 @@ class _AdgSectionState extends State<_AdgSection> {
 
   void _showRecordWeightSheet() {
     double? selectedWeight;
+    int? selectedBCS;
     DateTime weighDate = DateTime.now();
     final weightCtrl = TextEditingController();
 
@@ -1098,6 +1099,36 @@ class _AdgSectionState extends State<_AdgSection> {
                     setModalState(() => selectedWeight = parsed);
                   },
                 ),
+                const SizedBox(height: 22),
+
+                // Body Condition Score
+                const Text('📊  Body Condition Score', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: RumenoTheme.backgroundCream,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: RumenoTheme.primaryGreen.withValues(alpha: 0.6)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<int>(
+                      isExpanded: true,
+                      value: selectedBCS,
+                      hint: const Text('Select score (1–5)', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                      icon: const Icon(Icons.arrow_drop_down_rounded, color: RumenoTheme.primaryGreen, size: 28),
+                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: RumenoTheme.textDark),
+                      items: List.generate(5, (i) {
+                        final score = i + 1;
+                        return DropdownMenuItem<int>(
+                          value: score,
+                          child: Text('$score — ${const ['Very Thin', 'Thin', 'Average', 'Fat', 'Obese'][i]}'),
+                        );
+                      }),
+                      onChanged: (val) => setModalState(() => selectedBCS = val),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 28),
 
                 // Save
@@ -1106,22 +1137,25 @@ class _AdgSectionState extends State<_AdgSection> {
                   height: 56,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      if (selectedWeight == null || selectedWeight! <= 0) {
+                      final weight = selectedWeight;
+                      if (weight == null || weight <= 0) {
                         ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Please select or enter weight'), backgroundColor: RumenoTheme.errorRed, behavior: SnackBarBehavior.floating));
                         return;
                       }
+                      final bcs = selectedBCS;
                       Navigator.pop(ctx);
                       setState(() {
                         _weightRecords.add(WeightRecord(
                           id: 'W_${DateTime.now().millisecondsSinceEpoch}',
                           animalId: widget.animal.id,
                           date: weighDate,
-                          weightKg: selectedWeight!,
+                          weightKg: weight,
+                          bodyConditionScore: bcs,
                         ));
                         _weightRecords.sort((a, b) => a.date.compareTo(b.date));
                       });
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Row(children: [const Icon(Icons.check_circle, color: Colors.white), const SizedBox(width: 8), Text('Weight ${selectedWeight!.toStringAsFixed(1)} kg recorded!')]),
+                        content: Row(children: [const Icon(Icons.check_circle, color: Colors.white), const SizedBox(width: 8), Text('Weight ${weight.toStringAsFixed(1)} kg recorded!')]),
                         backgroundColor: RumenoTheme.successGreen,
                         behavior: SnackBarBehavior.floating,
                       ));
@@ -1149,7 +1183,7 @@ class _AdgSectionState extends State<_AdgSection> {
     final recent = _recentAdg;
     final totalGain = _totalGain;
     final rating = _growthRating(adg);
-    final hasRecords = _weightRecords.length >= 2;
+    final hasRecords = _weightRecords.length >= 2 && adg != null && totalGain != null;
 
     // Rating visual config
     final String ratingEmoji;

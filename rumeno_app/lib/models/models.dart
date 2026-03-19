@@ -527,6 +527,7 @@ class WeightRecord {
   final String animalId;
   final DateTime date;
   final double weightKg;
+  final int? bodyConditionScore;
   final String? notes;
 
   const WeightRecord({
@@ -534,6 +535,7 @@ class WeightRecord {
     required this.animalId,
     required this.date,
     required this.weightKg,
+    this.bodyConditionScore,
     this.notes,
   });
 }
