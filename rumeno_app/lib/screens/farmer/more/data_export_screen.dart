@@ -28,6 +28,8 @@ class _DataExportScreenState extends State<DataExportScreen> {
   final Set<Species> _speciesFilter = {};
   final Set<AnimalStatus> _statusFilter = {};
   final Set<AnimalPurpose> _purposeFilter = {};
+  final Set<String> _ageRangeFilter = {};
+  final Set<String> _animalEventFilter = {};
   final Set<VaccinationStatus> _vaccinationStatusFilter = {};
   final Set<TreatmentStatus> _treatmentStatusFilter = {};
   final Set<DewormingStatus> _dewormingStatusFilter = {};
@@ -88,6 +90,23 @@ class _DataExportScreenState extends State<DataExportScreen> {
       'subtitle': 'Team members list',
       'color': Color(0xFF9C27B0),
     },
+  ];
+
+  static const _ageRangeOptions = [
+    {'key': 'under_1m', 'emoji': '🐣', 'label': 'Under 1 Month'},
+    {'key': '1_3m', 'emoji': '🍼', 'label': '1 – 3 Months'},
+    {'key': '3_6m', 'emoji': '🐄', 'label': '3 – 6 Months'},
+    {'key': '6_9m', 'emoji': '🐄', 'label': '6 – 9 Months'},
+    {'key': '9_12m', 'emoji': '🐄', 'label': '9 – 12 Months'},
+    {'key': '12_18m', 'emoji': '🐄', 'label': '12 – 18 Months'},
+    {'key': '18_24m', 'emoji': '🐄', 'label': '18 – 24 Months'},
+    {'key': '24_plus', 'emoji': '🐃', 'label': '24+ Months'},
+  ];
+
+  static const _animalEventOptions = [
+    {'key': 'castration', 'emoji': '✂️', 'label': 'Castration', 'color': Color(0xFF795548)},
+    {'key': 'mortality', 'emoji': '💀', 'label': 'Mortality', 'color': Color(0xFF616161)},
+    {'key': 'sell', 'emoji': '💰', 'label': 'Sell', 'color': Color(0xFFFF9800)},
   ];
 
   @override
@@ -531,6 +550,42 @@ class _DataExportScreenState extends State<DataExportScreen> {
               onTap: () => setState(() => _purposeFilter.contains(p)
                   ? _purposeFilter.remove(p)
                   : _purposeFilter.add(p)),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 14),
+        _buildFilterSubtitle('Age Group'),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _ageRangeOptions.map((opt) {
+            final key = opt['key'] as String;
+            return _buildIconChip(
+              emoji: opt['emoji'] as String,
+              label: opt['label'] as String,
+              selected: _ageRangeFilter.contains(key),
+              color: const Color(0xFF4CAF50),
+              onTap: () => setState(() => _ageRangeFilter.contains(key)
+                  ? _ageRangeFilter.remove(key)
+                  : _ageRangeFilter.add(key)),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 14),
+        _buildFilterSubtitle('Animal Events'),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _animalEventOptions.map((opt) {
+            final key = opt['key'] as String;
+            return _buildIconChip(
+              emoji: opt['emoji'] as String,
+              label: opt['label'] as String,
+              selected: _animalEventFilter.contains(key),
+              color: opt['color'] as Color,
+              onTap: () => setState(() => _animalEventFilter.contains(key)
+                  ? _animalEventFilter.remove(key)
+                  : _animalEventFilter.add(key)),
             );
           }).toList(),
         ),
