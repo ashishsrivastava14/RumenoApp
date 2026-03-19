@@ -1378,10 +1378,7 @@ class _KidFormSheetState extends State<_KidFormSheet> {
               onTap: () => _pickDate(context, _coccGivenDate,
                   (d) => setState(() {
                         _coccGivenDate = d;
-                        if (_coccNextDate == null) {
-                          _coccNextDate =
-                              d.add(const Duration(days: 30));
-                        }
+                        _coccNextDate ??= d.add(const Duration(days: 30));
                       })),
             ),
             const SizedBox(height: 12),

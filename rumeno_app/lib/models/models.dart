@@ -59,6 +59,11 @@ class Animal {
   // Castration
   final DateTime? castrationDate;
 
+  // Sale
+  final DateTime? saleDate;
+  final double? salePrice;
+  final String? buyerName;
+
   const Animal({
     required this.id,
     required this.tagId,
@@ -81,6 +86,9 @@ class Animal {
     this.mortalityDate,
     this.mortalityReason,
     this.castrationDate,
+    this.saleDate,
+    this.salePrice,
+    this.buyerName,
   });
 
   int get ageInMonths {
@@ -136,6 +144,7 @@ class Animal {
 
   bool get isDead => status == AnimalStatus.deceased;
   bool get isCastrated => castrationDate != null;
+  bool get isSold => saleDate != null;
 
   String? get ageAtDeath {
     if (mortalityDate == null) return null;
