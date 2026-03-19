@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../config/theme.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../mock/mock_health.dart';
+import '../../../mock/mock_weight.dart';
 import '../../../models/models.dart';
 import '../../../widgets/charts/bar_chart_widget.dart';
 import '../../../widgets/charts/line_chart_widget.dart';
@@ -864,14 +865,8 @@ class _OverviewTabState extends State<_OverviewTab> {
         _InfoRow('Color', animal.color ?? '-'),
         _InfoRow('Shed', animal.shedNumber ?? '-'),
         _InfoRow('Purpose', animal.purpose.name.toUpperCase()),
-        const SizedBox(height: 16),
-        LineChartWidget(
-          title: 'Weight History',
-          spots: const [
-            FlSpot(0, 350), FlSpot(1, 370), FlSpot(2, 385), FlSpot(3, 400), FlSpot(4, 410), FlSpot(5, 420),
-          ],
-          bottomLabels: const ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'],
-        ),
+        const SizedBox(height: 20),
+        _AdgSection(animal: animal),
         if (animal.purpose == AnimalPurpose.dairy || animal.purpose == AnimalPurpose.mixed) ...[
           const SizedBox(height: 16),
           BarChartWidget(
@@ -889,6 +884,624 @@ class _OverviewTabState extends State<_OverviewTab> {
           barColor: RumenoTheme.warningYellow,
         ),
       ],
+    );
+  }
+}
+
+// ── ADG (Average Daily Gain) Section — illiterate-friendly ──
+
+class _AdgSection extends StatefulWidget {
+  final Animal animal;
+  const _AdgSection({required this.animal});
+
+  @override
+  State<_AdgSection> createState() => _AdgSectionState();
+}
+
+class _AdgSectionState extends State<_AdgSection> {
+  late List<WeightRecord> _weightRecords;
+
+  @override
+  void initState() {
+    super.initState();
+    _weightRecords = getWeightRecords(widget.animal.id);
+  }
+
+  /// Overall ADG from first to last record (kg/day)
+  double? get _overallAdg {
+    if (_weightRecords.length < 2) return null;
+    final first = _weightRecords.first;
+    final last = _weightRecords.last;
+    final days = last.date.difference(first.date).inDays;
+    if (days <= 0) return null;
+    return (last.weightKg - first.weightKg) / days;
+  }
+
+  /// Recent ADG from second-last to last record
+  double? get _recentAdg {
+    if (_weightRecords.length < 2) return null;
+    final prev = _weightRecords[_weightRecords.length - 2];
+    final last = _weightRecords.last;
+    final days = last.date.difference(prev.date).inDays;
+    if (days <= 0) return null;
+    return (last.weightKg - prev.weightKg) / days;
+  }
+
+  /// Total weight gained from first to last
+  double? get _totalGain {
+    if (_weightRecords.length < 2) return null;
+    return _weightRecords.last.weightKg - _weightRecords.first.weightKg;
+  }
+
+  /// Growth rating: 'great', 'good', 'slow', 'losing'
+  String _growthRating(double? adg) {
+    if (adg == null) return 'none';
+    // Thresholds are relative to species
+    final sp = widget.animal.species;
+    final double goodThreshold;
+    final double greatThreshold;
+    switch (sp) {
+      case Species.cow:
+      case Species.buffalo:
+        goodThreshold = 0.3;
+        greatThreshold = 0.6;
+      case Species.goat:
+      case Species.sheep:
+        goodThreshold = 0.05;
+        greatThreshold = 0.1;
+      case Species.pig:
+        goodThreshold = 0.4;
+        greatThreshold = 0.7;
+      case Species.horse:
+        goodThreshold = 0.3;
+        greatThreshold = 0.6;
+    }
+    if (adg < 0) return 'losing';
+    if (adg < goodThreshold) return 'slow';
+    if (adg < greatThreshold) return 'good';
+    return 'great';
+  }
+
+  // Quick-preset weights for "Record Weight" — illiterate-friendly tap targets
+  List<double> get _quickWeights {
+    final current = widget.animal.weightKg;
+    // Generate presets around current weight
+    final step = current > 100 ? 5.0 : 1.0;
+    return [
+      current - step * 2,
+      current - step,
+      current,
+      current + step,
+      current + step * 2,
+      current + step * 3,
+    ].where((w) => w > 0).toList();
+  }
+
+  void _showRecordWeightSheet() {
+    double? selectedWeight;
+    DateTime weighDate = DateTime.now();
+    final weightCtrl = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)))),
+                const SizedBox(height: 16),
+                Row(children: [
+                  const Text('⚖️', style: TextStyle(fontSize: 30)),
+                  const SizedBox(width: 10),
+                  Expanded(child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Record Weight', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      Text('${widget.animal.tagId} — ${widget.animal.breed}', style: const TextStyle(fontSize: 14, color: RumenoTheme.textGrey)),
+                    ],
+                  )),
+                ]),
+                const SizedBox(height: 20),
+
+                // Date picker
+                const Text('📅  When?', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () async {
+                    final d = await showDatePicker(
+                      context: ctx,
+                      initialDate: weighDate,
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime.now(),
+                      builder: (_, child) => Theme(data: Theme.of(ctx).copyWith(colorScheme: const ColorScheme.light(primary: RumenoTheme.primaryGreen, onPrimary: Colors.white, surface: Colors.white)), child: child!),
+                    );
+                    if (d != null) setModalState(() => weighDate = d);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: RumenoTheme.primaryGreen.withValues(alpha: 0.6)),
+                    ),
+                    child: Row(children: [
+                      const Text('📅', style: TextStyle(fontSize: 24)),
+                      const SizedBox(width: 12),
+                      Text(DateFormat('dd MMM yyyy').format(weighDate), style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                      const Spacer(),
+                      const Icon(Icons.calendar_today_rounded, color: RumenoTheme.primaryGreen, size: 22),
+                    ]),
+                  ),
+                ),
+                const SizedBox(height: 22),
+
+                // Quick weight presets — big tappable tiles
+                const Text('⚖️  How much?', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: _quickWeights.map((w) {
+                    final sel = selectedWeight == w;
+                    return GestureDetector(
+                      onTap: () => setModalState(() {
+                        selectedWeight = w;
+                        weightCtrl.text = w.toStringAsFixed(w == w.roundToDouble() ? 0 : 1);
+                      }),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: sel ? RumenoTheme.primaryGreen.withValues(alpha: 0.12) : RumenoTheme.backgroundCream,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textLight, width: sel ? 2.5 : 1),
+                        ),
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          const Text('⚖️', style: TextStyle(fontSize: 20)),
+                          const SizedBox(width: 8),
+                          Text('${w.toStringAsFixed(w == w.roundToDouble() ? 0 : 1)} kg', style: TextStyle(fontSize: 17, fontWeight: sel ? FontWeight.bold : FontWeight.w500, color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textDark)),
+                        ]),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 14),
+
+                // Custom weight input
+                TextField(
+                  controller: weightCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  decoration: InputDecoration(
+                    suffixText: 'kg',
+                    suffixStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RumenoTheme.primaryGreen),
+                    hintText: 'Or type weight',
+                    hintStyle: TextStyle(fontSize: 16, color: Colors.grey.shade400),
+                    filled: true,
+                    fillColor: RumenoTheme.backgroundCream,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: RumenoTheme.primaryGreen.withValues(alpha: 0.6))),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: RumenoTheme.primaryGreen.withValues(alpha: 0.6))),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: RumenoTheme.primaryGreen, width: 2)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  ),
+                  onChanged: (val) {
+                    final parsed = double.tryParse(val);
+                    setModalState(() => selectedWeight = parsed);
+                  },
+                ),
+                const SizedBox(height: 28),
+
+                // Save
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      if (selectedWeight == null || selectedWeight! <= 0) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Please select or enter weight'), backgroundColor: RumenoTheme.errorRed, behavior: SnackBarBehavior.floating));
+                        return;
+                      }
+                      Navigator.pop(ctx);
+                      setState(() {
+                        _weightRecords.add(WeightRecord(
+                          id: 'W_${DateTime.now().millisecondsSinceEpoch}',
+                          animalId: widget.animal.id,
+                          date: weighDate,
+                          weightKg: selectedWeight!,
+                        ));
+                        _weightRecords.sort((a, b) => a.date.compareTo(b.date));
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Row(children: [const Icon(Icons.check_circle, color: Colors.white), const SizedBox(width: 8), Text('Weight ${selectedWeight!.toStringAsFixed(1)} kg recorded!')]),
+                        backgroundColor: RumenoTheme.successGreen,
+                        behavior: SnackBarBehavior.floating,
+                      ));
+                    },
+                    icon: const Text('⚖️', style: TextStyle(fontSize: 22)),
+                    label: const Text('Save Weight', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: RumenoTheme.primaryGreen,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final adg = _overallAdg;
+    final recent = _recentAdg;
+    final totalGain = _totalGain;
+    final rating = _growthRating(adg);
+    final hasRecords = _weightRecords.length >= 2;
+
+    // Rating visual config
+    final String ratingEmoji;
+    final String ratingLabel;
+    final Color ratingColor;
+    final Color ratingBgColor;
+    switch (rating) {
+      case 'great':
+        ratingEmoji = '🚀';
+        ratingLabel = 'Great Growth!';
+        ratingColor = const Color(0xFF2E7D32);
+        ratingBgColor = const Color(0xFFE8F5E9);
+      case 'good':
+        ratingEmoji = '👍';
+        ratingLabel = 'Good Growth';
+        ratingColor = const Color(0xFF558B2F);
+        ratingBgColor = const Color(0xFFF1F8E9);
+      case 'slow':
+        ratingEmoji = '🐢';
+        ratingLabel = 'Slow Growth';
+        ratingColor = const Color(0xFFF9A825);
+        ratingBgColor = const Color(0xFFFFF8E1);
+      case 'losing':
+        ratingEmoji = '⚠️';
+        ratingLabel = 'Losing Weight!';
+        ratingColor = const Color(0xFFC62828);
+        ratingBgColor = const Color(0xFFFFEBEE);
+      default:
+        ratingEmoji = '📊';
+        ratingLabel = 'No Data';
+        ratingColor = RumenoTheme.textGrey;
+        ratingBgColor = RumenoTheme.backgroundCream;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ── Section Header ──
+        Row(children: [
+          const Text('📈', style: TextStyle(fontSize: 24)),
+          const SizedBox(width: 8),
+          const Expanded(child: Text('Growth Tracker', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+          // Record Weight button
+          GestureDetector(
+            onTap: _showRecordWeightSheet,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: RumenoTheme.primaryGreen,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                Text('⚖️', style: TextStyle(fontSize: 18)),
+                SizedBox(width: 6),
+                Text('Add', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+              ]),
+            ),
+          ),
+        ]),
+        const SizedBox(height: 14),
+
+        if (!hasRecords) ...[
+          // ── No data — prompt to record ──
+          GestureDetector(
+            onTap: _showRecordWeightSheet,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              decoration: BoxDecoration(
+                color: RumenoTheme.backgroundCream,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: RumenoTheme.primaryGreen.withValues(alpha: 0.3), width: 2, strokeAlign: BorderSide.strokeAlignInside),
+              ),
+              child: Column(children: [
+                const Text('⚖️', style: TextStyle(fontSize: 48)),
+                const SizedBox(height: 10),
+                const Text('Tap to record first weight', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: RumenoTheme.textGrey)),
+                const SizedBox(height: 6),
+                Text('Current: ${widget.animal.weightKg.toStringAsFixed(0)} kg', style: const TextStyle(fontSize: 14, color: RumenoTheme.textLight)),
+              ]),
+            ),
+          ),
+        ] else ...[
+          // ── Big Growth Status Card ──
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: ratingBgColor,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: ratingColor.withValues(alpha: 0.3), width: 2),
+            ),
+            child: Column(children: [
+              // Big emoji + rating
+              Text(ratingEmoji, style: const TextStyle(fontSize: 56)),
+              const SizedBox(height: 8),
+              Text(ratingLabel, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: ratingColor)),
+              const SizedBox(height: 16),
+
+              // ADG value — big and prominent
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
+                  Text(
+                    adg! >= 0 ? '📈' : '📉',
+                    style: const TextStyle(fontSize: 28),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(children: [
+                    Text(
+                      '${adg.abs().toStringAsFixed(2)} kg',
+                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: ratingColor),
+                    ),
+                    Text('per day', style: TextStyle(fontSize: 14, color: ratingColor.withValues(alpha: 0.7))),
+                  ]),
+                ]),
+              ),
+              const SizedBox(height: 16),
+
+              // Visual weight journey — first → last with arrow
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                _WeightBubble(
+                  label: _weightRecords.first.weightKg.toStringAsFixed(0),
+                  sub: DateFormat('MMM yy').format(_weightRecords.first.date),
+                  color: RumenoTheme.textGrey,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Column(children: [
+                    Icon(
+                      totalGain! >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                      color: ratingColor,
+                      size: 32,
+                    ),
+                    Text(
+                      '${totalGain >= 0 ? "+" : ""}${totalGain.toStringAsFixed(1)} kg',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ratingColor),
+                    ),
+                  ]),
+                ),
+                _WeightBubble(
+                  label: _weightRecords.last.weightKg.toStringAsFixed(0),
+                  sub: DateFormat('MMM yy').format(_weightRecords.last.date),
+                  color: ratingColor,
+                ),
+              ]),
+            ]),
+          ),
+          const SizedBox(height: 14),
+
+          // ── Recent vs Overall ADG comparison ──
+          if (recent != null)
+            Row(children: [
+              Expanded(child: _AdgMiniCard(
+                emoji: '📅',
+                title: 'Last Month',
+                value: '${recent.abs().toStringAsFixed(2)} kg/day',
+                isPositive: recent >= 0,
+              )),
+              const SizedBox(width: 10),
+              Expanded(child: _AdgMiniCard(
+                emoji: '📊',
+                title: 'Overall',
+                value: '${adg!.abs().toStringAsFixed(2)} kg/day',
+                isPositive: adg >= 0,
+              )),
+            ]),
+          const SizedBox(height: 14),
+
+          // ── Weight history timeline — visual step markers ──
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(children: [
+                  Text('📋', style: TextStyle(fontSize: 20)),
+                  SizedBox(width: 8),
+                  Text('Weight History', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ]),
+                const SizedBox(height: 12),
+                ...List.generate(_weightRecords.length, (i) {
+                  final rec = _weightRecords[i];
+                  final isLast = i == _weightRecords.length - 1;
+                  final double? change;
+                  if (i > 0) {
+                    change = rec.weightKg - _weightRecords[i - 1].weightKg;
+                  } else {
+                    change = null;
+                  }
+                  return _WeightTimelineRow(
+                    date: rec.date,
+                    weightKg: rec.weightKg,
+                    change: change,
+                    isLast: isLast,
+                  );
+                }),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // ── Weight chart using actual records ──
+          LineChartWidget(
+            title: 'Weight Chart',
+            spots: List.generate(_weightRecords.length, (i) => FlSpot(i.toDouble(), _weightRecords[i].weightKg)),
+            bottomLabels: _weightRecords.map((w) => DateFormat('MMM').format(w.date)).toList(),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Circular weight bubble for the journey visualization
+class _WeightBubble extends StatelessWidget {
+  final String label;
+  final String sub;
+  final Color color;
+
+  const _WeightBubble({required this.label, required this.sub, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Container(
+        width: 72,
+        height: 72,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color.withValues(alpha: 0.12),
+          border: Border.all(color: color, width: 2.5),
+        ),
+        child: Center(
+          child: Text('$label\nkg', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color, height: 1.2)),
+        ),
+      ),
+      const SizedBox(height: 4),
+      Text(sub, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.7))),
+    ]);
+  }
+}
+
+/// Mini card for Recent vs Overall ADG
+class _AdgMiniCard extends StatelessWidget {
+  final String emoji;
+  final String title;
+  final String value;
+  final bool isPositive;
+
+  const _AdgMiniCard({required this.emoji, required this.title, required this.value, required this.isPositive});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 6, offset: const Offset(0, 2))],
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Text(emoji, style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: 6),
+          Text(title, style: const TextStyle(fontSize: 13, color: RumenoTheme.textGrey)),
+        ]),
+        const SizedBox(height: 8),
+        Row(children: [
+          Text(isPositive ? '📈' : '📉', style: const TextStyle(fontSize: 16)),
+          const SizedBox(width: 6),
+          Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isPositive ? RumenoTheme.successGreen : RumenoTheme.errorRed)),
+        ]),
+      ]),
+    );
+  }
+}
+
+/// Single row in the weight timeline
+class _WeightTimelineRow extends StatelessWidget {
+  final DateTime date;
+  final double weightKg;
+  final double? change;
+  final bool isLast;
+
+  const _WeightTimelineRow({required this.date, required this.weightKg, this.change, required this.isLast});
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicHeight(
+      child: Row(
+        children: [
+          // Timeline dot + line
+          SizedBox(
+            width: 28,
+            child: Column(children: [
+              Container(
+                width: 14,
+                height: 14,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isLast ? RumenoTheme.primaryGreen : RumenoTheme.textLight,
+                  border: Border.all(color: isLast ? RumenoTheme.primaryGreen : RumenoTheme.textLight, width: 2),
+                ),
+              ),
+              if (!isLast)
+                Expanded(child: Container(width: 2, color: RumenoTheme.textLight.withValues(alpha: 0.4))),
+            ]),
+          ),
+          const SizedBox(width: 10),
+          // Date + weight + change
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Row(children: [
+                Text(DateFormat('dd MMM yy').format(date), style: const TextStyle(fontSize: 13, color: RumenoTheme.textGrey)),
+                const Spacer(),
+                Text('${weightKg.toStringAsFixed(1)} kg', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isLast ? RumenoTheme.primaryGreen : RumenoTheme.textDark)),
+                if (change != null) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: change! >= 0
+                          ? RumenoTheme.successGreen.withValues(alpha: 0.12)
+                          : RumenoTheme.errorRed.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '${change! >= 0 ? "+" : ""}${change!.toStringAsFixed(1)}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: change! >= 0 ? RumenoTheme.successGreen : RumenoTheme.errorRed,
+                      ),
+                    ),
+                  ),
+                ],
+              ]),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

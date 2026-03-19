@@ -520,6 +520,24 @@ class KidRecord {
   }
 }
 
+// ─── Weight Tracking ───
+
+class WeightRecord {
+  final String id;
+  final String animalId;
+  final DateTime date;
+  final double weightKg;
+  final String? notes;
+
+  const WeightRecord({
+    required this.id,
+    required this.animalId,
+    required this.date,
+    required this.weightKg,
+    this.notes,
+  });
+}
+
 enum LabReportStatus { pending, completed }
 
 class LabReport {
