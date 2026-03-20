@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../mock/mock_health.dart';
 import '../../../models/models.dart';
@@ -525,7 +526,7 @@ class _DewormingScreenState extends State<DewormingScreen>
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('Deworming'),
+        title: Text(AppLocalizations.of(context).healthCardDeworming),
         actions: const [VeterinarianButton(), MarketplaceButton()],
         bottom: TabBar(
           controller: _tabController,

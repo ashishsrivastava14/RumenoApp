@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
 import '../../widgets/common/marketplace_button.dart';
@@ -13,6 +14,7 @@ class OrderDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ecommerce = context.watch<EcommerceProvider>();
     final order = ecommerce.getOrderById(orderId);
 
@@ -29,7 +31,7 @@ class OrderDetailScreen extends StatelessWidget {
             children: [
               Icon(Icons.error_outline_rounded, size: 60, color: RumenoTheme.textLight),
               const SizedBox(height: 16),
-              const Text('Order not found'),
+              Text(l10n.orderDetailNotFound),
             ],
           ),
         ),
@@ -44,14 +46,14 @@ class OrderDetailScreen extends StatelessWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Order #${order.id}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+            Text(l10n.orderDetailTitle(order.id), style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
           ],
         ),
         leading: IconButton(icon: const Icon(Icons.arrow_back_rounded, size: 26), onPressed: () => context.go('/shop/orders')),
         actions: [
           IconButton(
             icon: const Icon(Icons.receipt_long_rounded),
-            tooltip: 'View Invoice',
+            tooltip: l10n.orderDetailViewInvoiceTooltip,
             onPressed: () => _showInvoiceSheet(context, order),
           ),
           const VeterinarianButton(),
@@ -76,41 +78,41 @@ class OrderDetailScreen extends StatelessWidget {
                       children: [
                         Icon(Icons.timeline_rounded, color: RumenoTheme.primaryGreen, size: 22),
                         const SizedBox(width: 8),
-                        Text('Order Status', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        Text(l10n.orderDetailStatusCardTitle, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const SizedBox(height: 16),
                     _TimelineStep(
                       icon: Icons.receipt_long_rounded,
-                      title: 'Order Placed',
+                      title: l10n.orderDetailTimelinePlaced,
                       subtitle: dateFormat.format(order.orderDate),
                       isCompleted: true,
                       isFirst: true,
                     ),
                     _TimelineStep(
                       icon: Icons.check_circle_rounded,
-                      title: 'Confirmed',
-                      subtitle: order.status.index >= OrderStatus.confirmed.index ? 'Order confirmed' : 'Pending',
+                      title: l10n.orderDetailTimelineConfirmed,
+                      subtitle: order.status.index >= OrderStatus.confirmed.index ? l10n.orderDetailTimelineConfirmedDesc : l10n.orderDetailTimelinePending,
                       isCompleted: order.status.index >= OrderStatus.confirmed.index,
                     ),
                     _TimelineStep(
                       icon: Icons.inventory_2_rounded,
-                      title: 'Packed',
-                      subtitle: order.packedDate != null ? dateFormat.format(order.packedDate!) : 'Pending',
+                      title: l10n.orderDetailTimelinePacked,
+                      subtitle: order.packedDate != null ? dateFormat.format(order.packedDate!) : l10n.orderDetailTimelinePending,
                       isCompleted: order.status.index >= OrderStatus.packed.index,
                     ),
                     _TimelineStep(
                       icon: Icons.local_shipping_rounded,
-                      title: 'Shipped',
+                      title: l10n.orderDetailTimelineShipped,
                       subtitle: order.shippedDate != null
-                          ? '${dateFormat.format(order.shippedDate!)}\nTracking: ${order.trackingNumber ?? "N/A"}'
-                          : 'Pending',
+                          ? '${dateFormat.format(order.shippedDate!)}\n${l10n.orderDetailTimelineShippedTracking(order.trackingNumber ?? "N/A")}'
+                          : l10n.orderDetailTimelinePending,
                       isCompleted: order.status.index >= OrderStatus.shipped.index,
                     ),
                     _TimelineStep(
                       icon: Icons.home_rounded,
-                      title: 'Delivered',
-                      subtitle: order.deliveredDate != null ? dateFormat.format(order.deliveredDate!) : 'Pending',
+                      title: l10n.orderDetailTimelineDelivered,
+                      subtitle: order.deliveredDate != null ? dateFormat.format(order.deliveredDate!) : l10n.orderDetailTimelinePending,
                       isCompleted: order.status == OrderStatus.delivered,
                       isLast: true,
                     ),
@@ -134,7 +136,7 @@ class OrderDetailScreen extends StatelessWidget {
                       children: [
                         Icon(Icons.shopping_bag_rounded, color: RumenoTheme.primaryGreen, size: 22),
                         const SizedBox(width: 8),
-                        Text('Items (${order.items.length})', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        Text(l10n.orderDetailItemsLabel(order.items.length), style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const Divider(height: 20),
@@ -187,7 +189,7 @@ class OrderDetailScreen extends StatelessWidget {
                                           child: Text('× ${item.quantity}', style: TextStyle(color: RumenoTheme.primaryGreen, fontSize: 13, fontWeight: FontWeight.bold)),
                                         ),
                                         const SizedBox(width: 8),
-                                        Text('₹${item.price.toStringAsFixed(0)} each', style: TextStyle(color: RumenoTheme.textGrey, fontSize: 12)),
+                                        Text(l10n.orderDetailEachLabel(item.price.toStringAsFixed(0)), style: TextStyle(color: RumenoTheme.textGrey, fontSize: 12)),
                                       ],
                                     ),
                                   ],
@@ -217,7 +219,7 @@ class OrderDetailScreen extends StatelessWidget {
                       children: [
                         Icon(Icons.location_on_rounded, color: RumenoTheme.primaryGreen, size: 22),
                         const SizedBox(width: 8),
-                        Text('Delivery Address', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        Text(l10n.orderDetailDeliveryAddress, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -273,24 +275,24 @@ class OrderDetailScreen extends StatelessWidget {
                       children: [
                         Icon(Icons.payments_rounded, color: RumenoTheme.primaryGreen, size: 22),
                         const SizedBox(width: 8),
-                        Text('Payment', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        Text(l10n.orderDetailPaymentTitle, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    _priceRow(Icons.money_rounded, 'Payment Method', order.paymentMethod),
-                    if (order.paymentId != null) _priceRow(Icons.tag_rounded, 'Payment ID', order.paymentId!),
+                    _priceRow(Icons.money_rounded, l10n.orderDetailPaymentMethod, order.paymentMethod),
+                    if (order.paymentId != null) _priceRow(Icons.tag_rounded, l10n.orderDetailPaymentId, order.paymentId!),
                     const Divider(height: 20),
-                    _priceRow(Icons.shopping_cart_rounded, 'Subtotal', '₹${order.subtotal.toStringAsFixed(0)}'),
+                    _priceRow(Icons.shopping_cart_rounded, l10n.orderDetailSubtotal, '₹${order.subtotal.toStringAsFixed(0)}'),
                     if (order.discount > 0)
                       _priceRow(
                         Icons.local_offer_rounded,
-                        'Discount${order.couponCode != null ? ' (${order.couponCode})' : ''}',
+                        l10n.orderDetailDiscount,
                         '-₹${order.discount.toStringAsFixed(0)}',
                         valueColor: RumenoTheme.successGreen,
                       ),
                     _priceRow(
                       Icons.local_shipping_rounded,
-                      'Delivery',
+                      l10n.orderDetailDelivery,
                       order.deliveryCharge == 0 ? 'FREE' : '₹${order.deliveryCharge.toStringAsFixed(0)}',
                       valueColor: order.deliveryCharge == 0 ? RumenoTheme.successGreen : null,
                     ),
@@ -345,7 +347,7 @@ class OrderDetailScreen extends StatelessWidget {
                           children: [
                             const Icon(Icons.check_circle, color: Colors.white, size: 20),
                             const SizedBox(width: 8),
-                            const Text('Items added to cart'),
+                            Text(l10n.orderDetailItemsAddedToCart),
                           ],
                         ),
                         behavior: SnackBarBehavior.floating,
@@ -355,7 +357,7 @@ class OrderDetailScreen extends StatelessWidget {
                     context.go('/shop/cart');
                   },
                   icon: const Icon(Icons.replay_rounded, size: 22),
-                  label: const Text('Reorder', style: TextStyle(fontSize: 15)),
+                  label: Text(l10n.orderDetailReorderButton, style: const TextStyle(fontSize: 15)),
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     side: BorderSide(color: RumenoTheme.primaryGreen, width: 1.5),

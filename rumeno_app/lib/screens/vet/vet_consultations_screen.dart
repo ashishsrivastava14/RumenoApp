@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../mock/mock_animals.dart';
 import '../../mock/mock_health.dart';
 import '../../models/models.dart';
@@ -28,10 +29,11 @@ class _VetConsultationsScreenState extends State<VetConsultationsScreen> {
       return matchStatus && matchSearch;
     }).toList();
 
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('All Consultations'),
+        title: Text(l10n.vetConsultationsTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
@@ -51,7 +53,7 @@ class _VetConsultationsScreenState extends State<VetConsultationsScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Search diagnosis or treatment...',
+                hintText: l10n.vetConsultationsSearchHint,
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: Colors.white,
@@ -72,21 +74,21 @@ class _VetConsultationsScreenState extends State<VetConsultationsScreen> {
               child: Row(
                 children: [
                   _StatusChip(
-                    label: 'All',
+                    label: l10n.commonAll,
                     selected: _filter == null,
                     color: RumenoTheme.primaryGreen,
                     onTap: () => setState(() => _filter = null),
                   ),
                   const SizedBox(width: 8),
                   _StatusChip(
-                    label: 'Active',
+                    label: l10n.commonActive,
                     selected: _filter == TreatmentStatus.active,
                     color: Colors.red,
                     onTap: () => setState(() => _filter = TreatmentStatus.active),
                   ),
                   const SizedBox(width: 8),
                   _StatusChip(
-                    label: 'Follow-up',
+                    label: l10n.commonFollowUp,
                     selected: _filter == TreatmentStatus.followUp,
                     color: Colors.orange,
                     onTap: () =>
@@ -94,7 +96,7 @@ class _VetConsultationsScreenState extends State<VetConsultationsScreen> {
                   ),
                   const SizedBox(width: 8),
                   _StatusChip(
-                    label: 'Completed',
+                    label: l10n.commonCompleted,
                     selected: _filter == TreatmentStatus.completed,
                     color: Colors.green,
                     onTap: () =>
@@ -121,8 +123,8 @@ class _VetConsultationsScreenState extends State<VetConsultationsScreen> {
           ),
           Expanded(
             child: filtered.isEmpty
-                ? const Center(
-                    child: Text('No consultations match your filter.'))
+                ? Center(
+                    child: Text(l10n.vetConsultationsEmpty))
                 : ListView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                     itemCount: filtered.length,
@@ -189,14 +191,14 @@ class _ConsultationCard extends StatelessWidget {
     }
   }
 
-  String _statusLabel(TreatmentStatus s) {
+  String _statusLabel(TreatmentStatus s, AppLocalizations l10n) {
     switch (s) {
       case TreatmentStatus.active:
-        return 'Active';
+        return l10n.commonActive;
       case TreatmentStatus.completed:
-        return 'Completed';
+        return l10n.commonCompleted;
       case TreatmentStatus.followUp:
-        return 'Follow-up';
+        return l10n.commonFollowUp;
     }
   }
 
@@ -211,6 +213,7 @@ class _ConsultationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final color = _statusColor(record.status);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -242,7 +245,7 @@ class _ConsultationCard extends StatelessWidget {
                   color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Text(_statusLabel(record.status),
+                child: Text(_statusLabel(record.status, l10n),
                     style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,

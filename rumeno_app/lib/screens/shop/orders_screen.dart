@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
 import '../../widgets/common/marketplace_button.dart';
@@ -13,6 +14,7 @@ class OrdersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ecommerce = context.watch<EcommerceProvider>();
     final orders = ecommerce.orders;
 
@@ -23,10 +25,10 @@ class OrdersScreen extends StatelessWidget {
           children: [
             const Icon(Icons.receipt_long_rounded, size: 24),
             const SizedBox(width: 8),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('My Orders', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(l10n.ordersTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ],
             ),
           ],
@@ -48,7 +50,7 @@ class OrdersScreen extends StatelessWidget {
                     child: Icon(Icons.receipt_long_outlined, size: 70, color: RumenoTheme.textLight),
                   ),
                   const SizedBox(height: 20),
-                  Text('No Orders Yet', style: Theme.of(context).textTheme.titleLarge),
+                  Text(l10n.ordersEmpty, style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 28),
                   SizedBox(
                     height: 50,
@@ -56,7 +58,7 @@ class OrdersScreen extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () => context.go('/shop'),
                       icon: const Icon(Icons.shopping_bag_rounded, size: 22),
-                      label: const Text('Start Shopping', textAlign: TextAlign.center, style: TextStyle(fontSize: 14)),
+                      label: Text(l10n.ordersStartShopping, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14)),
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
@@ -84,6 +86,7 @@ class _OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final dateFormat = DateFormat('dd MMM yyyy');
 
     return Card(
@@ -182,7 +185,7 @@ class _OrderCard extends StatelessWidget {
                 children: [
                   Icon(Icons.payments_rounded, size: 18, color: RumenoTheme.primaryGreen),
                   const SizedBox(width: 6),
-                  const Text('Total:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  Text('Total:', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   const Spacer(),
                   Text(
                     '₹${order.totalAmount.toStringAsFixed(0)}',
@@ -198,7 +201,7 @@ class _OrderCard extends StatelessWidget {
                     child: OutlinedButton.icon(
                       onPressed: () => context.go('/shop/order/${order.id}'),
                       icon: const Icon(Icons.visibility_rounded, size: 16),
-                      label: const Text('View Details', style: TextStyle(fontSize: 12)),
+                      label: Text(l10n.orderViewDetailsButton, style: TextStyle(fontSize: 12, color: RumenoTheme.textGrey)),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -212,7 +215,7 @@ class _OrderCard extends StatelessWidget {
                     child: OutlinedButton.icon(
                       onPressed: () => context.go('/shop/order/${order.id}'),
                       icon: Icon(Icons.receipt_long_rounded, size: 16, color: RumenoTheme.primaryGreen),
-                      label: Text('Invoice', style: TextStyle(fontSize: 12, color: RumenoTheme.primaryGreen)),
+                      label: Text(l10n.orderInvoiceButton, style: TextStyle(fontSize: 12, color: RumenoTheme.primaryGreen)),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -230,7 +233,7 @@ class _OrderCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        order.trackingNumber != null ? 'Tracking: ${order.trackingNumber}' : 'Tracking will be updated soon',
+                        order.trackingNumber != null ? 'Tracking: ${order.trackingNumber}' : l10n.orderTrackingComingSoon,
                         style: TextStyle(color: RumenoTheme.infoBlue, fontSize: 11),
                       ),
                     ),
@@ -252,11 +255,12 @@ class _OrderProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final steps = [
-      {'icon': Icons.check_circle_rounded, 'label': 'Placed'},
-      {'icon': Icons.inventory_2_rounded, 'label': 'Packed'},
-      {'icon': Icons.local_shipping_rounded, 'label': 'Shipped'},
-      {'icon': Icons.home_rounded, 'label': 'Delivered'},
+      {'icon': Icons.check_circle_rounded, 'label': l10n.orderProgressPlaced},
+      {'icon': Icons.inventory_2_rounded, 'label': l10n.orderProgressPacked},
+      {'icon': Icons.local_shipping_rounded, 'label': l10n.orderProgressShipped},
+      {'icon': Icons.home_rounded, 'label': l10n.orderProgressDelivered},
     ];
 
     int activeIndex;

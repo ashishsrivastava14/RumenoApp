@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
 
@@ -17,16 +18,16 @@ class _LoginScreenState extends State<LoginScreen> {
   final _phoneController = TextEditingController(text: '9876543210');
   bool _otpSent = false;
 
-  String _roleName(UserRole? role) {
+  String _roleName(UserRole? role, AppLocalizations l10n) {
     switch (role) {
       case UserRole.farmer:
-        return 'Farm Owner';
+        return l10n.authRoleFarmOwner;
       case UserRole.vet:
-        return 'Veterinarian';
+        return l10n.authRoleVet;
       case UserRole.admin:
-        return 'Super Admin';
+        return l10n.authRoleSuperAdmin;
       case UserRole.farmProducts:
-        return 'Farm Products';
+        return l10n.authRoleFarmProducts;
       case null:
         return '';
     }
@@ -70,6 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final role = context.watch<AuthProvider>().selectedRole;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       body: Container(
@@ -166,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Text(_roleEmoji(role), style: const TextStyle(fontSize: 20)),
                                 const SizedBox(width: 10),
                                 Text(
-                                  _roleName(role),
+                                  _roleName(role, l10n),
                                   style: TextStyle(
                                     color: RumenoTheme.primaryGreen,
                                     fontWeight: FontWeight.w700,
@@ -179,14 +181,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 32),
                           // Welcome text
                           Text(
-                            'Welcome Back!',
+                            l10n.loginWelcomeBack,
                             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Enter your phone number to continue',
+                            l10n.loginEnterPhonePrompt,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Colors.black54,
                             ),
@@ -214,8 +216,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   keyboardType: TextInputType.phone,
                                   maxLength: 10,
                                   decoration: InputDecoration(
-                                    labelText: 'Phone Number',
-                                    prefixText: '+91 ',
+                                    labelText: l10n.loginPhoneLabel,
+                                    prefixText: l10n.loginPhonePrefix,
                                     prefixIcon: Icon(Icons.phone_android, color: RumenoTheme.primaryGreen),
                                     counterText: '',
                                     filled: true,
@@ -232,16 +234,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                         if (_phoneController.text.length == 10) {
                                           setState(() => _otpSent = true);
                                           ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text('OTP sent: 1234 (mock)')),
+                                            SnackBar(content: Text(l10n.loginOtpSentSnackbar)),
                                           );
                                         }
                                       },
-                                      child: const Text('Send OTP', style: TextStyle(fontSize: 16)),
+                                      child: Text(l10n.loginSendOtpButton, style: const TextStyle(fontSize: 16)),
                                     ),
                                   ),
                                 if (_otpSent) ...[
                                   Text(
-                                    'Enter the OTP sent to +91 ${_phoneController.text}',
+                                    l10n.loginOtpPrompt(_phoneController.text),
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: Colors.black54,
                                     ),
@@ -258,7 +260,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           context.go('/otp');
                                         }
                                       },
-                                      child: const Text('Enter OTP', style: TextStyle(fontSize: 16)),
+                                      child: Text(l10n.loginEnterOtpButton, style: const TextStyle(fontSize: 16)),
                                     ),
                                   ),
                                 ],

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../models/models.dart';
 import '../../../widgets/common/marketplace_button.dart';
@@ -102,7 +103,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('Add New Animal'),
+        title: Text(AppLocalizations.of(context).addAnimalTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {

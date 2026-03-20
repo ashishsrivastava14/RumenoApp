@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_health.dart';
 import '../../../models/models.dart';
 import '../../../widgets/cards/vaccination_card.dart';
@@ -244,8 +245,8 @@ class _VaccinationScreenState extends State<VaccinationScreen>
                       );
                     },
                     icon: const Icon(Icons.save),
-                    label: const Text('Save Record',
-                        style: TextStyle(
+                    label: Text(AppLocalizations.of(context).commonSaveRecord,
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: RumenoTheme.primaryGreen,
@@ -338,7 +339,7 @@ class _VaccinationScreenState extends State<VaccinationScreen>
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('Vaccinations'),
+        title: Text(AppLocalizations.of(context).vaccinationTitle),
         actions: const [VeterinarianButton(), MarketplaceButton()],
         bottom: TabBar(
           controller: _tabController,

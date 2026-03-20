@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../l10n/app_localizations.dart';
 
 class VetShell extends StatelessWidget {
   final Widget child;
@@ -15,6 +16,7 @@ class VetShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final idx = _currentIndex(context);
     return Scaffold(
       body: child,
@@ -38,26 +40,26 @@ class VetShell extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         indicatorColor: const Color(0xFF5B7A2E).withValues(alpha: 0.15),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard_rounded, color: Color(0xFF5B7A2E)),
-            label: 'Dashboard',
+            icon: const Icon(Icons.dashboard_outlined),
+            selectedIcon: const Icon(Icons.dashboard_rounded, color: Color(0xFF5B7A2E)),
+            label: l10n.navVetDashboard,
           ),
           NavigationDestination(
-            icon: Icon(Icons.agriculture_outlined),
-            selectedIcon: Icon(Icons.agriculture_rounded, color: Color(0xFF5B7A2E)),
-            label: 'Farms',
+            icon: const Icon(Icons.agriculture_outlined),
+            selectedIcon: const Icon(Icons.agriculture_rounded, color: Color(0xFF5B7A2E)),
+            label: l10n.navVetFarms,
           ),
           NavigationDestination(
-            icon: Icon(Icons.medical_services_outlined),
-            selectedIcon: Icon(Icons.medical_services_rounded, color: Color(0xFF5B7A2E)),
-            label: 'Health',
+            icon: const Icon(Icons.medical_services_outlined),
+            selectedIcon: const Icon(Icons.medical_services_rounded, color: Color(0xFF5B7A2E)),
+            label: l10n.navVetHealth,
           ),
           NavigationDestination(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF5B7A2E)),
-            label: 'Earnings',
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            selectedIcon: const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF5B7A2E)),
+            label: l10n.navVetEarnings,
           ),
         ],
       ),

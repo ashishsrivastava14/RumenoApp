@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/ecommerce_provider.dart';
+import '../../widgets/common/language_selector.dart';
 import '../../widgets/common/marketplace_button.dart';
 import 'shop_home_screen.dart';
 
@@ -14,6 +16,7 @@ class ShopAccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final user = auth.currentUser;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
@@ -22,10 +25,10 @@ class ShopAccountScreen extends StatelessWidget {
           children: [
             const Icon(Icons.person_rounded, size: 24),
             const SizedBox(width: 8),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('My Account', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(l10n.shopAccountTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ],
             ),
           ],
@@ -80,19 +83,19 @@ class ShopAccountScreen extends StatelessWidget {
               items: [
                 _MenuItem(
                   icon: Icons.receipt_long_rounded,
-                  label: 'My Orders',
+                  label: l10n.shopAccountMyOrders,
                   color: const Color(0xFF2196F3),
                   onTap: () => context.go('/shop/orders'),
                 ),
                 _MenuItem(
                   icon: Icons.location_on_rounded,
-                  label: 'Saved Addresses',
+                  label: l10n.shopAccountSavedAddresses,
                   color: const Color(0xFF4CAF50),
                   onTap: () => _showAddressesBottomSheet(context),
                 ),
                 _MenuItem(
                   icon: Icons.favorite_rounded,
-                  label: 'Wishlist',
+                  label: l10n.shopAccountWishlist,
                   color: const Color(0xFFE91E63),
                   onTap: () => _showWishlistBottomSheet(context),
                 ),
@@ -105,19 +108,19 @@ class ShopAccountScreen extends StatelessWidget {
               items: [
                 _MenuItem(
                   icon: Icons.agriculture_rounded,
-                  label: 'Livestock Farm Management',
+                  label: l10n.shopAccountFarmManagement,
                   color: const Color(0xFF8BC34A),
                   onTap: () => context.go('/farmer/dashboard'),
                 ),
                 _MenuItem(
                   icon: Icons.medical_services_rounded,
-                  label: 'Switch to Vet',
+                  label: l10n.shopAccountSwitchToVet,
                   color: const Color(0xFF009688),
                   onTap: () => context.go('/vet/dashboard'),
                 ),
                 _MenuItem(
                   icon: Icons.storefront_rounded,
-                  label: 'Become a Vendor',
+                  label: l10n.shopAccountBecomeVendor,
                   color: const Color(0xFFFF9800),
                   onTap: () => context.go('/shop/vendor-register'),
                 ),
@@ -129,49 +132,58 @@ class ShopAccountScreen extends StatelessWidget {
             _MenuCard(
               items: [
                 _MenuItem(
+                  icon: Icons.language_rounded,
+                  label: l10n.moreLanguage,
+                  color: const Color(0xFF3F51B5),
+                  onTap: () => showLanguageSelectorSheet(context),
+                ),
+                _MenuItem(
                   icon: Icons.help_rounded,
-                  label: 'Help & Support',
+                  label: l10n.shopAccountHelpSupport,
                   color: const Color(0xFF00BCD4),
                   onTap: () => _showHelpBottomSheet(context),
                 ),
                 _MenuItem(
                   icon: Icons.info_rounded,
-                  label: 'About Rumeno',
+                  label: l10n.shopAccountAbout,
                   color: const Color(0xFF607D8B),
                   onTap: () => _showAboutBottomSheet(context),
                 ),
                 _MenuItem(
                   icon: Icons.logout_rounded,
-                  label: 'Logout',
+                  label: l10n.shopAccountLogout,
                   color: RumenoTheme.errorRed,
                   onTap: () {
                     showDialog(
                       context: context,
-                      builder: (ctx) => AlertDialog(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        title: Row(
-                          children: [
-                            Icon(Icons.logout_rounded, color: RumenoTheme.errorRed),
-                            const SizedBox(width: 10),
-                            const Text('Logout?'),
+                      builder: (ctx) {
+                        final dialogL10n = AppLocalizations.of(ctx);
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          title: Row(
+                            children: [
+                              Icon(Icons.logout_rounded, color: RumenoTheme.errorRed),
+                              const SizedBox(width: 10),
+                              Text(dialogL10n.shopAccountLogoutDialogTitle),
+                            ],
+                          ),
+                          content: Text(dialogL10n.shopAccountLogoutDialogMessage),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: Text(dialogL10n.commonCancel),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                auth.logout();
+                                context.go('/shop');
+                              },
+                              child: Text(dialogL10n.shopAccountLogout, style: TextStyle(color: RumenoTheme.errorRed)),
+                            ),
                           ],
-                        ),
-                        content: const Text('Are you sure you want to logout?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx),
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(ctx);
-                              auth.logout();
-                              context.go('/shop');
-                            },
-                            child: Text('Logout', style: TextStyle(color: RumenoTheme.errorRed)),
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -213,7 +225,7 @@ class ShopAccountScreen extends StatelessWidget {
                 children: [
                   Icon(Icons.location_on_rounded, color: RumenoTheme.primaryGreen, size: 24),
                   const SizedBox(width: 8),
-                  const Text('Saved Addresses', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                  Text(AppLocalizations.of(context).shopAccountSavedAddresses, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -226,7 +238,7 @@ class ShopAccountScreen extends StatelessWidget {
                         children: [
                           Icon(Icons.location_off_rounded, size: 50, color: RumenoTheme.textLight),
                           const SizedBox(height: 12),
-                          const Text('No saved addresses'),
+                          Text(AppLocalizations.of(context).shopAccountNoAddresses),
                         ],
                       ),
                     )
@@ -328,7 +340,7 @@ class ShopAccountScreen extends StatelessWidget {
                 children: [
                   Icon(Icons.favorite_rounded, color: const Color(0xFFE91E63), size: 24),
                   const SizedBox(width: 8),
-                  const Text('Wishlist', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                  Text(AppLocalizations.of(context).shopAccountWishlist, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -341,7 +353,7 @@ class ShopAccountScreen extends StatelessWidget {
                         children: [
                           Icon(Icons.favorite_outline_rounded, size: 50, color: RumenoTheme.textLight),
                           const SizedBox(height: 12),
-                          const Text('No wishlist items'),
+                          Text(AppLocalizations.of(context).shopAccountNoWishlistItems),
                         ],
                       ),
                     )
@@ -455,7 +467,7 @@ class ShopAccountScreen extends StatelessWidget {
               children: [
                 Icon(Icons.help_rounded, color: const Color(0xFF00BCD4), size: 28),
                 const SizedBox(width: 10),
-                const Text('Help & Support', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(AppLocalizations.of(context).shopAccountHelpSupport, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ],
             ),
             const SizedBox(height: 20),

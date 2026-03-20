@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 
 class OrderSuccessScreen extends StatelessWidget {
   final String orderId;
@@ -8,6 +9,7 @@ class OrderSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       body: SafeArea(
@@ -39,7 +41,7 @@ class OrderSuccessScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 28),
                 Text(
-                  'Order Placed!',
+                  l10n.orderSuccessTitle,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     color: RumenoTheme.successGreen,
                     fontWeight: FontWeight.bold,
@@ -60,7 +62,7 @@ class OrderSuccessScreen extends StatelessWidget {
                     children: [
                       Icon(Icons.tag_rounded, size: 18, color: RumenoTheme.textGrey),
                       const SizedBox(width: 8),
-                      Text('Order ID: $orderId', style: TextStyle(color: RumenoTheme.textGrey, fontSize: 14, fontWeight: FontWeight.w500)),
+                      Text(l10n.orderSuccessOrderId(orderId), style: TextStyle(color: RumenoTheme.textGrey, fontSize: 14, fontWeight: FontWeight.w500)),
                     ],
                   ),
                 ),
@@ -81,7 +83,7 @@ class OrderSuccessScreen extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              'You will receive confirmation shortly',
+                              l10n.orderSuccessConfirmationPrompt,
                               style: TextStyle(color: RumenoTheme.textGrey, fontSize: 13),
                             ),
                           ),
@@ -94,7 +96,7 @@ class OrderSuccessScreen extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              'Delivery updates will be sent',
+                              l10n.orderSuccessDeliveryUpdates,
                               style: TextStyle(color: RumenoTheme.textGrey, fontSize: 13),
                             ),
                           ),
@@ -112,7 +114,7 @@ class OrderSuccessScreen extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () => context.go('/shop/orders'),
                     icon: const Icon(Icons.local_shipping_rounded, size: 22),
-                    label: const Text('Track Order', style: TextStyle(fontSize: 16)),
+                    label: Text(l10n.orderSuccessTrackButton, style: const TextStyle(fontSize: 16)),
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
@@ -127,7 +129,7 @@ class OrderSuccessScreen extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () => context.go('/shop'),
                     icon: const Icon(Icons.shopping_bag_rounded, size: 22),
-                    label: const Text('Continue Shopping', style: TextStyle(fontSize: 16)),
+                    label: Text(l10n.orderSuccessContinueButton, style: const TextStyle(fontSize: 16)),
                     style: OutlinedButton.styleFrom(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       side: BorderSide(color: RumenoTheme.primaryGreen, width: 1.5),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../mock/mock_milk.dart';
 import '../../../models/models.dart';
@@ -243,6 +244,7 @@ class _MilkLogScreenState extends State<MilkLogScreen> {
   }
 
   Widget _buildHeader(double todayTotal, int recordCount) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(6, 8, 16, 16),
       decoration: const BoxDecoration(
@@ -266,10 +268,10 @@ class _MilkLogScreenState extends State<MilkLogScreen> {
                 icon: const Icon(Icons.arrow_back_rounded,
                     color: Colors.white, size: 26),
               ),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Log Milk',
-                  style: TextStyle(
+                  l10n.milkLogTitle,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -294,7 +296,7 @@ class _MilkLogScreenState extends State<MilkLogScreen> {
                       const SizedBox(width: 6),
                       Text(
                         _isToday(_selectedDate)
-                            ? 'Today'
+                            ? l10n.commonToday
                             : DateFormat('dd MMM').format(_selectedDate),
                         style: const TextStyle(
                           color: Colors.white,

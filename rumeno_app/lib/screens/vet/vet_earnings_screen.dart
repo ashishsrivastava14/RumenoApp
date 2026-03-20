@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/common/stat_card.dart';
 import '../../widgets/charts/line_chart_widget.dart';
 import '../../widgets/charts/bar_chart_widget.dart';
@@ -11,10 +12,11 @@ class VetEarningsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('Earnings'),
+        title: Text(l10n.vetEarningsTitle),
         actions: const [FarmButton(), MarketplaceButton()],
       ),
       body: SingleChildScrollView(
@@ -24,24 +26,24 @@ class VetEarningsScreen extends StatelessWidget {
           children: [
             // Summary cards
             Row(
-              children: const [
-                Expanded(child: StatCard(title: 'This Month', value: '₹12,500', icon: Icons.currency_rupee)),
-                SizedBox(width: 10),
-                Expanded(child: StatCard(title: 'Total Earned', value: '₹68,400', icon: Icons.account_balance_wallet)),
+              children: [
+                Expanded(child: StatCard(title: l10n.vetEarningsStatThisMonth, value: '₹12,500', icon: Icons.currency_rupee)),
+                const SizedBox(width: 10),
+                Expanded(child: StatCard(title: l10n.vetEarningsStatTotalEarned, value: '₹68,400', icon: Icons.account_balance_wallet)),
               ],
             ),
             const SizedBox(height: 10),
             Row(
-              children: const [
-                Expanded(child: StatCard(title: 'Pending', value: '₹3,200', icon: Icons.hourglass_top)),
-                SizedBox(width: 10),
-                Expanded(child: StatCard(title: 'Commission %', value: '15%', icon: Icons.percent)),
+              children: [
+                Expanded(child: StatCard(title: l10n.vetEarningsStatPending, value: '₹3,200', icon: Icons.hourglass_top)),
+                const SizedBox(width: 10),
+                Expanded(child: StatCard(title: l10n.vetEarningsStatCommission, value: '15%', icon: Icons.percent)),
               ],
             ),
             const SizedBox(height: 24),
 
             // Monthly earnings chart
-            Text('Monthly Earnings', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.vetEarningsChartTitle, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             SizedBox(
               height: 200,
@@ -61,29 +63,29 @@ class VetEarningsScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Commission breakdown
-            Text('Commission Breakdown', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.vetEarningsCommissionBreakdown, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             SizedBox(
               height: 200,
               child: BarChartWidget(
                 values: const [4500, 3200, 2800, 1200, 800],
-                labels: const ['Consults', 'Referrals', 'Vaccinations', 'Treatments', 'Products'],
+                labels: [l10n.vetEarningsBarConsults, l10n.vetEarningsBarReferrals, l10n.vetEarningsBarVaccinations, l10n.vetEarningsBarTreatments, l10n.vetEarningsBarProducts],
                 barColor: RumenoTheme.accentOlive,
               ),
             ),
             const SizedBox(height: 24),
 
             // Payout history
-            Text('Payout History', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.vetEarningsPayoutHistory, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
-            ..._buildPayouts(context),
+            ..._buildPayouts(context, l10n),
           ],
         ),
       ),
     );
   }
 
-  List<Widget> _buildPayouts(BuildContext context) {
+  List<Widget> _buildPayouts(BuildContext context, AppLocalizations l10n) {
     final payouts = [
       {'month': 'June 2025', 'amount': '₹11,800', 'date': '01 Jul 2025', 'status': 'Paid'},
       {'month': 'May 2025', 'amount': '₹10,200', 'date': '01 Jun 2025', 'status': 'Paid'},
@@ -108,7 +110,7 @@ class VetEarningsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(p['month']!, style: Theme.of(context).textTheme.titleSmall),
-                Text('Paid on ${p['date']}', style: Theme.of(context).textTheme.bodySmall),
+                Text(l10n.vetEarningsPayoutPaidOn(p['date']!), style: Theme.of(context).textTheme.bodySmall),
               ],
             ),
           ),

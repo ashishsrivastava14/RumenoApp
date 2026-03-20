@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
 import '../../widgets/common/marketplace_button.dart';
@@ -35,6 +36,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ecommerce = context.watch<EcommerceProvider>();
 
     var products = ecommerce.products;
@@ -56,7 +58,7 @@ class _SearchScreenState extends State<SearchScreen> {
             style: const TextStyle(color: Colors.white, fontSize: 16),
             cursorColor: Colors.white,
             decoration: InputDecoration(
-              hintText: 'Search...',
+              hintText: l10n.shopSearchHint,
               hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16),
               border: InputBorder.none,
               filled: true,
@@ -107,41 +109,41 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 _FilterChip(
                   icon: Icons.grid_view_rounded,
-                  label: 'All',
+                  label: l10n.shopCategoryAll,
                   isSelected: _filterCategory == null,
                   onTap: () => setState(() => _filterCategory = null),
                 ),
                 _FilterChip(
                   icon: Icons.grass_rounded,
-                  label: 'Feed',
+                  label: l10n.shopCategoryFeed,
                   isSelected: _filterCategory == ProductCategory.animalFeed,
                   onTap: () => setState(() => _filterCategory = ProductCategory.animalFeed),
                   color: const Color(0xFF4CAF50),
                 ),
                 _FilterChip(
                   icon: Icons.science_rounded,
-                  label: 'Supplements',
+                  label: l10n.shopCategorySupplements,
                   isSelected: _filterCategory == ProductCategory.supplements,
                   onTap: () => setState(() => _filterCategory = ProductCategory.supplements),
                   color: const Color(0xFFFF9800),
                 ),
                 _FilterChip(
                   icon: Icons.science_rounded,
-                  label: 'Tonic',
+                  label: l10n.shopCategoryTonic,
                   isSelected: _filterCategory == ProductCategory.tonic,
                   onTap: () => setState(() => _filterCategory = ProductCategory.tonic),
                   color: const Color(0xFFFF9800),
                 ),
                 _FilterChip(
                   icon: Icons.medication_rounded,
-                  label: 'Medicine',
+                  label: l10n.shopCategoryMedicine,
                   isSelected: _filterCategory == ProductCategory.veterinaryMedicines,
                   onTap: () => setState(() => _filterCategory = ProductCategory.veterinaryMedicines),
                   color: const Color(0xFFE53935),
                 ),
                 _FilterChip(
                   icon: Icons.construction_rounded,
-                  label: 'Tools',
+                  label: l10n.shopCategoryTools,
                   isSelected: _filterCategory == ProductCategory.farmEquipment,
                   onTap: () => setState(() => _filterCategory = ProductCategory.farmEquipment),
                   color: const Color(0xFF2196F3),
@@ -158,48 +160,48 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 _FilterChip(
                   icon: Icons.pets_rounded,
-                  label: 'All Animals',
+                  label: l10n.shopSearchAnimalFilterAll,
                   isSelected: _filterAnimal == null,
                   onTap: () => setState(() => _filterAnimal = null),
                 ),
                 _FilterChip(
                   icon: Icons.set_meal_rounded,
-                  label: 'Cattle',
+                  label: l10n.shopSearchAnimalFilterCattle,
                   isSelected: _filterAnimal == ProductAnimal.cattle,
                   onTap: () => setState(() => _filterAnimal = ProductAnimal.cattle),
                   color: const Color(0xFF795548),
                 ),
                 _FilterChip(
                   icon: Icons.cruelty_free_rounded,
-                  label: 'Goat',
+                  label: l10n.shopSearchAnimalFilterGoat,
                   isSelected: _filterAnimal == ProductAnimal.goat,
                   onTap: () => setState(() => _filterAnimal = ProductAnimal.goat),
                   color: const Color(0xFF8D6E63),
                 ),
                 _FilterChip(
                   icon: Icons.grain_rounded,
-                  label: 'Sheep',
+                  label: l10n.shopSearchAnimalFilterSheep,
                   isSelected: _filterAnimal == ProductAnimal.sheep,
                   onTap: () => setState(() => _filterAnimal = ProductAnimal.sheep),
                   color: const Color(0xFF90A4AE),
                 ),
                 _FilterChip(
                   icon: Icons.egg_alt_rounded,
-                  label: 'Poultry',
+                  label: l10n.shopSearchAnimalFilterPoultry,
                   isSelected: _filterAnimal == ProductAnimal.poultry,
                   onTap: () => setState(() => _filterAnimal = ProductAnimal.poultry),
                   color: const Color(0xFFFDD835),
                 ),
                 _FilterChip(
                   icon: Icons.sentiment_satisfied_rounded,
-                  label: 'Pig',
+                  label: l10n.shopSearchAnimalFilterPig,
                   isSelected: _filterAnimal == ProductAnimal.pig,
                   onTap: () => setState(() => _filterAnimal = ProductAnimal.pig),
                   color: const Color(0xFFF48FB1),
                 ),
                 _FilterChip(
                   icon: Icons.speed_rounded,
-                  label: 'Horse',
+                  label: l10n.shopSearchAnimalFilterHorse,
                   isSelected: _filterAnimal == ProductAnimal.horse,
                   onTap: () => setState(() => _filterAnimal = ProductAnimal.horse),
                   color: const Color(0xFF6D4C41),
@@ -215,7 +217,7 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Row(
                 children: [
                   Text(
-                    '${products.length} products found',
+                    l10n.shopSearchResultCount(products.length),
                     style: TextStyle(color: RumenoTheme.textGrey, fontSize: 13),
                   ),
                 ],
@@ -238,7 +240,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           child: Icon(Icons.search_off_rounded, size: 60, color: RumenoTheme.textLight),
                         ),
                         const SizedBox(height: 16),
-                        Text('No products found', style: TextStyle(color: RumenoTheme.textGrey, fontSize: 17)),
+                        Text(l10n.shopSearchNoResults, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 17)),
                       ],
                     ),
                   )

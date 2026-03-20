@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_health.dart';
 import '../../../models/models.dart';
 import '../../../widgets/common/marketplace_button.dart';
@@ -439,7 +440,7 @@ class _LabReportsScreenState extends State<LabReportsScreen>
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('Lab Reports'),
+        title: Text(AppLocalizations.of(context).healthCardLabReports),
         actions: const [VeterinarianButton(), MarketplaceButton()],
         bottom: TabBar(
           controller: _tabController,

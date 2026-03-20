@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
 
@@ -81,7 +82,7 @@ class _OtpScreenState extends State<OtpScreen> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid OTP. Use 1234'), backgroundColor: Colors.red),
+        SnackBar(content: Text(AppLocalizations.of(context).otpInvalidError), backgroundColor: Colors.red),
       );
     }
   }
@@ -100,6 +101,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
@@ -122,10 +124,10 @@ class _OtpScreenState extends State<OtpScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Verify OTP', style: Theme.of(context).textTheme.headlineLarge),
+              Text(l10n.otpTitle, style: Theme.of(context).textTheme.headlineLarge),
               const SizedBox(height: 8),
               Text(
-                'Enter the 4-digit code sent to your phone',
+                l10n.otpSubtitle,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 40),
@@ -166,17 +168,17 @@ class _OtpScreenState extends State<OtpScreen> {
               Center(
                 child: _resendTimer > 0
                     ? Text(
-                        'Resend OTP in ${_resendTimer}s',
+                        l10n.otpResendTimer(_resendTimer),
                         style: Theme.of(context).textTheme.bodySmall,
                       )
                     : TextButton(
                         onPressed: () {
                           _startTimer();
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('OTP resent: 1234 (mock)')),
+                            SnackBar(content: Text(l10n.otpResendSnackbar)),
                           );
                         },
-                        child: const Text('Resend OTP'),
+                        child: Text(l10n.otpResendButton),
                       ),
               ),
               const SizedBox(height: 32),
@@ -190,7 +192,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
-                      : const Text('Verify & Login'),
+                      : Text(l10n.otpVerifyLoginButton),
                 ),
               ),
               const SizedBox(height: 16),
@@ -202,7 +204,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'Mock OTP: 1234',
+                    l10n.otpMockLabel,
                     style: TextStyle(
                       color: RumenoTheme.warmBrown,
                       fontWeight: FontWeight.w600,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../mock/mock_animals.dart';
 import '../../mock/mock_health.dart';
 import '../../models/models.dart';
@@ -85,7 +86,7 @@ class _VetAnimalHealthScreenState extends State<VetAnimalHealthScreen>
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('Animal Health'),
+        title: Text(AppLocalizations.of(context).vetAnimalHealthTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
@@ -106,11 +107,11 @@ class _VetAnimalHealthScreenState extends State<VetAnimalHealthScreen>
           indicatorWeight: 3,
           labelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
           unselectedLabelStyle: const TextStyle(fontSize: 11),
-          tabs: const [
-            Tab(icon: Icon(Icons.dashboard_rounded, size: 20), text: 'Overview'),
-            Tab(icon: Icon(Icons.medical_information_rounded, size: 20), text: 'Records'),
-            Tab(icon: Icon(Icons.vaccines_rounded, size: 20), text: 'Vaccines'),
-            Tab(icon: Icon(Icons.add_circle_rounded, size: 20), text: 'Consult'),
+          tabs: [
+            Tab(icon: const Icon(Icons.dashboard_rounded, size: 20), text: AppLocalizations.of(context).vetAnimalHealthTabOverview),
+            Tab(icon: const Icon(Icons.medical_information_rounded, size: 20), text: AppLocalizations.of(context).vetAnimalHealthTabRecords),
+            Tab(icon: const Icon(Icons.vaccines_rounded, size: 20), text: AppLocalizations.of(context).vetAnimalHealthTabVaccines),
+            Tab(icon: const Icon(Icons.add_circle_rounded, size: 20), text: AppLocalizations.of(context).vetAnimalHealthTabConsult),
           ],
         ),
       ),
@@ -147,7 +148,7 @@ class _OverviewTab extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       children: [
         // ── Stats ──────────────────────────────────
-        _SectionHeader(icon: Icons.bar_chart_rounded, label: 'Health Summary'),
+        _SectionHeader(icon: Icons.bar_chart_rounded, label: AppLocalizations.of(context).vetAnimalHealthSummaryTitle),
         const SizedBox(height: 10),
         GridView.count(
           crossAxisCount: 2,
@@ -159,28 +160,28 @@ class _OverviewTab extends StatelessWidget {
           children: [
             _StatCard(
               icon: Icons.pets_rounded,
-              label: 'Total Animals',
+              label: AppLocalizations.of(context).vetAnimalHealthStatTotalAnimals,
               value: '${mockAnimals.length}',
               color: RumenoTheme.primaryGreen,
               emoji: '🐾',
             ),
             _StatCard(
               icon: Icons.sick_rounded,
-              label: 'Sick / Treating',
+              label: AppLocalizations.of(context).vetAnimalHealthStatSickTreating,
               value: '$sickCount active, $activeRx Rx',
               color: RumenoTheme.errorRed,
               emoji: '🤒',
             ),
             _StatCard(
               icon: Icons.vaccines_rounded,
-              label: 'Vaccines Overdue',
+              label: AppLocalizations.of(context).vetAnimalHealthStatVaccinesOverdue,
               value: '$overdueVax overdue, $dueVax due',
               color: overdueVax > 0 ? RumenoTheme.errorRed : RumenoTheme.warningYellow,
               emoji: '💉',
             ),
             _StatCard(
               icon: Icons.warning_amber_rounded,
-              label: 'Urgent Alerts',
+              label: AppLocalizations.of(context).vetAnimalHealthStatUrgentAlerts,
               value: highAlerts > 0 ? '$highAlerts alerts' : 'All clear',
               color: highAlerts > 0 ? RumenoTheme.errorRed : RumenoTheme.successGreen,
               emoji: highAlerts > 0 ? '🚨' : '✅',
@@ -190,29 +191,29 @@ class _OverviewTab extends StatelessWidget {
         const SizedBox(height: 20),
 
         // ── Quick Actions ───────────────────────────
-        _SectionHeader(icon: Icons.flash_on_rounded, label: 'Quick Actions'),
+        _SectionHeader(icon: Icons.flash_on_rounded, label: AppLocalizations.of(context).commonQuickActions),
         const SizedBox(height: 10),
         Row(
           children: [
-            Expanded(child: _QuickActionBtn(icon: Icons.add_circle_rounded, label: 'New Consult', color: RumenoTheme.primaryGreen, onTap: onConsultTap)),
+            Expanded(child: _QuickActionBtn(icon: Icons.add_circle_rounded, label: AppLocalizations.of(context).vetAnimalHealthQuickActionNewConsult, color: RumenoTheme.primaryGreen, onTap: onConsultTap)),
             const SizedBox(width: 10),
-            Expanded(child: _QuickActionBtn(icon: Icons.vaccines_rounded, label: 'Log Vaccine', color: RumenoTheme.infoBlue, onTap: () {})),
+            Expanded(child: _QuickActionBtn(icon: Icons.vaccines_rounded, label: AppLocalizations.of(context).vetAnimalHealthQuickActionLogVaccine, color: RumenoTheme.infoBlue, onTap: () {})),
             const SizedBox(width: 10),
-            Expanded(child: _QuickActionBtn(icon: Icons.science_rounded, label: 'Lab Report', color: RumenoTheme.accentOlive, onTap: () {})),
+            Expanded(child: _QuickActionBtn(icon: Icons.science_rounded, label: AppLocalizations.of(context).vetAnimalHealthQuickActionLabReport, color: RumenoTheme.accentOlive, onTap: () {})),
           ],
         ),
         const SizedBox(height: 20),
 
         // ── Alerts ─────────────────────────────────
         if (mockAlerts.isNotEmpty) ...[
-          _SectionHeader(icon: Icons.notifications_active_rounded, label: 'Alerts'),
+          _SectionHeader(icon: Icons.notifications_active_rounded, label: AppLocalizations.of(context).vetAnimalHealthAlertsSection),
           const SizedBox(height: 10),
           ...mockAlerts.map((alert) => _AlertTile(alert: alert)),
           const SizedBox(height: 20),
         ],
 
         // ── Upcoming Events ─────────────────────────
-        _SectionHeader(icon: Icons.event_rounded, label: 'Upcoming Events'),
+        _SectionHeader(icon: Icons.event_rounded, label: AppLocalizations.of(context).vetAnimalHealthUpcomingEventsSection),
         const SizedBox(height: 10),
         ...mockUpcomingEvents.map((evt) => _EventTile(evt: evt)),
       ],
@@ -449,7 +450,7 @@ class _RecordsTabState extends State<_RecordsTab> {
             child: Row(
               children: [
                 _FilterChip(
-                  label: 'All',
+                  label: AppLocalizations.of(context).commonAll,
                   icon: Icons.list_rounded,
                   selected: _filter == null,
                   color: RumenoTheme.primaryGreen,
@@ -457,7 +458,7 @@ class _RecordsTabState extends State<_RecordsTab> {
                 ),
                 const SizedBox(width: 8),
                 _FilterChip(
-                  label: 'Active',
+                  label: AppLocalizations.of(context).commonActive,
                   icon: Icons.local_hospital_rounded,
                   selected: _filter == TreatmentStatus.active,
                   color: RumenoTheme.errorRed,
@@ -465,7 +466,7 @@ class _RecordsTabState extends State<_RecordsTab> {
                 ),
                 const SizedBox(width: 8),
                 _FilterChip(
-                  label: 'Follow-up',
+                  label: AppLocalizations.of(context).commonFollowUp,
                   icon: Icons.schedule_rounded,
                   selected: _filter == TreatmentStatus.followUp,
                   color: RumenoTheme.warningYellow,
@@ -473,7 +474,7 @@ class _RecordsTabState extends State<_RecordsTab> {
                 ),
                 const SizedBox(width: 8),
                 _FilterChip(
-                  label: 'Completed',
+                  label: AppLocalizations.of(context).commonCompleted,
                   icon: Icons.check_circle_rounded,
                   selected: _filter == TreatmentStatus.completed,
                   color: RumenoTheme.successGreen,
@@ -486,7 +487,7 @@ class _RecordsTabState extends State<_RecordsTab> {
         // List
         Expanded(
           child: filtered.isEmpty
-              ? const _EmptyState(emoji: '🩺', message: 'No records for this filter')
+              ? _EmptyState(emoji: '🩺', message: AppLocalizations.of(context).vetAnimalHealthNoRecords)
               : ListView.builder(
                   padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
                   itemCount: filtered.length,
@@ -517,11 +518,11 @@ class _TreatmentCardState extends State<_TreatmentCard> {
     }
   }
 
-  String get _statusLabel {
+  String _statusLabel(AppLocalizations l10n) {
     switch (widget.record.status) {
-      case TreatmentStatus.active:    return 'Active';
-      case TreatmentStatus.completed: return 'Completed';
-      case TreatmentStatus.followUp:  return 'Follow-up';
+      case TreatmentStatus.active:    return l10n.commonActive;
+      case TreatmentStatus.completed: return l10n.commonCompleted;
+      case TreatmentStatus.followUp:  return l10n.commonFollowUp;
     }
   }
 
@@ -535,6 +536,7 @@ class _TreatmentCardState extends State<_TreatmentCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final animal = _animalById(widget.record.animalId);
     return GestureDetector(
       onTap: () => setState(() => _expanded = !_expanded),
@@ -593,7 +595,7 @@ class _TreatmentCardState extends State<_TreatmentCard> {
                           children: [
                             Icon(_statusIcon, size: 13, color: _statusColor),
                             const SizedBox(width: 4),
-                            Text(_statusLabel, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: _statusColor)),
+                            Text(_statusLabel(l10n), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: _statusColor)),
                           ],
                         ),
                       ),
@@ -644,13 +646,13 @@ class _TreatmentCardState extends State<_TreatmentCard> {
                     children: [
                       Icon(Icons.calendar_today_rounded, size: 12, color: RumenoTheme.textGrey),
                       const SizedBox(width: 4),
-                      Text('Started: ${DateFormat('d MMM yyyy').format(widget.record.startDate)}',
+                      Text(l10n.vetAnimalHealthTreatmentStarted(DateFormat('d MMM yyyy').format(widget.record.startDate)),
                           style: const TextStyle(fontSize: 11, color: RumenoTheme.textGrey)),
                       if (widget.record.followUpDate != null) ...[
                         const SizedBox(width: 10),
                         Icon(Icons.event_repeat_rounded, size: 12, color: RumenoTheme.warningYellow),
                         const SizedBox(width: 4),
-                        Text('Follow-up: ${DateFormat('d MMM').format(widget.record.followUpDate!)}',
+                        Text(l10n.vetFarmDetailFollowUpDate(DateFormat('d MMM').format(widget.record.followUpDate!)),
                             style: const TextStyle(fontSize: 11, color: RumenoTheme.warningYellow, fontWeight: FontWeight.w600)),
                       ],
                     ],
@@ -672,7 +674,7 @@ class _TreatmentCardState extends State<_TreatmentCard> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(_expanded ? 'Hide Details' : 'View Details',
+                    Text(_expanded ? l10n.vetAnimalHealthHideDetails : l10n.vetAnimalHealthViewDetails,
                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _statusColor)),
                     Icon(_expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 16, color: _statusColor),
                   ],
@@ -687,15 +689,15 @@ class _TreatmentCardState extends State<_TreatmentCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Divider(height: 14),
-                    _DetailRow(icon: Icons.vaccines_rounded, label: 'Treatment', value: widget.record.treatment),
+                    _DetailRow(icon: Icons.vaccines_rounded, label: l10n.vetAnimalHealthDetailTreatmentLabel, value: widget.record.treatment),
                     if (widget.record.vetName.isNotEmpty)
-                      _DetailRow(icon: Icons.person_rounded, label: 'Vet', value: widget.record.vetName),
+                      _DetailRow(icon: Icons.person_rounded, label: l10n.vetAnimalHealthDetailVetLabel, value: widget.record.vetName),
                     if (widget.record.withdrawalDays != null)
-                      _DetailRow(icon: Icons.do_not_disturb_on_rounded, label: 'Withdrawal', value: '${widget.record.withdrawalDays} days (no milk/meat)'),
+                      _DetailRow(icon: Icons.do_not_disturb_on_rounded, label: l10n.vetAnimalHealthDetailWithdrawalLabel, value: l10n.vetAnimalHealthWithdrawalValue(widget.record.withdrawalDays!)),
                     if (widget.record.endDate != null)
-                      _DetailRow(icon: Icons.event_available_rounded, label: 'Ended', value: DateFormat('d MMM yyyy').format(widget.record.endDate!)),
+                      _DetailRow(icon: Icons.event_available_rounded, label: l10n.vetAnimalHealthDetailEndedLabel, value: DateFormat('d MMM yyyy').format(widget.record.endDate!)),
                     if (widget.record.notes != null)
-                      _DetailRow(icon: Icons.notes_rounded, label: 'Notes', value: widget.record.notes!),
+                      _DetailRow(icon: Icons.notes_rounded, label: l10n.commonNotes, value: widget.record.notes!),
                   ],
                 ),
               ),
@@ -759,13 +761,13 @@ class _VaccinationsTabState extends State<_VaccinationsTab> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _FilterChip(label: 'All', icon: Icons.list_rounded, selected: _filter == null, color: RumenoTheme.primaryGreen, onTap: () => setState(() => _filter = null)),
+                _FilterChip(label: AppLocalizations.of(context).commonAll, icon: Icons.list_rounded, selected: _filter == null, color: RumenoTheme.primaryGreen, onTap: () => setState(() => _filter = null)),
                 const SizedBox(width: 8),
-                _FilterChip(label: 'Overdue', icon: Icons.warning_rounded, selected: _filter == VaccinationStatus.overdue, color: RumenoTheme.errorRed, onTap: () => setState(() => _filter = VaccinationStatus.overdue)),
+                _FilterChip(label: AppLocalizations.of(context).commonOverdue, icon: Icons.warning_rounded, selected: _filter == VaccinationStatus.overdue, color: RumenoTheme.errorRed, onTap: () => setState(() => _filter = VaccinationStatus.overdue)),
                 const SizedBox(width: 8),
-                _FilterChip(label: 'Due Soon', icon: Icons.schedule_rounded, selected: _filter == VaccinationStatus.due, color: RumenoTheme.warningYellow, onTap: () => setState(() => _filter = VaccinationStatus.due)),
+                _FilterChip(label: AppLocalizations.of(context).commonDueSoon, icon: Icons.schedule_rounded, selected: _filter == VaccinationStatus.due, color: RumenoTheme.warningYellow, onTap: () => setState(() => _filter = VaccinationStatus.due)),
                 const SizedBox(width: 8),
-                _FilterChip(label: 'Done', icon: Icons.check_circle_rounded, selected: _filter == VaccinationStatus.done, color: RumenoTheme.successGreen, onTap: () => setState(() => _filter = VaccinationStatus.done)),
+                _FilterChip(label: AppLocalizations.of(context).commonDone, icon: Icons.check_circle_rounded, selected: _filter == VaccinationStatus.done, color: RumenoTheme.successGreen, onTap: () => setState(() => _filter = VaccinationStatus.done)),
               ],
             ),
           ),
@@ -777,16 +779,16 @@ class _VaccinationsTabState extends State<_VaccinationsTab> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _VaxStat(count: mockVaccinations.where((v) => v.status == VaccinationStatus.overdue).length, label: 'Overdue', color: RumenoTheme.errorRed),
-              _VaxStat(count: mockVaccinations.where((v) => v.status == VaccinationStatus.due).length, label: 'Due', color: RumenoTheme.warningYellow),
-              _VaxStat(count: mockVaccinations.where((v) => v.status == VaccinationStatus.done).length, label: 'Done', color: RumenoTheme.successGreen),
+              _VaxStat(count: mockVaccinations.where((v) => v.status == VaccinationStatus.overdue).length, label: AppLocalizations.of(context).commonOverdue, color: RumenoTheme.errorRed),
+              _VaxStat(count: mockVaccinations.where((v) => v.status == VaccinationStatus.due).length, label: AppLocalizations.of(context).commonDue, color: RumenoTheme.warningYellow),
+              _VaxStat(count: mockVaccinations.where((v) => v.status == VaccinationStatus.done).length, label: AppLocalizations.of(context).commonDone, color: RumenoTheme.successGreen),
             ],
           ),
         ),
         // List
         Expanded(
           child: filtered.isEmpty
-              ? const _EmptyState(emoji: '💉', message: 'No vaccinations here')
+              ? _EmptyState(emoji: '💉', message: AppLocalizations.of(context).vetAnimalHealthNoVaccinations)
               : ListView.builder(
                   padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
                   itemCount: filtered.length,
@@ -840,16 +842,17 @@ class _VaccineCard extends StatelessWidget {
     }
   }
 
-  String get _label {
+  String _labelFor(AppLocalizations l10n) {
     switch (record.status) {
-      case VaccinationStatus.done:    return 'Done ✓';
-      case VaccinationStatus.due:     return 'Due Soon';
-      case VaccinationStatus.overdue: return 'Overdue!';
+      case VaccinationStatus.done:    return '${l10n.commonDone} ✓';
+      case VaccinationStatus.due:     return l10n.commonDueSoon;
+      case VaccinationStatus.overdue: return '${l10n.commonOverdue}!';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final animal = _animalById(record.animalId);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -898,8 +901,8 @@ class _VaccineCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       record.status == VaccinationStatus.done
-                          ? 'Given: ${DateFormat('d MMM yyyy').format(record.dateAdministered!)}'
-                          : 'Due: ${DateFormat('d MMM yyyy').format(record.dueDate)}',
+                          ? l10n.vetFarmDetailGivenDate(DateFormat('d MMM yyyy').format(record.dateAdministered!))
+                          : l10n.vetFarmDetailDueDate(DateFormat('d MMM yyyy').format(record.dueDate)),
                       style: TextStyle(fontSize: 11, color: record.status == VaccinationStatus.overdue ? RumenoTheme.errorRed : RumenoTheme.textGrey, fontWeight: record.status == VaccinationStatus.overdue ? FontWeight.w700 : FontWeight.normal),
                     ),
                   ],
@@ -910,7 +913,7 @@ class _VaccineCard extends StatelessWidget {
                     children: [
                       Icon(Icons.event_repeat_rounded, size: 12, color: RumenoTheme.infoBlue),
                       const SizedBox(width: 4),
-                      Text('Next: ${DateFormat('d MMM yyyy').format(record.nextDueDate!)}',
+                      Text(l10n.vetFarmDetailNextDate(DateFormat('d MMM yyyy').format(record.nextDueDate!)),
                           style: const TextStyle(fontSize: 11, color: RumenoTheme.infoBlue)),
                     ],
                   ),
@@ -936,7 +939,7 @@ class _VaccineCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                 decoration: BoxDecoration(color: _col.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
-                child: Text(_label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _col)),
+                child: Text(_labelFor(l10n), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _col)),
               ),
             ],
           ),
@@ -976,6 +979,29 @@ class _ConsultTabState extends State<_ConsultTab> {
     'No follow-up', 'After 3 days', 'After 1 week', 'After 2 weeks', 'After 1 month',
   ];
 
+  String _symptomLabel(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'Loss of appetite':  return l10n.vetAnimalHealthSymptomLossOfAppetite;
+      case 'Lethargy':          return l10n.vetAnimalHealthSymptomLethargy;
+      case 'Lameness':          return l10n.vetAnimalHealthSymptomLameness;
+      case 'Swelling':          return l10n.vetAnimalHealthSymptomSwelling;
+      case 'Diarrhea':          return l10n.vetAnimalHealthSymptomDiarrhea;
+      case 'Cough':             return l10n.vetAnimalHealthSymptomCough;
+      case 'Nasal discharge':   return l10n.vetAnimalHealthSymptomNasalDischarge;
+      case 'Reduced milk':      return l10n.vetAnimalHealthSymptomReducedMilk;
+      default:                  return l10n.vetAnimalHealthSymptomFever;
+    }
+  }
+
+  String _followUpLabel(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'After 3 days':   return l10n.vetAnimalHealthConsultFollowUp3Days;
+      case 'After 1 week':   return l10n.vetAnimalHealthConsultFollowUp1Week;
+      case 'After 2 weeks':  return l10n.vetAnimalHealthConsultFollowUp2Weeks;
+      case 'After 1 month':  return l10n.vetAnimalHealthConsultFollowUp1Month;
+      default:               return l10n.vetAnimalHealthConsultFollowUpNone;
+    }
+  }
   @override
   void dispose() {
     _diagnosisCtrl.dispose();
@@ -986,10 +1012,11 @@ class _ConsultTabState extends State<_ConsultTab> {
   }
 
   void _save() {
+    final l10n = AppLocalizations.of(context);
     if (_diagnosisCtrl.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Row(children: const [Icon(Icons.error_outline, color: Colors.white), SizedBox(width: 8), Text('Please enter a diagnosis')]),
+          content: Row(children: [const Icon(Icons.error_outline, color: Colors.white), const SizedBox(width: 8), Text(l10n.vetAnimalHealthConsultErrorDiagnosis)]),
           backgroundColor: RumenoTheme.errorRed,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -1009,7 +1036,7 @@ class _ConsultTabState extends State<_ConsultTab> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(children: const [Icon(Icons.check_circle_rounded, color: Colors.white), SizedBox(width: 8), Text('Consultation saved successfully!')]),
+        content: Row(children: [const Icon(Icons.check_circle_rounded, color: Colors.white), const SizedBox(width: 8), Text(l10n.vetAnimalHealthConsultSaveSuccess)]),
         backgroundColor: RumenoTheme.successGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -1040,13 +1067,18 @@ class _ConsultTabState extends State<_ConsultTab> {
                   child: const Icon(Icons.medical_services_rounded, color: Colors.white, size: 26),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('New Consultation', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
-                      Text('Fill in the animal health details below', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                    ],
+                Expanded(
+                  child: Builder(
+                    builder: (ctx) {
+                      final l10n = AppLocalizations.of(ctx);
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(l10n.vetAnimalHealthConsultTitle, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+                          Text(l10n.vetAnimalHealthConsultSubtitle, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ],
@@ -1055,7 +1087,7 @@ class _ConsultTabState extends State<_ConsultTab> {
           const SizedBox(height: 20),
 
           // ── Step 1: Select Animal ──
-          _StepLabel(step: '1', icon: Icons.pets_rounded, label: 'Select Animal'),
+          _StepLabel(step: '1', icon: Icons.pets_rounded, label: AppLocalizations.of(context).vetAnimalHealthConsultStepSelectAnimal),
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
@@ -1113,7 +1145,7 @@ class _ConsultTabState extends State<_ConsultTab> {
           const SizedBox(height: 20),
 
           // ── Step 2: Symptoms ──
-          _StepLabel(step: '2', icon: Icons.sick_rounded, label: 'Symptoms  (tap to select)'),
+          _StepLabel(step: '2', icon: Icons.sick_rounded, label: AppLocalizations.of(context).vetAnimalHealthConsultStepSymptoms),
           const SizedBox(height: 10),
           GridView.count(
             crossAxisCount: 3,
@@ -1125,6 +1157,7 @@ class _ConsultTabState extends State<_ConsultTab> {
             children: _allSymptoms.map((s) {
               final selected = _symptoms.contains(s);
               final ic = _symptomIcons[s] ?? Icons.circle;
+              final displayLabel = _symptomLabel(s, AppLocalizations.of(context));
               return GestureDetector(
                 onTap: () => setState(() => selected ? _symptoms.remove(s) : _symptoms.add(s)),
                 child: AnimatedContainer(
@@ -1143,7 +1176,7 @@ class _ConsultTabState extends State<_ConsultTab> {
                     children: [
                       Icon(ic, size: 24, color: selected ? RumenoTheme.errorRed : RumenoTheme.textGrey),
                       const SizedBox(height: 4),
-                      Text(s, textAlign: TextAlign.center,
+                      Text(displayLabel, textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 10, fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
                               color: selected ? RumenoTheme.errorRed : RumenoTheme.textGrey)),
                       if (selected)
@@ -1157,25 +1190,26 @@ class _ConsultTabState extends State<_ConsultTab> {
           const SizedBox(height: 20),
 
           // ── Step 3: Diagnosis & Treatment ──
-          _StepLabel(step: '3', icon: Icons.biotech_rounded, label: 'Diagnosis & Treatment'),
+          _StepLabel(step: '3', icon: Icons.biotech_rounded, label: AppLocalizations.of(context).vetAnimalHealthConsultStepDiagnosis),
           const SizedBox(height: 10),
-          _InputField(controller: _diagnosisCtrl, label: 'Diagnosis *', icon: Icons.biotech_rounded, hint: 'e.g. Foot Rot, Mastitis'),
+          _InputField(controller: _diagnosisCtrl, label: AppLocalizations.of(context).vetAnimalHealthConsultDiagnosisLabel, icon: Icons.biotech_rounded, hint: AppLocalizations.of(context).vetAnimalHealthConsultDiagnosisHint),
           const SizedBox(height: 12),
-          _InputField(controller: _treatmentCtrl, label: 'Treatment Prescribed', icon: Icons.medical_services_rounded, hint: 'e.g. Oxytetracycline 5mg/kg IM', maxLines: 2),
+          _InputField(controller: _treatmentCtrl, label: AppLocalizations.of(context).vetAnimalHealthConsultTreatmentLabel, icon: Icons.medical_services_rounded, hint: AppLocalizations.of(context).vetAnimalHealthConsultTreatmentHint, maxLines: 2),
           const SizedBox(height: 12),
-          _InputField(controller: _medicinesCtrl, label: 'Medicines / Injections', icon: Icons.medication_rounded, hint: 'e.g. Penicilin, Ivermectin'),
+          _InputField(controller: _medicinesCtrl, label: AppLocalizations.of(context).vetAnimalHealthConsultMedicinesLabel, icon: Icons.medication_rounded, hint: AppLocalizations.of(context).vetAnimalHealthConsultMedicinesHint),
           const SizedBox(height: 12),
-          _InputField(controller: _notesCtrl, label: 'Notes', icon: Icons.notes_rounded, hint: 'Any additional observations...', maxLines: 3),
+          _InputField(controller: _notesCtrl, label: AppLocalizations.of(context).commonNotes, icon: Icons.notes_rounded, hint: AppLocalizations.of(context).vetAnimalHealthConsultNotesHint, maxLines: 3),
           const SizedBox(height: 20),
 
           // ── Step 4: Follow-up ──
-          _StepLabel(step: '4', icon: Icons.event_repeat_rounded, label: 'Follow-up Schedule'),
+          _StepLabel(step: '4', icon: Icons.event_repeat_rounded, label: AppLocalizations.of(context).vetAnimalHealthConsultStepFollowUp),
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: _followUpOptions.map((f) {
               final sel = _selectedFollowUp == f;
+              final displayLabel = _followUpLabel(f, AppLocalizations.of(context));
               return GestureDetector(
                 onTap: () => setState(() => _selectedFollowUp = sel ? null : f),
                 child: AnimatedContainer(
@@ -1193,7 +1227,7 @@ class _ConsultTabState extends State<_ConsultTab> {
                       Icon(sel ? Icons.event_available_rounded : Icons.event_rounded, size: 16,
                           color: sel ? Colors.white : RumenoTheme.textGrey),
                       const SizedBox(width: 6),
-                      Text(f, style: TextStyle(fontSize: 13, color: sel ? Colors.white : RumenoTheme.textDark,
+                      Text(displayLabel, style: TextStyle(fontSize: 13, color: sel ? Colors.white : RumenoTheme.textDark,
                           fontWeight: sel ? FontWeight.w700 : FontWeight.normal)),
                     ],
                   ),
@@ -1216,7 +1250,7 @@ class _ConsultTabState extends State<_ConsultTab> {
               ),
               onPressed: _save,
               icon: const Icon(Icons.save_rounded, size: 22),
-              label: const Text('Save Consultation', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+              label: Text(AppLocalizations.of(context).vetAnimalHealthConsultSaveButton, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
             ),
           ),
         ],

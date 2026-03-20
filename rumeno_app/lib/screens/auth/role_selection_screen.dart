@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
 
@@ -164,7 +165,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                               ],
                             ).createShader(bounds),
                             child: Text(
-                              'Welcome to Rumeno',
+                              AppLocalizations.of(context).authWelcomeToRumeno,
                               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -173,7 +174,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                           ),
                           const SizedBox(height: 5),
                           Text(
-                            'Select your role to get started',
+                            AppLocalizations.of(context).authSelectRolePrompt,
                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                   color: Colors.black54,
                                   fontWeight: FontWeight.w500,
@@ -184,8 +185,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                           _buildAnimatedCard(
                             index: 0,
                             emoji: '🐄',
-                            title: 'Farm Owner / Staff',
-                            subtitle: 'Manage your farm, animals, and operations',
+                            title: AppLocalizations.of(context).authRoleFarmOwner,
+                            subtitle: AppLocalizations.of(context).authRoleFarmOwnerSubtitle,
                             gradient: LinearGradient(
                               colors: [
                                 RumenoTheme.primaryGreen.withValues(alpha: 0.1),
@@ -201,8 +202,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                           _buildAnimatedCard(
                             index: 1,
                             emoji: '🩺',
-                            title: 'Veterinarian / Partner',
-                            subtitle: 'Manage consultations and earn commissions',
+                            title: AppLocalizations.of(context).authRoleVet,
+                            subtitle: AppLocalizations.of(context).authRoleVetSubtitle,
                             gradient: LinearGradient(
                               colors: [
                                 Colors.blue.withValues(alpha: 0.1),
@@ -218,8 +219,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                           _buildAnimatedCard(
                             index: 2,
                             emoji: '🔧',
-                            title: 'Super Admin',
-                            subtitle: 'Manage platform, users, and configurations',
+                            title: AppLocalizations.of(context).authRoleSuperAdmin,
+                            subtitle: AppLocalizations.of(context).authRoleSuperAdminSubtitle,
                             gradient: LinearGradient(
                               colors: [
                                 Colors.orange.withValues(alpha: 0.1),
@@ -235,8 +236,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                           _buildAnimatedCard(
                             index: 3,
                             emoji: '🛒',
-                            title: 'Farm Products',
-                            subtitle: 'Browse and purchase farm products',
+                            title: AppLocalizations.of(context).authRoleFarmProducts,
+                            subtitle: AppLocalizations.of(context).authRoleFarmProductsSubtitle,
                             gradient: LinearGradient(
                               colors: [
                                 Colors.purple.withValues(alpha: 0.1),

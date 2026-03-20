@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_health.dart';
 import '../../../models/models.dart';
 import '../../../widgets/cards/vaccination_card.dart';
@@ -12,6 +13,7 @@ class HealthDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final overdueCount =
         mockVaccinations.where((v) => v.status == VaccinationStatus.overdue).length;
     final activeCount =
@@ -22,7 +24,7 @@ class HealthDashboardScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('Health Center'),
+        title: Text(l10n.healthDashboardTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
@@ -65,7 +67,7 @@ class HealthDashboardScreen extends StatelessWidget {
             const SizedBox(height: 8),
             _sectionTitleWithAction(
               '💉  Upcoming Vaccinations',
-              'See All',
+              l10n.commonSeeAll,
               () => context.go('/farmer/health/vaccination'),
             ),
             const SizedBox(height: 4),
@@ -79,7 +81,7 @@ class HealthDashboardScreen extends StatelessWidget {
             const SizedBox(height: 8),
             _sectionTitleWithAction(
               '🩺  Active Treatments',
-              'See All',
+              l10n.commonSeeAll,
               () => context.go('/farmer/health/treatment'),
             ),
             const SizedBox(height: 4),
@@ -145,38 +147,39 @@ class HealthDashboardScreen extends StatelessWidget {
   }
 
   Widget _buildQuickActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final items = [
       {
         'e': '💉',
-        'l': 'Vaccinations',
+        'l': l10n.healthCardVaccinations,
         's': 'Schedule & records',
         'c': RumenoTheme.infoBlue,
         'r': '/farmer/health/vaccination'
       },
       {
         'e': '🩺',
-        'l': 'Treatments',
+        'l': l10n.healthCardTreatments,
         's': 'Medicines & diagnosis',
         'c': RumenoTheme.errorRed,
         'r': '/farmer/health/treatment'
       },
       {
         'e': '🪱',
-        'l': 'Deworming',
+        'l': l10n.healthCardDeworming,
         's': 'Antiparasitic schedule',
         'c': RumenoTheme.accentOlive,
         'r': '/farmer/health/deworming'
       },
       {
         'e': '🔬',
-        'l': 'Lab Reports',
+        'l': l10n.healthCardLabReports,
         's': 'Test results & history',
         'c': RumenoTheme.warmBrown,
         'r': '/farmer/health/lab-reports'
       },
       {
         'e': '🦶',
-        'l': 'Hoof Cutting',
+        'l': l10n.healthCardHoofCutting,
         's': 'Trim & schedule',
         'c': const Color(0xFF8D6E63),
         'r': null,
@@ -621,8 +624,8 @@ class HealthDashboardScreen extends StatelessWidget {
                       );
                     },
                     icon: const Text('✅', style: TextStyle(fontSize: 20)),
-                    label: const Text('Save Record',
-                        style: TextStyle(
+                    label: Text(AppLocalizations.of(ctx).commonSaveRecord,
+                        style: const TextStyle(
                             fontSize: 17, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF8D6E63),

@@ -9,6 +9,7 @@ import '../../mock/mock_health.dart';
 import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/common/marketplace_button.dart';
+import '../../l10n/app_localizations.dart';
 // VeterinarianButton is defined in marketplace_button.dart
 
 // Helper function to show info dialog
@@ -46,9 +47,9 @@ void _showInfoDialog(BuildContext context, String title, String description) {
           style: TextButton.styleFrom(
             foregroundColor: RumenoTheme.primaryGreen,
           ),
-          child: const Text(
-            'Got it',
-            style: TextStyle(fontWeight: FontWeight.w600),
+          child: Text(
+            AppLocalizations.of(context).commonGotIt,
+            style: const TextStyle(fontWeight: FontWeight.w600),
           ),
         ),
       ],
@@ -66,13 +67,15 @@ class FarmerDashboardScreen extends StatefulWidget {
 class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
   File? _farmLogoFile;
 
-  static String _greeting(int hour) {
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+  static String _greeting(BuildContext context, int hour) {
+    final l10n = AppLocalizations.of(context);
+    if (hour < 12) return l10n.dashboardGreetingMorning;
+    if (hour < 17) return l10n.dashboardGreetingAfternoon;
+    return l10n.dashboardGreetingEvening;
   }
 
   Future<void> _pickImage(BuildContext ctx) async {
+    final l10n = AppLocalizations.of(ctx);
     final source = await showModalBottomSheet<ImageSource>(
       context: ctx,
       backgroundColor: Colors.transparent,
@@ -94,11 +97,11 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 4, 20, 8),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
               child: Text(
-                'Set Farm Logo',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                l10n.dashboardSetFarmLogoTitle,
+                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
               ),
             ),
             ListTile(
@@ -111,8 +114,8 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                 ),
                 child: Icon(Icons.photo_library_rounded, color: RumenoTheme.primaryGreen),
               ),
-              title: const Text('Choose from Gallery', style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: const Text('Select an existing photo'),
+              title: Text(l10n.commonChooseFromGallery, style: const TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Text(l10n.commonChooseFromGallerySubtitle),
               onTap: () => Navigator.pop(ctx, ImageSource.gallery),
             ),
             ListTile(
@@ -125,8 +128,8 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                 ),
                 child: const Icon(Icons.camera_alt_rounded, color: Color(0xFF1565C0)),
               ),
-              title: const Text('Take a Photo', style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: const Text('Use your camera'),
+              title: Text(l10n.commonTakeAPhoto, style: const TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Text(l10n.commonTakeAPhotoSubtitle),
               onTap: () => Navigator.pop(ctx, ImageSource.camera),
             ),
             const SizedBox(height: 12),
@@ -150,7 +153,8 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().currentUser;
-    final greeting = _greeting(DateTime.now().hour);
+    final l10n = AppLocalizations.of(context);
+    final greeting = _greeting(context, DateTime.now().hour);
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
@@ -182,10 +186,10 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
             SliverToBoxAdapter(child: _QuickActionsSection()),
 
             // ── Alerts ───────────────────────────────────────────
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 6),
-                child: _SectionTitle(title: 'Active Alerts', icon: Icons.warning_amber_rounded),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+                child: _SectionTitle(title: l10n.dashboardActiveAlerts, icon: Icons.warning_amber_rounded),
               ),
             ),
             SliverList(
@@ -196,10 +200,10 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
             ),
 
             // ── Upcoming Events ──────────────────────────────────
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(16, 18, 16, 10),
-                child: _SectionTitle(title: 'Upcoming Events', icon: Icons.event_rounded),
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
+                child: _SectionTitle(title: l10n.dashboardUpcomingEvents, icon: Icons.event_rounded),
               ),
             ),
             SliverList(
@@ -340,7 +344,7 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
                                     ),
                                     const SizedBox(height: 6),
                                     Text(
-                                      'Add Farm Logo',
+                                      AppLocalizations.of(context).dashboardAddFarmLogo,
                                       style: TextStyle(
                                         color: Colors.white.withValues(alpha: 0.9),
                                         fontSize: 11,

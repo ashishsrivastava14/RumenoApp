@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/common/marketplace_button.dart';
 
 class VendorRegisterScreen extends StatefulWidget {
@@ -55,10 +56,11 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('Vendor Registration'),
+        title: Text(l10n.vendorRegisterTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
@@ -84,18 +86,18 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
                   if (_currentStep < 3)
                     ElevatedButton(
                       onPressed: details.onStepContinue,
-                      child: const Text('Continue'),
+                      child: Text(l10n.vendorRegisterContinueButton),
                     )
                   else
                     ElevatedButton(
                       onPressed: _submitRegistration,
-                      child: const Text('Submit Application'),
+                      child: Text(l10n.vendorRegisterSubmitButton),
                     ),
                   if (_currentStep > 0) ...[
                     const SizedBox(width: 12),
                     OutlinedButton(
                       onPressed: details.onStepCancel,
-                      child: const Text('Back'),
+                      child: Text(l10n.commonBack),
                     ),
                   ],
                 ],
@@ -114,70 +116,70 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
           },
           steps: [
             Step(
-              title: const Text('Business Information'),
+              title: Text(l10n.vendorRegisterStep1),
               isActive: _currentStep >= 0,
               state: _currentStep > 0 ? StepState.complete : StepState.indexed,
               content: Column(
                 children: [
-                  TextFormField(controller: _businessNameC, decoration: const InputDecoration(labelText: 'Business Name *')),
+                  TextFormField(controller: _businessNameC, decoration: InputDecoration(labelText: l10n.vendorRegisterBusinessName)),
                   const SizedBox(height: 10),
-                  TextFormField(controller: _ownerNameC, decoration: const InputDecoration(labelText: 'Owner Name *')),
+                  TextFormField(controller: _ownerNameC, decoration: InputDecoration(labelText: l10n.vendorRegisterOwnerName)),
                   const SizedBox(height: 10),
-                  TextFormField(controller: _phoneC, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Phone Number *', prefixText: '+91 ')),
+                  TextFormField(controller: _phoneC, keyboardType: TextInputType.phone, decoration: InputDecoration(labelText: l10n.vendorRegisterPhone, prefixText: l10n.loginPhonePrefix)),
                   const SizedBox(height: 10),
-                  TextFormField(controller: _emailC, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email *')),
+                  TextFormField(controller: _emailC, keyboardType: TextInputType.emailAddress, decoration: InputDecoration(labelText: l10n.vendorRegisterEmail)),
                 ],
               ),
             ),
             Step(
-              title: const Text('Documents'),
+              title: Text(l10n.vendorRegisterStep2),
               isActive: _currentStep >= 1,
               state: _currentStep > 1 ? StepState.complete : StepState.indexed,
               content: Column(
                 children: [
-                  TextFormField(controller: _gstC, decoration: const InputDecoration(labelText: 'GST Number *')),
+                  TextFormField(controller: _gstC, decoration: InputDecoration(labelText: l10n.vendorRegisterGst)),
                   const SizedBox(height: 10),
-                  TextFormField(controller: _panC, decoration: const InputDecoration(labelText: 'PAN Number *')),
+                  TextFormField(controller: _panC, decoration: InputDecoration(labelText: l10n.vendorRegisterPan)),
                   const SizedBox(height: 10),
                   OutlinedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.upload_file),
-                    label: const Text('Upload ID Proof'),
+                    label: Text(l10n.vendorRegisterUploadIdProof),
                   ),
                 ],
               ),
             ),
             Step(
-              title: const Text('Bank Details'),
+              title: Text(l10n.vendorRegisterStep3),
               isActive: _currentStep >= 2,
               state: _currentStep > 2 ? StepState.complete : StepState.indexed,
               content: Column(
                 children: [
-                  TextFormField(controller: _bankNameC, decoration: const InputDecoration(labelText: 'Bank Name *')),
+                  TextFormField(controller: _bankNameC, decoration: InputDecoration(labelText: l10n.vendorRegisterBankName)),
                   const SizedBox(height: 10),
-                  TextFormField(controller: _accountC, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Account Number *')),
+                  TextFormField(controller: _accountC, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: l10n.vendorRegisterAccountNumber)),
                   const SizedBox(height: 10),
-                  TextFormField(controller: _ifscC, decoration: const InputDecoration(labelText: 'IFSC Code *')),
+                  TextFormField(controller: _ifscC, decoration: InputDecoration(labelText: l10n.vendorRegisterIfsc)),
                 ],
               ),
             ),
             Step(
-              title: const Text('Address'),
+              title: Text(l10n.vendorRegisterStep4),
               isActive: _currentStep >= 3,
               state: _currentStep > 3 ? StepState.complete : StepState.indexed,
               content: Column(
                 children: [
-                  TextFormField(controller: _addressC, maxLines: 2, decoration: const InputDecoration(labelText: 'Business Address *')),
+                  TextFormField(controller: _addressC, maxLines: 2, decoration: InputDecoration(labelText: l10n.vendorRegisterBusinessAddress)),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Expanded(child: TextFormField(controller: _cityC, decoration: const InputDecoration(labelText: 'City *'))),
+                      Expanded(child: TextFormField(controller: _cityC, decoration: InputDecoration(labelText: l10n.vendorRegisterCity))),
                       const SizedBox(width: 10),
-                      Expanded(child: TextFormField(controller: _stateC, decoration: const InputDecoration(labelText: 'State *'))),
+                      Expanded(child: TextFormField(controller: _stateC, decoration: InputDecoration(labelText: l10n.vendorRegisterState))),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  TextFormField(controller: _pincodeC, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Pincode *')),
+                  TextFormField(controller: _pincodeC, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: l10n.vendorRegisterPincode)),
                 ],
               ),
             ),
@@ -190,28 +192,31 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
   void _submitRegistration() {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Icon(Icons.check_circle, color: RumenoTheme.successGreen),
-            const SizedBox(width: 8),
-            const Text('Application Submitted'),
-          ],
-        ),
-        content: const Text(
-          'Your vendor registration has been submitted for review. Our team will verify your documents and approve your account within 2-3 business days. You will be notified via email.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.go('/shop');
-            },
-            child: const Text('OK'),
+      builder: (ctx) {
+        final dialogL10n = AppLocalizations.of(ctx);
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Icon(Icons.check_circle, color: RumenoTheme.successGreen),
+              const SizedBox(width: 8),
+              Text(dialogL10n.vendorRegisterSuccessTitle),
+            ],
           ),
-        ],
-      ),
+          content: Text(
+            dialogL10n.vendorRegisterSuccessMessage,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                context.go('/shop');
+              },
+              child: Text(dialogL10n.commonGotIt),
+            ),
+          ],
+        );
+      },
     );
   }
 }

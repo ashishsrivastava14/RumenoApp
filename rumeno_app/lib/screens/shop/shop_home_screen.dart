@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -26,6 +27,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ecommerce = context.watch<EcommerceProvider>();
     final allProducts = ecommerce.allProductsUnfiltered;
     final feedCount = allProducts.where((p) => p.category == ProductCategory.animalFeed).length;
@@ -63,8 +65,8 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  'Rumeno Shop',
+                Text(
+                  l10n.shopHomeTitle,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -116,7 +118,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                         Icon(Icons.search, color: RumenoTheme.textGrey, size: 26),
                         const SizedBox(width: 10),
                         Text(
-                          'Search...',
+                          l10n.shopSearchHint,
                           style: TextStyle(color: RumenoTheme.textGrey, fontSize: 16),
                         ),
                       ],
@@ -139,7 +141,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                       Icon(Icons.category_rounded, color: RumenoTheme.primaryGreen, size: 24),
                       const SizedBox(width: 8),
                       Text(
-                        'Categories',
+                        l10n.shopCategoriesSection,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20),
                       ),
                     ],
@@ -155,7 +157,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                     children: [
                       _BigCategoryTile(
                         icon: Icons.grass_rounded,
-                        label: 'Feed',
+                        label: l10n.shopCategoryFeed,
                         count: feedCount,
                         color: const Color(0xFF4CAF50),
                         bgColor: const Color(0xFFE8F5E9),
@@ -163,7 +165,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                       ),
                       _BigCategoryTile(
                         icon: Icons.science_rounded,
-                        label: 'Tonic',
+                        label: l10n.shopCategoryTonic,
                         count: supplementsCount,
                         color: const Color(0xFFFF9800),
                         bgColor: const Color(0xFFFFF3E0),
@@ -171,7 +173,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                       ),
                       _BigCategoryTile(
                         icon: Icons.medication_rounded,
-                        label: 'Medicine',
+                        label: l10n.shopCategoryMedicine,
                         count: medicinesCount,
                         color: const Color(0xFFE53935),
                         bgColor: const Color(0xFFFFEBEE),
@@ -179,7 +181,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                       ),
                       _BigCategoryTile(
                         icon: Icons.construction_rounded,
-                        label: 'Tools',
+                        label: l10n.shopCategoryTools,
                         count: equipmentCount,
                         color: const Color(0xFF2196F3),
                         bgColor: const Color(0xFFE3F2FD),
@@ -187,7 +189,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                       ),
                       _BigCategoryTile(
                         icon: Icons.biotech_rounded,
-                        label: 'Supplements',
+                        label: l10n.shopCategorySupplements,
                         count: supplementsCount,
                         color: const Color(0xFF9C27B0),
                         bgColor: const Color(0xFFF3E5F5),
@@ -195,7 +197,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                       ),
                       _BigCategoryTile(
                         icon: Icons.grid_view_rounded,
-                        label: 'All',
+                        label: l10n.shopCategoryAll,
                         count: allCount,
                         color: const Color(0xFF607D8B),
                         bgColor: const Color(0xFFECEFF1),
@@ -247,9 +249,9 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                             children: [
                               const Icon(Icons.local_shipping_rounded, color: Colors.white, size: 28),
                               const SizedBox(width: 8),
-                              const Expanded(
+                              Expanded(
                                 child: Text(
-                                  'FREE Delivery',
+                                  l10n.shopBannerFreeDelivery,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,
@@ -260,8 +262,8 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                             ],
                           ),
                           const SizedBox(height: 8),
-                          const Text(
-                            'On orders above ₹999',
+                          Text(
+                            l10n.shopBannerFreeDeliveryCondition,
                             style: TextStyle(color: Colors.white70, fontSize: 15),
                           ),
                           const SizedBox(height: 10),
@@ -270,11 +272,11 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                               Clipboard.setData(const ClipboardData(text: 'WELCOME20'));
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: const Row(
+                                  content: Row(
                                     children: [
                                       Icon(Icons.check_circle, color: Colors.white, size: 20),
                                       SizedBox(width: 8),
-                                      Text('Coupon code WELCOME20 copied!'),
+                                      Text(l10n.shopCouponCopiedSnackbar),
                                     ],
                                   ),
                                   duration: const Duration(seconds: 2),
@@ -295,7 +297,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                                   Icon(Icons.local_offer_rounded, color: RumenoTheme.primaryGreen, size: 18),
                                   const SizedBox(width: 6),
                                   Text(
-                                    'Code: WELCOME20',
+                                    l10n.shopBannerCouponCode,
                                     style: TextStyle(
                                       color: RumenoTheme.primaryGreen,
                                       fontWeight: FontWeight.bold,
@@ -325,11 +327,11 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                 children: [
                   const Icon(Icons.star_rounded, color: Colors.amber, size: 24),
                   const SizedBox(width: 6),
-                  Text('Best Products', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20)),
+                  Text(l10n.shopBestProductsSection, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20)),
                   const Spacer(),
                   TextButton.icon(
                     onPressed: () => context.go('/shop/search'),
-                    icon: const Text('See All'),
+                    icon: Text(l10n.commonSeeAll),
                     label: const Icon(Icons.arrow_forward_rounded, size: 18),
                   ),
                 ],
@@ -359,7 +361,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
                 children: [
                   const Icon(Icons.grid_view_rounded, color: RumenoTheme.primaryGreen, size: 24),
                   const SizedBox(width: 6),
-                  Text('All Products', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20)),
+                  Text(l10n.shopAllProductsSection, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20)),
                 ],
               ),
             ),
@@ -869,6 +871,7 @@ class _ShopBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthProvider>();
     final ecommerce = context.watch<EcommerceProvider>();
 
@@ -888,21 +891,21 @@ class _ShopBottomBar extends StatelessWidget {
               _BottomNavItem(
                 icon: Icons.home_rounded,
                 outlineIcon: Icons.home_outlined,
-                label: 'Home',
+                label: l10n.navShopHome,
                 isSelected: currentIndex == 0,
                 onTap: () => context.go('/shop'),
               ),
               _BottomNavItem(
                 icon: Icons.search_rounded,
                 outlineIcon: Icons.search,
-                label: 'Search',
+                label: l10n.navShopSearch,
                 isSelected: currentIndex == 1,
                 onTap: () => context.go('/shop/search'),
               ),
               _BottomNavItem(
                 icon: Icons.shopping_cart_rounded,
                 outlineIcon: Icons.shopping_cart_outlined,
-                label: 'Cart',
+                label: l10n.navShopCart,
                 isSelected: currentIndex == 2,
                 badge: ecommerce.cartItemCount > 0 ? ecommerce.cartItemCount : null,
                 onTap: () => context.go('/shop/cart'),
@@ -910,7 +913,7 @@ class _ShopBottomBar extends StatelessWidget {
               _BottomNavItem(
                 icon: Icons.receipt_long_rounded,
                 outlineIcon: Icons.receipt_long_outlined,
-                label: 'Orders',
+                label: l10n.navShopOrders,
                 isSelected: currentIndex == 3,
                 onTap: () {
                   if (auth.isAuthenticated) {
@@ -923,7 +926,7 @@ class _ShopBottomBar extends StatelessWidget {
               _BottomNavItem(
                 icon: Icons.person_rounded,
                 outlineIcon: Icons.person_outline,
-                label: 'Account',
+                label: l10n.navShopAccount,
                 isSelected: currentIndex == 4,
                 onTap: () {
                   if (auth.isAuthenticated) {

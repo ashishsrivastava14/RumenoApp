@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/locale_provider.dart';
+import '../../widgets/common/language_selector.dart';
 import '../../widgets/common/marketplace_button.dart';
 
 class MoreScreen extends StatelessWidget {
@@ -10,10 +13,14 @@ class MoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final localeProvider = context.watch<LocaleProvider>();
+    final currentLang = localeProvider.locale.languageCode == 'hi' ? 'हिन्दी' : 'English';
+
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('More'),
+        title: Text(l10n.moreTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
@@ -85,14 +92,14 @@ class MoreScreen extends StatelessWidget {
                               color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.star_rounded, color: Colors.amber, size: 16),
-                                SizedBox(width: 4),
+                                const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
+                                const SizedBox(width: 4),
                                 Text(
-                                  'Pro Plan',
-                                  style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                                  l10n.morePlanPro,
+                                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
                                 ),
                               ],
                             ),
@@ -126,64 +133,64 @@ class MoreScreen extends StatelessWidget {
               children: [
                 _BigMenuTile(
                   emoji: '🏡',
-                  label: 'My Farm',
-                  sublabel: 'Farm Details',
+                  label: l10n.moreMyFarm,
+                  sublabel: l10n.moreMyFarmSubtitle,
                   color: const Color(0xFF4CAF50),
                   onTap: () => context.go('/farmer/more/profile'),
                 ),
                 _BigMenuTile(
                   emoji: '👥',
-                  label: 'My Team',
-                  sublabel: 'Workers',
+                  label: l10n.moreMyTeam,
+                  sublabel: l10n.moreMyTeamSubtitle,
                   color: const Color(0xFF2196F3),
                   onTap: () => context.go('/farmer/more/team'),
                 ),
                 _BigMenuTile(
                   emoji: '💳',
-                  label: 'My Plan',
-                  sublabel: 'Subscription',
+                  label: l10n.moreMyPlan,
+                  sublabel: l10n.moreMyPlanSubtitle,
                   color: const Color(0xFFFF9800),
                   onTap: () => context.go('/farmer/more/subscription'),
                 ),
                 _BigMenuTile(
                   emoji: '🔔',
-                  label: 'Alerts',
-                  sublabel: 'Notifications',
+                  label: l10n.moreAlerts,
+                  sublabel: l10n.moreAlertsSubtitle,
                   color: const Color(0xFFE91E63),
                   onTap: () => context.go('/farmer/more/notifications'),
                 ),
                 _BigMenuTile(
                   emoji: '🌐',
-                  label: 'Language',
-                  sublabel: 'भाषा बदलें',
+                  label: l10n.moreLanguage,
+                  sublabel: currentLang,
                   color: const Color(0xFF9C27B0),
-                  onTap: () => _showLanguageDialog(context),
+                  onTap: () => showLanguageSelectorSheet(context),
                 ),
                 _BigMenuTile(
                   emoji: '📋',
-                  label: 'Export',
-                  sublabel: 'Save Data',
+                  label: l10n.moreExport,
+                  sublabel: l10n.moreExportSubtitle,
                   color: const Color(0xFF00BCD4),
                   onTap: () => context.go('/farmer/more/export'),
                 ),
                 _BigMenuTile(
                   emoji: '🧹',
-                  label: 'Sanitization',
-                  sublabel: 'Farm Cleaning',
+                  label: l10n.moreSanitization,
+                  sublabel: l10n.moreSanitizationSubtitle,
                   color: const Color(0xFF2196F3),
                   onTap: () => context.go('/farmer/more/sanitization'),
                 ),
                 _BigMenuTile(
                   emoji: '❓',
-                  label: 'Help',
-                  sublabel: 'Support',
+                  label: l10n.moreHelp,
+                  sublabel: l10n.moreHelpSubtitle,
                   color: const Color(0xFF607D8B),
                   onTap: () => context.go('/farmer/more/help'),
                 ),
                 _BigMenuTile(
                   emoji: '🚪',
-                  label: 'Logout',
-                  sublabel: 'Sign Out',
+                  label: l10n.moreLogout,
+                  sublabel: l10n.moreLogoutSubtitle,
                   color: const Color(0xFFE53935),
                   onTap: () => _showLogoutConfirm(context),
                 ),
@@ -212,7 +219,7 @@ class MoreScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Version 1.0.0',
+                    l10n.moreVersion,
                     style: TextStyle(fontSize: 12, color: RumenoTheme.textGrey),
                   ),
                 ],
@@ -226,25 +233,26 @@ class MoreScreen extends StatelessWidget {
   }
 
   void _showLogoutConfirm(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Text('🚪', style: TextStyle(fontSize: 28)),
-            SizedBox(width: 10),
-            Text('Logout?'),
+            const Text('🚪', style: TextStyle(fontSize: 28)),
+            const SizedBox(width: 10),
+            Text(l10n.logoutDialogTitle),
           ],
         ),
-        content: const Text(
-          'Are you sure you want to sign out?',
-          style: TextStyle(fontSize: 16),
+        content: Text(
+          l10n.logoutDialogMessage,
+          style: const TextStyle(fontSize: 16),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('No, Stay', style: TextStyle(fontSize: 16)),
+            child: Text(l10n.logoutDialogStay, style: const TextStyle(fontSize: 16)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: RumenoTheme.errorRed),
@@ -253,110 +261,9 @@ class MoreScreen extends StatelessWidget {
               context.read<AuthProvider>().logout();
               context.go('/role-selection');
             },
-            child: const Text('Yes, Logout', style: TextStyle(fontSize: 16)),
+            child: Text(l10n.logoutDialogConfirm, style: const TextStyle(fontSize: 16)),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showLanguageDialog(BuildContext context) {
-    final languages = [
-      {'name': 'English', 'native': 'English', 'flag': '🇬🇧'},
-      {'name': 'Hindi', 'native': 'हिन्दी', 'flag': '🇮🇳'},
-      // {'name': 'Gujarati', 'native': 'ગુજરાતી', 'flag': '🇮🇳'},
-      // {'name': 'Marathi', 'native': 'मराठी', 'flag': '🇮🇳'},
-      // {'name': 'Punjabi', 'native': 'ਪੰਜਾਬੀ', 'flag': '🇮🇳'},
-    ];
-
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Row(
-              children: [
-                Text('🌐', style: TextStyle(fontSize: 28)),
-                SizedBox(width: 10),
-                Text('Select Language', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              ],
-            ),
-            const SizedBox(height: 20),
-            ...languages.map((l) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(14),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('✅  Language set to ${l['name']}'),
-                      backgroundColor: RumenoTheme.successGreen,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  decoration: BoxDecoration(
-                    color: l['name'] == 'English'
-                        ? RumenoTheme.primaryGreen.withValues(alpha: 0.08)
-                        : Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: l['name'] == 'English'
-                          ? RumenoTheme.primaryGreen
-                          : Colors.grey.shade200,
-                      width: l['name'] == 'English' ? 2 : 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(l['flag']!, style: const TextStyle(fontSize: 24)),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l['name']!,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: l['name'] == 'English' ? RumenoTheme.primaryGreen : RumenoTheme.textDark,
-                              ),
-                            ),
-                            Text(
-                              l['native']!,
-                              style: TextStyle(fontSize: 13, color: RumenoTheme.textGrey),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (l['name'] == 'English')
-                        const Icon(Icons.check_circle, color: RumenoTheme.primaryGreen, size: 22),
-                    ],
-                  ),
-                ),
-              ),
-            )),
-            const SizedBox(height: 8),
-          ],
-        ),
       ),
     );
   }

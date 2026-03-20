@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
 import '../../widgets/common/marketplace_button.dart';
@@ -26,6 +27,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ecommerce = context.watch<EcommerceProvider>();
     final addresses = ecommerce.addresses;
     final cartItems = ecommerce.cartItems;
@@ -33,7 +35,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (cartItems.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Checkout'),
+          title: Text(l10n.checkoutTitle),
           actions: const [VeterinarianButton(), FarmButton()],
         ),
         body: Center(
@@ -42,7 +44,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             children: [
               Icon(Icons.shopping_cart_outlined, size: 80, color: RumenoTheme.textLight),
               const SizedBox(height: 16),
-              const Text('Your cart is empty', style: TextStyle(fontSize: 18)),
+              Text(l10n.checkoutCartEmpty, style: const TextStyle(fontSize: 18)),
             ],
           ),
         ),
@@ -52,7 +54,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('Checkout'),
+        title: Text(l10n.checkoutTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
@@ -79,11 +81,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
               child: Row(
                 children: [
-                  _StepIndicator(icon: Icons.location_on_rounded, label: 'Address', stepNum: 1, isActive: true),
+                  _StepIndicator(icon: Icons.location_on_rounded, label: l10n.checkoutStepAddress, stepNum: 1, isActive: true),
                   Expanded(child: Container(height: 2, color: RumenoTheme.primaryGreen)),
-                  _StepIndicator(icon: Icons.payment_rounded, label: 'Payment', stepNum: 2, isActive: true),
+                  _StepIndicator(icon: Icons.payment_rounded, label: l10n.checkoutStepPayment, stepNum: 2, isActive: true),
                   Expanded(child: Container(height: 2, color: RumenoTheme.primaryGreen)),
-                  _StepIndicator(icon: Icons.check_circle_rounded, label: 'Confirm', stepNum: 3, isActive: true),
+                  _StepIndicator(icon: Icons.check_circle_rounded, label: l10n.checkoutStepConfirm, stepNum: 3, isActive: true),
                 ],
               ),
             ),
@@ -94,7 +96,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               children: [
                 Icon(Icons.location_on_rounded, color: RumenoTheme.primaryGreen, size: 22),
                 const SizedBox(width: 6),
-                Text('Delivery Address', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 17)),
+                Text(l10n.checkoutDeliveryAddressTitle, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 17)),
               ],
             ),
             const SizedBox(height: 10),
@@ -121,7 +123,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Add delivery address', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                              Text(l10n.checkoutAddDeliveryAddress, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                             ],
                           ),
                         ),
@@ -214,7 +216,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     Icon(Icons.add_circle_rounded, color: RumenoTheme.primaryGreen, size: 22),
                     const SizedBox(width: 6),
                     Text(
-                      'Add New Address',
+                      l10n.checkoutAddNewAddress,
                       style: TextStyle(color: RumenoTheme.primaryGreen, fontWeight: FontWeight.w600, fontSize: 14),
                     ),
                   ],
@@ -229,7 +231,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               children: [
                 Icon(Icons.receipt_long_rounded, color: RumenoTheme.primaryGreen, size: 22),
                 const SizedBox(width: 6),
-                Text('Order Summary', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 17)),
+                Text(l10n.checkoutOrderSummary, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 17)),
               ],
             ),
             const SizedBox(height: 10),
@@ -297,7 +299,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               children: [
                 Icon(Icons.payment_rounded, color: RumenoTheme.primaryGreen, size: 22),
                 const SizedBox(width: 6),
-                Text('Payment Method', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 17)),
+                Text(l10n.checkoutPaymentMethod, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 17)),
               ],
             ),
             const SizedBox(height: 10),
@@ -364,12 +366,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    _row(Icons.receipt_rounded, 'Subtotal', '₹${ecommerce.cartSubtotal.toStringAsFixed(0)}'),
+                    _row(Icons.receipt_rounded, l10n.cartSubtotalLabel, '₹${ecommerce.cartSubtotal.toStringAsFixed(0)}'),
                     if (ecommerce.cartDiscount > 0)
-                      _row(Icons.local_offer_rounded, 'Discount', '-₹${ecommerce.cartDiscount.toStringAsFixed(0)}', color: RumenoTheme.successGreen),
+                      _row(Icons.local_offer_rounded, l10n.cartDiscountLabel, '-₹${ecommerce.cartDiscount.toStringAsFixed(0)}', color: RumenoTheme.successGreen),
                     _row(
                       Icons.local_shipping_rounded,
-                      'Delivery',
+                      l10n.cartDeliveryLabel,
                       ecommerce.deliveryCharge == 0 ? 'FREE' : '₹${ecommerce.deliveryCharge.toStringAsFixed(0)}',
                       color: ecommerce.deliveryCharge == 0 ? RumenoTheme.successGreen : null,
                     ),
@@ -378,7 +380,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       children: [
                         Icon(Icons.payments_rounded, color: RumenoTheme.primaryGreen, size: 22),
                         const SizedBox(width: 6),
-                        Text('Total', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        Text(l10n.cartTotalLabel, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                         const Spacer(),
                         Text(
                           '₹${ecommerce.cartTotal.toStringAsFixed(0)}',
@@ -419,8 +421,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               icon: const Icon(Icons.check_circle_rounded, size: 24),
               label: Text(
                 addresses.isEmpty
-                    ? 'Add Address First'
-                    : 'Pay ₹${ecommerce.cartTotal.toStringAsFixed(0)}',
+                    ? l10n.checkoutAddAddressFirst
+                    : l10n.checkoutPayButton(ecommerce.cartTotal.toStringAsFixed(0)),
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               style: ElevatedButton.styleFrom(
@@ -450,6 +452,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _showAddAddressDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final nameC = TextEditingController();
     final phoneC = TextEditingController();
     final addr1C = TextEditingController();
@@ -479,16 +482,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   children: [
                     Icon(Icons.location_on_rounded, color: RumenoTheme.primaryGreen, size: 26),
                     const SizedBox(width: 8),
-                    Text('Add Address', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22)),
+                    Text(l10n.checkoutAddAddressDialogTitle, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22)),
                   ],
                 ),
                 const SizedBox(height: 18),
                 TextField(
                   controller: nameC,
                   style: const TextStyle(fontSize: 16),
-                  decoration: const InputDecoration(
-                    labelText: 'Full Name',
-                    prefixIcon: Icon(Icons.person_rounded),
+                  decoration: InputDecoration(
+                    labelText: l10n.checkoutAddressFullName,
+                    prefixIcon: const Icon(Icons.person_rounded),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -496,27 +499,27 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   controller: phoneC,
                   keyboardType: TextInputType.phone,
                   style: const TextStyle(fontSize: 16),
-                  decoration: const InputDecoration(
-                    labelText: 'Phone',
-                    prefixIcon: Icon(Icons.phone_rounded),
+                  decoration: InputDecoration(
+                    labelText: l10n.checkoutAddressPhone,
+                    prefixIcon: const Icon(Icons.phone_rounded),
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: addr1C,
                   style: const TextStyle(fontSize: 16),
-                  decoration: const InputDecoration(
-                    labelText: 'Address',
-                    prefixIcon: Icon(Icons.home_rounded),
+                  decoration: InputDecoration(
+                    labelText: l10n.checkoutAddressLine1,
+                    prefixIcon: const Icon(Icons.home_rounded),
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: addr2C,
                   style: const TextStyle(fontSize: 16),
-                  decoration: const InputDecoration(
-                    labelText: 'Landmark (Optional)',
-                    prefixIcon: Icon(Icons.place_rounded),
+                  decoration: InputDecoration(
+                    labelText: l10n.checkoutAddressLandmark,
+                    prefixIcon: const Icon(Icons.place_rounded),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -526,9 +529,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       child: TextField(
                         controller: cityC,
                         style: const TextStyle(fontSize: 16),
-                        decoration: const InputDecoration(
-                          labelText: 'City',
-                          prefixIcon: Icon(Icons.location_city_rounded),
+                        decoration: InputDecoration(
+                          labelText: l10n.checkoutAddressCity,
+                          prefixIcon: const Icon(Icons.location_city_rounded),
                         ),
                       ),
                     ),
@@ -537,9 +540,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       child: TextField(
                         controller: stateC,
                         style: const TextStyle(fontSize: 16),
-                        decoration: const InputDecoration(
-                          labelText: 'State',
-                          prefixIcon: Icon(Icons.map_rounded),
+                        decoration: InputDecoration(
+                          labelText: l10n.checkoutAddressState,
+                          prefixIcon: const Icon(Icons.map_rounded),
                         ),
                       ),
                     ),
@@ -550,9 +553,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   controller: pinC,
                   keyboardType: TextInputType.number,
                   style: const TextStyle(fontSize: 16),
-                  decoration: const InputDecoration(
-                    labelText: 'Pincode',
-                    prefixIcon: Icon(Icons.pin_drop_rounded),
+                  decoration: InputDecoration(
+                    labelText: l10n.checkoutAddressPincode,
+                    prefixIcon: const Icon(Icons.pin_drop_rounded),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -563,12 +566,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     onPressed: () {
                       if (nameC.text.isEmpty || phoneC.text.isEmpty || addr1C.text.isEmpty || cityC.text.isEmpty || stateC.text.isEmpty || pinC.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Row(
                               children: [
-                                Icon(Icons.error_outline, color: Colors.white, size: 20),
-                                SizedBox(width: 8),
-                                Expanded(child: Text('Please fill all required fields')),
+                                const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text(l10n.checkoutAddressFillAllFields)),
                               ],
                             ),
                             behavior: SnackBarBehavior.floating,
@@ -592,7 +595,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       Navigator.pop(context);
                     },
                     icon: const Icon(Icons.check_rounded),
-                    label: const Text('Save Address', style: TextStyle(fontSize: 16)),
+                    label: Text(l10n.checkoutSaveAddressButton, style: const TextStyle(fontSize: 16)),
                   ),
                 ),
                 const SizedBox(height: 10),

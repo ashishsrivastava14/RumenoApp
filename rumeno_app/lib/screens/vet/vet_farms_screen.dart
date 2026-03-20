@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../mock/mock_farmers.dart';
 import '../../models/models.dart';
 import '../../widgets/common/marketplace_button.dart';
@@ -22,7 +23,7 @@ class _VetFarmsScreenState extends State<VetFarmsScreen> {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('Referred Farms'),
+        title: Text(AppLocalizations.of(context).vetFarmsTitle),
         actions: const [FarmButton(), MarketplaceButton()],
       ),
       body: Column(
@@ -31,7 +32,7 @@ class _VetFarmsScreenState extends State<VetFarmsScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Search farms...',
+                hintText: AppLocalizations.of(context).vetFarmsSearchHint,
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: Colors.white,
@@ -118,7 +119,7 @@ class _FarmCard extends StatelessWidget {
               const Spacer(),
               Icon(Icons.pets_rounded, size: 14, color: Colors.grey[500]),
               const SizedBox(width: 4),
-              Text('${farmer.animalCount} animals', style: Theme.of(context).textTheme.bodySmall),
+              Text(AppLocalizations.of(context).vetFarmsAnimalCount(farmer.animalCount), style: Theme.of(context).textTheme.bodySmall),
             ],
           ),
           const SizedBox(height: 8),
@@ -131,7 +132,7 @@ class _FarmCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: () => context.go('/vet/farms/${farmer.id}'),
                 icon: const Icon(Icons.visibility_rounded, size: 16),
-                label: const Text('View Animals'),
+                label: Text(AppLocalizations.of(context).vetFarmsViewAnimalsButton),
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   textStyle: const TextStyle(fontSize: 12),

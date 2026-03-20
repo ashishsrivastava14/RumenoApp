@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_health.dart';
 import '../../../models/models.dart';
 import '../../../widgets/cards/health_record_card.dart';
@@ -323,7 +324,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('Disease & Treatment'),
+        title: Text(AppLocalizations.of(context).treatmentTitle),
         actions: const [VeterinarianButton(), MarketplaceButton()],
       ),
       body: Column(

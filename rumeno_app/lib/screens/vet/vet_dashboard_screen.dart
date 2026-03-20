@@ -7,6 +7,7 @@ import '../../mock/mock_farmers.dart';
 import '../../mock/mock_health.dart';
 import '../../mock/mock_users.dart';
 import '../../models/models.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/common/marketplace_button.dart';
 
 class VetDashboardScreen extends StatelessWidget {
@@ -20,6 +21,7 @@ class VetDashboardScreen extends StatelessWidget {
     final totalFarms = vetFarmers.length;
     final totalAnimals = vetFarmers.fold<int>(0, (sum, f) => sum + f.animalCount);
     final activeTreatments = mockTreatments.where((t) => t.status == TreatmentStatus.active).length;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F0),
@@ -119,9 +121,9 @@ class VetDashboardScreen extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Good morning,',
-                                    style: TextStyle(color: Colors.white60, fontSize: 12, letterSpacing: 0.3),
+                                  Text(
+                                    l10n.vetDashboardGreeting,
+                                    style: const TextStyle(color: Colors.white60, fontSize: 12, letterSpacing: 0.3),
                                   ),
                                   Text(
                                     vet.name,
@@ -134,7 +136,7 @@ class VetDashboardScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    vet.specialization ?? 'Veterinary Specialist',
+                                    vet.specialization ?? l10n.vetDashboardSpecialization,
                                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                                   ),
                                 ],
@@ -190,28 +192,28 @@ class VetDashboardScreen extends StatelessWidget {
                     childAspectRatio: 1.6,
                     children: [
                       _GradientStatCard(
-                        title: 'Referred Farms',
+                        title: l10n.vetDashboardStatReferredFarms,
                         value: '$totalFarms',
                         icon: Icons.agriculture_rounded,
                         gradientColors: const [Color(0xFF4CAF50), Color(0xFF2E7D32)],
                       ),
                       _GradientStatCard(
-                        title: 'Total Animals',
+                        title: l10n.vetDashboardStatTotalAnimals,
                         value: '$totalAnimals',
                         icon: Icons.pets_rounded,
                         gradientColors: const [Color(0xFF26C6DA), Color(0xFF00838F)],
                       ),
                       _GradientStatCard(
-                        title: 'Active Cases',
+                        title: l10n.vetDashboardStatActiveCases,
                         value: '$activeTreatments',
                         icon: Icons.phone_in_talk_rounded,
                         gradientColors: const [Color(0xFFFF8A65), Color(0xFFE64A19)],
                       ),
-                      const _GradientStatCard(
-                        title: 'Monthly Earnings',
+                      _GradientStatCard(
+                        title: l10n.vetDashboardStatMonthlyEarnings,
                         value: '₹12.5K',
                         icon: Icons.currency_rupee_rounded,
-                        gradientColors: [Color(0xFFAB47BC), Color(0xFF6A1B9A)],
+                        gradientColors: const [Color(0xFFAB47BC), Color(0xFF6A1B9A)],
                       ),
                     ],
                   ),
@@ -219,34 +221,34 @@ class VetDashboardScreen extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // ── Quick Actions ───────────────────────────────────
-                  const _SectionTitle(title: 'Quick Actions'),
+                  _SectionTitle(title: l10n.commonQuickActions),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       _QuickAction(
                         icon: Icons.add_circle_outline_rounded,
-                        label: 'New Visit',
+                        label: l10n.vetDashboardQuickActionNewVisit,
                         color: const Color(0xFF5B7A2E),
                         onTap: () => _showNewVisitSheet(context),
                       ),
                       const SizedBox(width: 10),
                       _QuickAction(
                         icon: Icons.vaccines_rounded,
-                        label: 'Record Health',
+                        label: l10n.vetDashboardQuickActionRecordHealth,
                         color: const Color(0xFF00838F),
                         onTap: () => context.go('/vet/health'),
                       ),
                       const SizedBox(width: 10),
                       _QuickAction(
                         icon: Icons.agriculture_rounded,
-                        label: 'My Farms',
+                        label: l10n.vetDashboardQuickActionMyFarms,
                         color: const Color(0xFF6D4C41),
                         onTap: () => context.go('/vet/farms'),
                       ),
                       const SizedBox(width: 10),
                       _QuickAction(
                         icon: Icons.account_balance_wallet_rounded,
-                        label: 'Earnings',
+                        label: l10n.vetDashboardQuickActionEarnings,
                         color: const Color(0xFF6A1B9A),
                         onTap: () => context.go('/vet/earnings'),
                       ),
@@ -284,18 +286,18 @@ class VetDashboardScreen extends StatelessWidget {
                           child: const Icon(Icons.trending_up_rounded, color: Colors.white, size: 28),
                         ),
                         const SizedBox(width: 14),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Great work this week!',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                                l10n.vetDashboardMotivationTitle,
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Text(
-                                'You completed 14 consultations — 40% more than last week.',
-                                style: TextStyle(color: Colors.white70, fontSize: 12),
+                                l10n.vetDashboardMotivationBody,
+                                style: const TextStyle(color: Colors.white70, fontSize: 12),
                               ),
                             ],
                           ),
@@ -307,14 +309,14 @@ class VetDashboardScreen extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // ── Recent Consultations ────────────────────────────
-                  _SectionHeader(title: 'Recent Consultations', onSeeAll: () => context.go('/vet/consultations')),
+                  _SectionHeader(title: l10n.vetDashboardRecentConsultations, onSeeAll: () => context.go('/vet/consultations')),
                   const SizedBox(height: 12),
                   ..._buildConsultations(context),
 
                   const SizedBox(height: 24),
 
                   // ── Upcoming Visits ─────────────────────────────────
-                  _SectionHeader(title: 'Upcoming Visits', onSeeAll: () => context.go('/vet/schedule')),
+                  _SectionHeader(title: l10n.vetDashboardUpcomingVisits, onSeeAll: () => context.go('/vet/schedule')),
                   const SizedBox(height: 12),
                   ..._buildVisits(context),
 
@@ -329,6 +331,7 @@ class VetDashboardScreen extends StatelessWidget {
   }
 
   List<Widget> _buildConsultations(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final consults = [
       {
         'farmer': 'John Smith',
@@ -428,7 +431,7 @@ class VetDashboardScreen extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
-                                      isOngoing ? 'Ongoing' : 'Resolved',
+                                      isOngoing ? l10n.commonOngoing : l10n.commonResolved,
                                       style: TextStyle(
                                         color: isOngoing
                                             ? const Color(0xFFE53935)
@@ -480,6 +483,7 @@ class VetDashboardScreen extends StatelessWidget {
   }
 
   List<Widget> _buildVisits(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final visits = [
       {
         'farmer': 'John Smith',
@@ -578,9 +582,9 @@ class VetDashboardScreen extends StatelessWidget {
                               color: const Color(0xFFFFF3E0),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Text(
-                              'Priority',
-                              style: TextStyle(
+                            child: Text(
+                              l10n.commonPriority,
+                              style: const TextStyle(
                                   color: Color(0xFFE64A19),
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600),
@@ -811,9 +815,9 @@ class _SectionHeader extends StatelessWidget {
         const Spacer(),
         GestureDetector(
           onTap: onSeeAll,
-          child: const Text(
-            'See all',
-            style: TextStyle(
+          child: Text(
+            AppLocalizations.of(context).commonSeeAll,
+            style: const TextStyle(
                 fontSize: 13,
                 color: Color(0xFF5B7A2E),
                 fontWeight: FontWeight.w600),
@@ -827,6 +831,7 @@ class _SectionHeader extends StatelessWidget {
 // ── Bottom Sheet Helpers ─────────────────────────────────────────────────────
 
 void _showNotificationsSheet(BuildContext context) {
+  final l10n = AppLocalizations.of(context);
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -858,9 +863,9 @@ void _showNotificationsSheet(BuildContext context) {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  const Text(
-                    'Notifications',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    l10n.commonNotifications,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const Spacer(),
                   Container(
@@ -971,13 +976,24 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
   final _notesController = TextEditingController();
 
   static const _purposes = <Map<String, Object>>[
-    {'label': 'Checkup',     'icon': Icons.health_and_safety_rounded, 'color': 0xFF00ACC1},
-    {'label': 'Vaccination', 'icon': Icons.vaccines_rounded,          'color': 0xFF8E24AA},
-    {'label': 'Treatment',   'icon': Icons.medical_services_rounded,  'color': 0xFFEF6C00},
-    {'label': 'Emergency',   'icon': Icons.warning_amber_rounded,     'color': 0xFFD32F2F},
-    {'label': 'Pregnancy',   'icon': Icons.pregnant_woman,            'color': 0xFFC2185B},
-    {'label': 'Other',       'icon': Icons.more_horiz_rounded,        'color': 0xFF546E7A},
+    {'key': 'Checkup',     'icon': Icons.health_and_safety_rounded, 'color': 0xFF00ACC1},
+    {'key': 'Vaccination', 'icon': Icons.vaccines_rounded,          'color': 0xFF8E24AA},
+    {'key': 'Treatment',   'icon': Icons.medical_services_rounded,  'color': 0xFFEF6C00},
+    {'key': 'Emergency',   'icon': Icons.warning_amber_rounded,     'color': 0xFFD32F2F},
+    {'key': 'Pregnancy',   'icon': Icons.pregnant_woman,            'color': 0xFFC2185B},
+    {'key': 'Other',       'icon': Icons.more_horiz_rounded,        'color': 0xFF546E7A},
   ];
+
+  String _purposeLabel(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'Vaccination': return l10n.vetDashboardVisitPurposeVaccination;
+      case 'Treatment':   return l10n.vetDashboardVisitPurposeTreatment;
+      case 'Emergency':   return l10n.vetDashboardVisitPurposeEmergency;
+      case 'Pregnancy':   return l10n.vetDashboardVisitPurposePregnancy;
+      case 'Other':       return l10n.vetDashboardVisitPurposeOther;
+      default:            return l10n.vetDashboardVisitPurposeCheckup;
+    }
+  }
 
   @override
   void dispose() {
@@ -996,10 +1012,11 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
   }
 
   void _save() {
+    final l10n = AppLocalizations.of(context);
     if (_selectedFarmId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a farm'),
+        SnackBar(
+          content: Text(l10n.vetDashboardScheduleSelectFarmError),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -1007,8 +1024,8 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
     }
     if (_selectedPurpose == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select the reason for visit'),
+        SnackBar(
+          content: Text(l10n.vetDashboardScheduleSelectReasonError),
           backgroundColor: Colors.orange,
         ),
       );
@@ -1016,9 +1033,9 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
     }
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('✅  Visit scheduled successfully!'),
-        backgroundColor: Color(0xFF4CAF50),
+      SnackBar(
+        content: Text(l10n.vetDashboardScheduleSuccess),
+        backgroundColor: const Color(0xFF4CAF50),
       ),
     );
   }
@@ -1028,6 +1045,7 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
   @override
   Widget build(BuildContext context) {
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: EdgeInsets.only(bottom: keyboardHeight),
       decoration: const BoxDecoration(
@@ -1046,25 +1064,25 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Step 1 ─ Farm
-                  _buildStepLabel('1', Icons.agriculture_rounded, 'Choose Farm', const Color(0xFF5B7A2E)),
+                  _buildStepLabel('1', Icons.agriculture_rounded, l10n.vetDashboardScheduleFarm, const Color(0xFF5B7A2E)),
                   const SizedBox(height: 12),
                   _buildFarmSelector(),
                   const SizedBox(height: 26),
 
                   // Step 2 ─ Date
-                  _buildStepLabel('2', Icons.calendar_month_rounded, 'When to Visit?', const Color(0xFF1E88E5)),
+                  _buildStepLabel('2', Icons.calendar_month_rounded, l10n.vetDashboardScheduleWhenToVisit, const Color(0xFF1E88E5)),
                   const SizedBox(height: 12),
                   _buildDateSelector(),
                   const SizedBox(height: 26),
 
                   // Step 3 ─ Purpose
-                  _buildStepLabel('3', Icons.assignment_turned_in_rounded, 'Reason for Visit', const Color(0xFF8E24AA)),
+                  _buildStepLabel('3', Icons.assignment_turned_in_rounded, l10n.vetDashboardScheduleReason, const Color(0xFF8E24AA)),
                   const SizedBox(height: 12),
                   _buildPurposeGrid(),
                   const SizedBox(height: 26),
 
                   // Step 4 ─ Notes
-                  _buildStepLabel('4', Icons.edit_note_rounded, 'Extra Notes (Optional)', Colors.grey.shade600),
+                  _buildStepLabel('4', Icons.edit_note_rounded, l10n.vetDashboardScheduleNotes, Colors.grey.shade600),
                   const SizedBox(height: 12),
                   _buildNotesField(),
                   const SizedBox(height: 32),
@@ -1133,18 +1151,18 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
                 child: const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 24),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Schedule New Visit',
-                      style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.bold),
+                      AppLocalizations.of(context).vetDashboardScheduleVisitTitle,
+                      style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     Text(
-                      'Follow the 4 simple steps below',
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                      AppLocalizations.of(context).vetDashboardScheduleVisitSubtitle,
+                      style: const TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                   ],
                 ),
@@ -1363,9 +1381,9 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
                       color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
-                      'Tap to change date',
-                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
+                    child: Text(
+                      AppLocalizations.of(context).vetDashboardTapToChangeDate,
+                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
                     ),
                   ),
                 ],
@@ -1394,13 +1412,14 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
       itemCount: _purposes.length,
       itemBuilder: (_, i) {
         final p = _purposes[i];
-        final label = p['label'] as String;
+        final key   = p['key'] as String;
+        final label = _purposeLabel(key, AppLocalizations.of(context));
         final icon  = p['icon']  as IconData;
         final color = Color(p['color'] as int);
-        final isSelected = _selectedPurpose == label;
+        final isSelected = _selectedPurpose == key;
 
         return GestureDetector(
-          onTap: () => setState(() => _selectedPurpose = label),
+          onTap: () => setState(() => _selectedPurpose = key),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
@@ -1473,7 +1492,7 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
         maxLines: 3,
         style: const TextStyle(fontSize: 14, color: Color(0xFF333333)),
         decoration: InputDecoration(
-          hintText: 'Any special instructions or observations…',
+          hintText: AppLocalizations.of(context).vetDashboardScheduleNotesHint,
           hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
           prefixIcon: Padding(
             padding: const EdgeInsets.only(left: 14, right: 10, top: 16),
@@ -1510,14 +1529,14 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.check_circle_rounded, color: Colors.white, size: 24),
-            SizedBox(width: 10),
+            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 24),
+            const SizedBox(width: 10),
             Text(
-              'Schedule Visit',
-              style: TextStyle(
+              AppLocalizations.of(context).vetDashboardScheduleButton,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 17,
                 fontWeight: FontWeight.bold,

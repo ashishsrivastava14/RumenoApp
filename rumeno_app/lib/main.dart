@@ -3,8 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'config/theme.dart';
 import 'config/router.dart';
+import 'l10n/app_localizations.dart';
 import 'providers/auth_provider.dart';
 import 'providers/ecommerce_provider.dart';
+import 'providers/locale_provider.dart';
 import 'services/home_widget_service.dart';
 
 void main() {
@@ -24,6 +26,7 @@ class RumenoApp extends StatefulWidget {
 class _RumenoAppState extends State<RumenoApp> with WidgetsBindingObserver {
   late final AuthProvider _authProvider;
   late final EcommerceProvider _ecommerceProvider;
+  late final LocaleProvider _localeProvider;
   late final GoRouter _router;
 
   @override
@@ -32,6 +35,7 @@ class _RumenoAppState extends State<RumenoApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _authProvider = AuthProvider();
     _ecommerceProvider = EcommerceProvider();
+    _localeProvider = LocaleProvider();
     _router = createRouter(_authProvider);
   }
 
@@ -51,6 +55,7 @@ class _RumenoAppState extends State<RumenoApp> with WidgetsBindingObserver {
     _router.dispose();
     _authProvider.dispose();
     _ecommerceProvider.dispose();
+    _localeProvider.dispose();
     super.dispose();
   }
 
@@ -60,12 +65,20 @@ class _RumenoAppState extends State<RumenoApp> with WidgetsBindingObserver {
       providers: [
         ChangeNotifierProvider.value(value: _authProvider),
         ChangeNotifierProvider.value(value: _ecommerceProvider),
+        ChangeNotifierProvider.value(value: _localeProvider),
       ],
-      child: MaterialApp.router(
-        title: 'Rumeno - Farm Management',
-        debugShowCheckedModeBanner: false,
-        theme: RumenoTheme.lightTheme,
-        routerConfig: _router,
+      child: Consumer<LocaleProvider>(
+        builder: (context, localeProvider, _) {
+          return MaterialApp.router(
+            title: 'Rumeno - Farm Management',
+            debugShowCheckedModeBanner: false,
+            theme: RumenoTheme.lightTheme,
+            locale: localeProvider.locale,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: _router,
+          );
+        },
       ),
     );
   }

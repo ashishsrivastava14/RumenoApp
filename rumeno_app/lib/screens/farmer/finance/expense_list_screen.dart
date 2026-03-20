@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_finance.dart';
 import '../../../models/models.dart';
 import '../../../widgets/cards/expense_card.dart';
@@ -68,18 +69,19 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final filtered = _filtered;
     final totalAmount = filtered.fold(0.0, (sum, e) => sum + e.amount);
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('📋 All Expenses'),
+        title: Text(l10n.expenseListTitle),
         actions: const [VeterinarianButton(), MarketplaceButton()],
       ),
       body: Column(
         children: [
-          SearchBarWidget(hintText: 'Search expenses...', onChanged: (v) => setState(() => _search = v)),
+          SearchBarWidget(hintText: l10n.expenseListSearchHint, onChanged: (v) => setState(() => _search = v)),
 
           // Total amount banner
           Container(
@@ -97,12 +99,12 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Total Spent', style: TextStyle(fontSize: 13, color: RumenoTheme.errorRed.withValues(alpha: 0.7))),
+                    Text(l10n.expenseListTotalSpent, style: TextStyle(fontSize: 13, color: RumenoTheme.errorRed.withValues(alpha: 0.7))),
                     Text('₹${totalAmount.toStringAsFixed(0)}', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: RumenoTheme.errorRed)),
                   ],
                 ),
                 const Spacer(),
-                Text('${filtered.length} items', style: TextStyle(fontSize: 14, color: RumenoTheme.textGrey)),
+                Text(l10n.expenseListItemCount(filtered.length), style: TextStyle(fontSize: 14, color: RumenoTheme.textGrey)),
               ],
             ),
           ),
@@ -135,7 +137,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                       children: [
                         Icon(Icons.search_off_rounded, size: 64, color: Colors.grey.shade300),
                         const SizedBox(height: 12),
-                        Text('No expenses found', style: TextStyle(fontSize: 16, color: RumenoTheme.textGrey)),
+                        Text(l10n.expenseListEmpty, style: TextStyle(fontSize: 16, color: RumenoTheme.textGrey)),
                       ],
                     ),
                   )

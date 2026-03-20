@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../widgets/common/marketplace_button.dart';
 
 class FarmProfileScreen extends StatefulWidget {
@@ -36,7 +37,7 @@ class _FarmProfileScreenState extends State<FarmProfileScreen> {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('My Farm'),
+        title: Text(AppLocalizations.of(context).moreMyFarm),
         actions: const [VeterinarianButton(), MarketplaceButton()],
       ),
       body: SingleChildScrollView(

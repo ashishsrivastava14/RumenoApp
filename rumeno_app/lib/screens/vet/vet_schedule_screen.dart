@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../mock/mock_animals.dart';
 import '../../mock/mock_health.dart';
 import '../../models/models.dart';
@@ -33,7 +34,7 @@ class VetScheduleScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('Upcoming Schedule'),
+        title: Text(AppLocalizations.of(context).vetScheduleTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
@@ -51,7 +52,7 @@ class VetScheduleScreen extends StatelessWidget {
         children: [
           // Upcoming Events section
           if (grouped.isNotEmpty) ...[
-            _SectionTitle(title: 'Visits & Events', count: sorted.length),
+            _SectionTitle(title: AppLocalizations.of(context).vetScheduleSectionVisits, count: sorted.length),
             const SizedBox(height: 8),
             ...grouped.entries.map((entry) => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +69,7 @@ class VetScheduleScreen extends StatelessWidget {
           if (upcomingVaccinations.isNotEmpty) ...[
             const SizedBox(height: 4),
             _SectionTitle(
-                title: 'Pending Vaccinations',
+                title: AppLocalizations.of(context).vetScheduleSectionVaccinations,
                 count: upcomingVaccinations.length),
             const SizedBox(height: 8),
             ...upcomingVaccinations
@@ -298,7 +299,7 @@ class _VaccinationEventCard extends StatelessWidget {
                   color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(isOverdue ? 'Overdue' : 'Due',
+                child: Text(isOverdue ? AppLocalizations.of(context).commonOverdue : AppLocalizations.of(context).commonDue,
                     style: TextStyle(
                         fontSize: 10,
                         color: color,

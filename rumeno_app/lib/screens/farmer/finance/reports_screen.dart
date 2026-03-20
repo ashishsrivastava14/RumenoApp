@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../widgets/charts/bar_chart_widget.dart';
 import '../../../widgets/charts/pie_chart_widget.dart';
 import '../../../widgets/common/date_range_picker_widget.dart';
@@ -13,7 +14,7 @@ class ReportsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('📊 Reports'),
+        title: Text(AppLocalizations.of(context).financeReportsTitle),
         actions: const [VeterinarianButton(), MarketplaceButton()],
       ),
       body: ListView(

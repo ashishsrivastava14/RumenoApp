@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_finance.dart';
 import '../../../models/models.dart';
 import '../../../widgets/cards/expense_card.dart';
@@ -22,7 +23,7 @@ class FinanceDashboardScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('💰 Finance'),
+        title: Text(AppLocalizations.of(context).financeDashboardTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {

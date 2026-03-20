@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -13,6 +14,7 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ecommerce = context.watch<EcommerceProvider>();
     final cartItems = ecommerce.cartItems;
 
@@ -23,7 +25,7 @@ class CartScreen extends StatelessWidget {
           children: [
             const Icon(Icons.shopping_cart_rounded, size: 22),
             const SizedBox(width: 8),
-            Text('Cart (${ecommerce.cartItemCount})'),
+            Text(l10n.cartTitle(ecommerce.cartItemCount)),
           ],
         ),
         leading: IconButton(
@@ -46,9 +48,9 @@ class CartScreen extends StatelessWidget {
                     child: Icon(Icons.shopping_cart_outlined, size: 80, color: RumenoTheme.textLight),
                   ),
                   const SizedBox(height: 20),
-                  Text('Cart is empty', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 20)),
+                  Text(l10n.cartEmpty, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 20)),
                   const SizedBox(height: 8),
-                  Text('Add products to get started', style: TextStyle(color: RumenoTheme.textGrey, fontSize: 15)),
+                  Text(l10n.cartEmptySubtitle, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 15)),
                   const SizedBox(height: 28),
                   SizedBox(
                     width: 220,
@@ -56,7 +58,7 @@ class CartScreen extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () => context.go('/shop'),
                       icon: const Icon(Icons.storefront_rounded, size: 22),
-                      label: const Text('Start Shopping', style: TextStyle(fontSize: 16)),
+                      label: Text(l10n.cartStartShopping, style: const TextStyle(fontSize: 16)),
                     ),
                   ),
                 ],
@@ -92,6 +94,7 @@ class _CartItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ecommerce = context.read<EcommerceProvider>();
+    final l10n = AppLocalizations.of(context);
     final product = item.product;
 
     return Card(
@@ -171,7 +174,7 @@ class _CartItemCard extends StatelessWidget {
                     ecommerce.removeFromCart(product.id);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('${product.name} removed'),
+                        content: Text(l10n.cartItemRemovedSnackbar(product.name)),
                         duration: const Duration(seconds: 1),
                         behavior: SnackBarBehavior.floating,
                       ),
@@ -243,6 +246,7 @@ class _CartItemCard extends StatelessWidget {
 class _CouponSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ecommerce = context.watch<EcommerceProvider>();
     final coupon = ecommerce.appliedCoupon;
 
@@ -266,7 +270,7 @@ class _CouponSection extends StatelessWidget {
                       children: [
                         Text(coupon.code, style: TextStyle(fontWeight: FontWeight.bold, color: RumenoTheme.successGreen, fontSize: 14)),
                         Text(
-                          'You save ₹${ecommerce.cartDiscount.toStringAsFixed(0)}',
+                          l10n.cartSavingsLabel(ecommerce.cartDiscount.toStringAsFixed(0)),
                           style: TextStyle(color: RumenoTheme.successGreen, fontSize: 12),
                         ),
                       ],
@@ -280,7 +284,7 @@ class _CouponSection extends StatelessWidget {
                         color: RumenoTheme.errorRed.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text('Remove', style: TextStyle(color: RumenoTheme.errorRed, fontSize: 13, fontWeight: FontWeight.w600)),
+                      child: Text(l10n.cartRemoveCoupon, style: TextStyle(color: RumenoTheme.errorRed, fontSize: 13, fontWeight: FontWeight.w600)),
                     ),
                   ),
                 ],
@@ -299,7 +303,7 @@ class _CouponSection extends StatelessWidget {
                   children: [
                     Icon(Icons.local_offer_rounded, color: RumenoTheme.primaryGreen, size: 24),
                     const SizedBox(width: 10),
-                    const Text('Apply Coupon', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                    Text(l10n.cartApplyCoupon, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                     const Spacer(),
                     Icon(Icons.chevron_right_rounded, color: RumenoTheme.primaryGreen, size: 26),
                   ],
@@ -310,6 +314,7 @@ class _CouponSection extends StatelessWidget {
   }
 
   void _showCouponDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
     showModalBottomSheet(
       context: context,
@@ -331,7 +336,7 @@ class _CouponSection extends StatelessWidget {
                 children: [
                   const Icon(Icons.local_offer_rounded, color: RumenoTheme.primaryGreen, size: 26),
                   const SizedBox(width: 8),
-                  Text('Apply Coupon', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22)),
+                  Text(l10n.cartCouponDialogTitle, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22)),
                 ],
               ),
               const SizedBox(height: 16),
@@ -339,10 +344,10 @@ class _CouponSection extends StatelessWidget {
                 controller: controller,
                 textCapitalization: TextCapitalization.characters,
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                decoration: const InputDecoration(
-                  hintText: 'Coupon code here...',
-                  prefixIcon: Icon(Icons.local_offer_outlined, size: 24),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: InputDecoration(
+                  hintText: l10n.cartCouponHint,
+                  prefixIcon: const Icon(Icons.local_offer_outlined, size: 24),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
               ),
               const SizedBox(height: 14),
@@ -369,12 +374,12 @@ class _CouponSection extends StatelessWidget {
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
+                        SnackBar(
                           content: Row(
                             children: [
-                              Icon(Icons.check_circle, color: Colors.white, size: 20),
-                              SizedBox(width: 8),
-                              Text('Coupon applied!'),
+                              const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                              const SizedBox(width: 8),
+                              Text(l10n.cartCouponApplied),
                             ],
                           ),
                           behavior: SnackBarBehavior.floating,
@@ -384,11 +389,11 @@ class _CouponSection extends StatelessWidget {
                     }
                   },
                   icon: const Icon(Icons.check_rounded),
-                  label: const Text('Apply', style: TextStyle(fontSize: 16)),
+                  label: Text(l10n.cartCouponApplyButton, style: const TextStyle(fontSize: 16)),
                 ),
               ),
               const SizedBox(height: 16),
-              Text('Available Coupons:', style: TextStyle(fontWeight: FontWeight.w600, color: RumenoTheme.textGrey, fontSize: 14)),
+              Text(l10n.cartAvailableCouponsHeader, style: TextStyle(fontWeight: FontWeight.w600, color: RumenoTheme.textGrey, fontSize: 14)),
               const SizedBox(height: 10),
               ..._availableCoupons(context),
               const SizedBox(height: 8),
@@ -400,10 +405,11 @@ class _CouponSection extends StatelessWidget {
   }
 
   List<Widget> _availableCoupons(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return [
-      _couponTile(context, 'WELCOME20', '20% off (max ₹200)', 'Min order: ₹500'),
-      _couponTile(context, 'FLAT100', '₹100 off', 'Min order: ₹999'),
-      _couponTile(context, 'FEED15', '15% off on feed (max ₹500)', 'Min order: ₹1500'),
+      _couponTile(context, 'WELCOME20', l10n.cartCouponWelcome20Desc, l10n.cartCouponWelcome20Condition),
+      _couponTile(context, 'FLAT100', l10n.cartCouponFlat100Desc, l10n.cartCouponFlat100Condition),
+      _couponTile(context, 'FEED15', l10n.cartCouponFeed15Desc, l10n.cartCouponFeed15Condition),
     ];
   }
 
@@ -465,6 +471,7 @@ class _CouponSection extends StatelessWidget {
 class _PriceSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ecommerce = context.watch<EcommerceProvider>();
 
     return Container(
@@ -475,13 +482,13 @@ class _PriceSummary extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _priceRow(context, Icons.receipt_rounded, 'Subtotal', '₹${ecommerce.cartSubtotal.toStringAsFixed(0)}'),
+          _priceRow(context, Icons.receipt_rounded, l10n.cartSubtotalLabel, '₹${ecommerce.cartSubtotal.toStringAsFixed(0)}'),
           if (ecommerce.cartDiscount > 0)
-            _priceRow(context, Icons.local_offer_rounded, 'Discount', '-₹${ecommerce.cartDiscount.toStringAsFixed(0)}', color: RumenoTheme.successGreen),
+            _priceRow(context, Icons.local_offer_rounded, l10n.cartDiscountLabel, '-₹${ecommerce.cartDiscount.toStringAsFixed(0)}', color: RumenoTheme.successGreen),
           _priceRow(
             context,
             Icons.local_shipping_rounded,
-            'Delivery',
+            l10n.cartDeliveryLabel,
             ecommerce.deliveryCharge == 0 ? 'FREE' : '₹${ecommerce.deliveryCharge.toStringAsFixed(0)}',
             color: ecommerce.deliveryCharge == 0 ? RumenoTheme.successGreen : null,
           ),
@@ -490,7 +497,7 @@ class _PriceSummary extends StatelessWidget {
             children: [
               Icon(Icons.payments_rounded, color: RumenoTheme.primaryGreen, size: 22),
               const SizedBox(width: 6),
-              Text('Total', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(l10n.cartTotalLabel, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, fontSize: 16)),
               const Spacer(),
               Text(
                 '₹${ecommerce.cartTotal.toStringAsFixed(0)}',
@@ -522,6 +529,7 @@ class _PriceSummary extends StatelessWidget {
 class _CheckoutButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthProvider>();
     final ecommerce = context.watch<EcommerceProvider>();
 
@@ -549,8 +557,8 @@ class _CheckoutButton extends StatelessWidget {
             ),
             label: Text(
               auth.isAuthenticated
-                  ? 'Checkout ₹${ecommerce.cartTotal.toStringAsFixed(0)}'
-                  : 'Login to Checkout',
+                  ? l10n.cartCheckoutButton(ecommerce.cartTotal.toStringAsFixed(0))
+                  : l10n.cartLoginToCheckout,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             style: ElevatedButton.styleFrom(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_health.dart';
 import '../../../widgets/common/marketplace_button.dart';
 import '../../../models/models.dart';
@@ -356,16 +357,16 @@ class _BreedingDashboardScreenState extends State<BreedingDashboardScreen> {
       child: Scaffold(
         backgroundColor: RumenoTheme.backgroundCream,
         appBar: AppBar(
-          title: const Text('Breeding'),
+          title: Text(AppLocalizations.of(context).breedingTitle),
           actions: const [VeterinarianButton(), MarketplaceButton()],
-          bottom: const TabBar(
+          bottom: TabBar(
             indicatorColor: Colors.white,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
             tabs: [
-              Tab(text: 'Dashboard'),
-              Tab(text: 'Heat Tracking'),
-              Tab(text: 'Pregnancy'),
+              Tab(text: AppLocalizations.of(context).breedingTabDashboard),
+              Tab(text: AppLocalizations.of(context).breedingTabHeatTracking),
+              Tab(text: AppLocalizations.of(context).breedingTabPregnancy),
             ],
           ),
         ),
@@ -380,7 +381,7 @@ class _BreedingDashboardScreenState extends State<BreedingDashboardScreen> {
           onPressed: _showAddMenu,
           backgroundColor: RumenoTheme.primaryGreen,
           icon: const Icon(Icons.add, color: Colors.white),
-          label: const Text('Add Record', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          label: Text(AppLocalizations.of(context).breedingAddRecordFab, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         ),
       ),
     );

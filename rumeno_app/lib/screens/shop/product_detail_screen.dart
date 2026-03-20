@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
 import '../../widgets/common/marketplace_button.dart';
@@ -14,6 +15,7 @@ class ProductDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ecommerce = context.watch<EcommerceProvider>();
     final product = ecommerce.getProductById(productId);
 
@@ -27,7 +29,7 @@ class ProductDetailScreen extends StatelessWidget {
               children: [
                 Icon(Icons.error_outline_rounded, size: 80, color: RumenoTheme.textLight),
                 const SizedBox(height: 16),
-                const Text('Product not found', style: TextStyle(fontSize: 18)),
+                Text(l10n.productNotFound, style: const TextStyle(fontSize: 18)),
               ],
             ),
           ),
@@ -83,7 +85,7 @@ class ProductDetailScreen extends StatelessWidget {
                             size: 20,
                           ),
                           const SizedBox(width: 8),
-                          Text(ecommerce.isInWishlist(productId) ? 'Added to wishlist!' : 'Removed from wishlist'),
+                          Text(ecommerce.isInWishlist(productId) ? l10n.productAddedToWishlist : l10n.productRemovedFromWishlist),
                         ],
                       ),
                       duration: const Duration(seconds: 1),
@@ -111,9 +113,9 @@ class ProductDetailScreen extends StatelessWidget {
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: 'Check out ${product.name} on Rumeno Shop! https://rumeno.in/shop/product/${product.id}'));
                   ScaffoldMessenger.of(scaffoldContext).showSnackBar(
-                    const SnackBar(
-                      content: Text('Share link copied to clipboard!'),
-                      duration: Duration(seconds: 1),
+                    SnackBar(
+                      content: Text(l10n.productShareCopied),
+                      duration: const Duration(seconds: 1),
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
@@ -153,12 +155,12 @@ class ProductDetailScreen extends StatelessWidget {
                             color: RumenoTheme.primaryGreen,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.verified_rounded, color: Colors.white, size: 16),
-                              SizedBox(width: 4),
-                              Text('Rumeno Product', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                              const Icon(Icons.verified_rounded, color: Colors.white, size: 16),
+                              const SizedBox(width: 4),
+                              Text(l10n.productRumenoBadge, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -174,7 +176,7 @@ class ProductDetailScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            '${product.discountPercent.toStringAsFixed(0)}% OFF',
+                            l10n.productOffBadge(product.discountPercent.round()),
                             style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -238,7 +240,7 @@ class ProductDetailScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'MRP ₹${product.mrp!.toStringAsFixed(0)}',
+                                l10n.productMrpLabel(product.mrp!.toStringAsFixed(0)),
                                 style: TextStyle(
                                   color: RumenoTheme.textLight,
                                   fontSize: 16,
@@ -250,7 +252,7 @@ class ProductDetailScreen extends StatelessWidget {
                                   Icon(Icons.savings_rounded, color: RumenoTheme.successGreen, size: 16),
                                   const SizedBox(width: 4),
                                   Text(
-                                    'Save ₹${(product.mrp! - product.price).toStringAsFixed(0)}',
+                                    l10n.productSaveLabel((product.mrp! - product.price).toStringAsFixed(0)),
                                     style: TextStyle(color: RumenoTheme.successGreen, fontSize: 14, fontWeight: FontWeight.bold),
                                   ),
                                 ],
@@ -262,9 +264,9 @@ class ProductDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text('(Inclusive of all taxes)', style: TextStyle(color: RumenoTheme.textGrey, fontSize: 12)),
+                  Text(l10n.productTaxIncluded, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 12)),
                   const SizedBox(height: 6),
-                  Text('Unit: ${product.unit}', style: TextStyle(color: RumenoTheme.textGrey, fontSize: 14)),
+                  Text(l10n.productUnitLabel(product.unit), style: TextStyle(color: RumenoTheme.textGrey, fontSize: 14)),
                   const SizedBox(height: 14),
 
                   // Rating & Stock - visual
@@ -317,7 +319,7 @@ class ProductDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          product.inStock ? 'In Stock' : 'Out of Stock',
+                          product.inStock ? l10n.shopInStock : l10n.shopOutOfStock,
                           style: TextStyle(
                             color: product.inStock ? RumenoTheme.successGreen : RumenoTheme.errorRed,
                             fontWeight: FontWeight.bold,
@@ -338,7 +340,7 @@ class ProductDetailScreen extends StatelessWidget {
                       Expanded(
                         child: _TrustBadge(
                           icon: Icons.local_shipping_rounded,
-                          label: 'Free Delivery\n₹999+',
+                          label: l10n.productTrustFreeDelivery,
                           color: RumenoTheme.infoBlue,
                         ),
                       ),
@@ -346,7 +348,7 @@ class ProductDetailScreen extends StatelessWidget {
                       Expanded(
                         child: _TrustBadge(
                           icon: Icons.verified_user_rounded,
-                          label: '100% Genuine\nOriginal Product',
+                          label: l10n.productTrustGenuine,
                           color: RumenoTheme.successGreen,
                         ),
                       ),
@@ -354,7 +356,7 @@ class ProductDetailScreen extends StatelessWidget {
                       Expanded(
                         child: _TrustBadge(
                           icon: Icons.replay_rounded,
-                          label: 'Easy Return\n7 Day Policy',
+                          label: l10n.productTrustEasyReturn,
                           color: const Color(0xFF9C27B0),
                         ),
                       ),
@@ -366,7 +368,7 @@ class ProductDetailScreen extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   // Description
-                  Text('Description', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18)),
+                  Text(l10n.productDescriptionLabel, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18)),
                   const SizedBox(height: 8),
                   Text(product.description, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 15, height: 1.6)),
 
@@ -382,8 +384,8 @@ class ProductDetailScreen extends StatelessWidget {
                           } else {
                             if (scaffoldContext.mounted) {
                               ScaffoldMessenger.of(scaffoldContext).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Could not open video'),
+                                SnackBar(
+                                  content: Text(l10n.productVideoOpenError),
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );
@@ -391,7 +393,7 @@ class ProductDetailScreen extends StatelessWidget {
                           }
                         },
                         icon: const Icon(Icons.play_circle_filled_rounded, color: Colors.red, size: 28),
-                        label: const Text('Watch Video', style: TextStyle(fontSize: 15)),
+                        label: Text(l10n.productWatchVideo, style: const TextStyle(fontSize: 15)),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           side: const BorderSide(color: Colors.red, width: 1.5),
@@ -409,7 +411,7 @@ class ProductDetailScreen extends StatelessWidget {
                     children: [
                       const Icon(Icons.rate_review_rounded, color: Colors.amber, size: 22),
                       const SizedBox(width: 6),
-                      Text('Reviews (${reviews.length})', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18)),
+                      Text(l10n.productReviewsLabel(reviews.length), style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -421,7 +423,7 @@ class ProductDetailScreen extends StatelessWidget {
                           children: [
                             Icon(Icons.rate_review_outlined, size: 48, color: RumenoTheme.textLight),
                             const SizedBox(height: 8),
-                            Text('No reviews yet', style: TextStyle(color: RumenoTheme.textGrey, fontSize: 15)),
+                            Text(l10n.productNoReviews, style: TextStyle(color: RumenoTheme.textGrey, fontSize: 15)),
                           ],
                         ),
                       ),
@@ -460,14 +462,14 @@ class ProductDetailScreen extends StatelessWidget {
                                   children: [
                                     const Icon(Icons.check_circle_rounded, color: Colors.white, size: 22),
                                     const SizedBox(width: 8),
-                                    Expanded(child: Text('${product.name} added to cart!')),
+                                    Expanded(child: Text(l10n.productAddedToCartSnackbar(product.name))),
                                   ],
                                 ),
                                 duration: const Duration(seconds: 2),
                                 behavior: SnackBarBehavior.floating,
                                 backgroundColor: RumenoTheme.successGreen,
                                 action: SnackBarAction(
-                                  label: 'View Cart',
+                                  label: l10n.cartViewCartSnackbarAction,
                                   textColor: Colors.white,
                                   onPressed: () => context.go('/shop/cart'),
                                 ),
@@ -479,7 +481,7 @@ class ProductDetailScreen extends StatelessWidget {
                             size: 24,
                           ),
                           label: Text(
-                            isInCart ? 'In Cart ✓' : 'Add to Cart',
+                            isInCart ? l10n.productInCart : l10n.productAddToCart,
                             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                           ),
                           style: OutlinedButton.styleFrom(
@@ -503,9 +505,9 @@ class ProductDetailScreen extends StatelessWidget {
                             context.go('/shop/cart');
                           },
                           icon: const Icon(Icons.flash_on_rounded, size: 24),
-                          label: const Text(
-                            'Buy Now',
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                          label: Text(
+                            l10n.productBuyNow,
+                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: RumenoTheme.primaryGreen,

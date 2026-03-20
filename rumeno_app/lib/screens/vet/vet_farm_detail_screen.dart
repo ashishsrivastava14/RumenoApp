@@ -7,6 +7,7 @@ import '../../mock/mock_farmers.dart';
 import '../../mock/mock_health.dart';
 import '../../models/models.dart';
 import '../../widgets/common/marketplace_button.dart';
+import '../../l10n/app_localizations.dart';
 
 class VetFarmDetailScreen extends StatefulWidget {
   final String farmerId;
@@ -64,10 +65,10 @@ class _VetFarmDetailScreenState extends State<VetFarmDetailScreen>
         actions: const [FarmButton(), MarketplaceButton()],
         bottom: TabBar(
           controller: _tab,
-          tabs: const [
-            Tab(text: 'Animals'),
-            Tab(text: 'Treatments'),
-            Tab(text: 'Vaccinations'),
+          tabs: [
+            Tab(text: AppLocalizations.of(context).vetFarmDetailTabAnimals),
+            Tab(text: AppLocalizations.of(context).vetFarmDetailTabTreatments),
+            Tab(text: AppLocalizations.of(context).vetFarmDetailTabVaccinations),
           ],
         ),
       ),
@@ -198,7 +199,7 @@ class _FarmInfoBanner extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     fontSize: 22),
               ),
-              const Text('animals', style: TextStyle(fontSize: 10, color: Colors.grey)),
+              Text(AppLocalizations.of(context).vetFarmDetailAnimalsLabel, style: const TextStyle(fontSize: 10, color: Colors.grey)),
             ],
           ),
         ],
@@ -235,7 +236,7 @@ class _AnimalsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (animals.isEmpty) {
-      return const Center(child: Text('No animals recorded for this farm.'));
+      return Center(child: Text(AppLocalizations.of(context).vetFarmDetailNoAnimals));
     }
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -292,11 +293,11 @@ class _AnimalsTab extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${a.breed} · ${a.speciesName} · ${a.gender == Gender.male ? 'Male' : 'Female'}',
+                      '${a.breed} · ${a.speciesName} · ${a.gender == Gender.male ? AppLocalizations.of(context).commonMale : AppLocalizations.of(context).commonFemale}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     Text(
-                      '${a.weightKg.toInt()} kg · Age: ${a.ageString}${a.shedNumber != null ? ' · Shed ${a.shedNumber}' : ''}',
+                      '${a.weightKg.toInt()} kg · Age: ${a.ageString}${a.shedNumber != null ? ' · ${AppLocalizations.of(context).vetFarmDetailShed} ${a.shedNumber}' : ''}',
                       style: Theme.of(context)
                           .textTheme
                           .bodySmall
@@ -331,14 +332,14 @@ class _TreatmentsTab extends StatelessWidget {
     }
   }
 
-  String _statusLabel(TreatmentStatus s) {
+  String _statusLabel(TreatmentStatus s, AppLocalizations l10n) {
     switch (s) {
       case TreatmentStatus.active:
-        return 'Active';
+        return l10n.commonActive;
       case TreatmentStatus.completed:
-        return 'Completed';
+        return l10n.commonCompleted;
       case TreatmentStatus.followUp:
-        return 'Follow-up';
+        return l10n.commonFollowUp;
     }
   }
 
@@ -353,8 +354,9 @@ class _TreatmentsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (treatments.isEmpty) {
-      return const Center(child: Text('No treatment records for this farm.'));
+      return Center(child: Text(l10n.vetFarmDetailNoTreatments));
     }
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -386,7 +388,7 @@ class _TreatmentsTab extends StatelessWidget {
                       color: color.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: Text(_statusLabel(t.status),
+                    child: Text(_statusLabel(t.status, l10n),
                         style: TextStyle(
                             fontSize: 10,
                             color: color,
@@ -419,7 +421,7 @@ class _TreatmentsTab extends StatelessWidget {
                         size: 12, color: Colors.orange[400]),
                     const SizedBox(width: 4),
                     Text(
-                        'Follow-up: ${DateFormat('dd MMM').format(t.followUpDate!)}',
+                        l10n.vetFarmDetailFollowUpDate(DateFormat('dd MMM').format(t.followUpDate!)),
                         style: TextStyle(
                             fontSize: 11, color: Colors.orange[600])),
                   ],
@@ -452,14 +454,14 @@ class _VaccinationsTab extends StatelessWidget {
     }
   }
 
-  String _statusLabel(VaccinationStatus s) {
+  String _statusLabel(VaccinationStatus s, AppLocalizations l10n) {
     switch (s) {
       case VaccinationStatus.done:
-        return 'Done';
+        return l10n.commonDone;
       case VaccinationStatus.due:
-        return 'Due';
+        return l10n.commonDue;
       case VaccinationStatus.overdue:
-        return 'Overdue';
+        return l10n.commonOverdue;
     }
   }
 
@@ -474,8 +476,9 @@ class _VaccinationsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (vaccinations.isEmpty) {
-      return const Center(child: Text('No vaccination records for this farm.'));
+      return Center(child: Text(l10n.vetFarmDetailNoVaccinations));
     }
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -520,7 +523,7 @@ class _VaccinationsTab extends StatelessWidget {
                             color: color.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: Text(_statusLabel(v.status),
+                          child: Text(_statusLabel(v.status, l10n),
                               style: TextStyle(
                                   fontSize: 10,
                                   color: color,
@@ -537,15 +540,15 @@ class _VaccinationsTab extends StatelessWidget {
                       children: [
                         Text(
                           v.dateAdministered != null
-                              ? 'Given: ${DateFormat('dd MMM yyyy').format(v.dateAdministered!)}'
-                              : 'Due: ${DateFormat('dd MMM yyyy').format(v.dueDate)}',
+                              ? l10n.vetFarmDetailGivenDate(DateFormat('dd MMM yyyy').format(v.dateAdministered!))
+                              : l10n.vetFarmDetailDueDate(DateFormat('dd MMM yyyy').format(v.dueDate)),
                           style: TextStyle(
                               fontSize: 11, color: Colors.grey[500]),
                         ),
                         if (v.nextDueDate != null) ...[
                           const SizedBox(width: 8),
                           Text(
-                            'Next: ${DateFormat('dd MMM yyyy').format(v.nextDueDate!)}',
+                            l10n.vetFarmDetailNextDate(DateFormat('dd MMM yyyy').format(v.nextDueDate!)),
                             style: TextStyle(
                                 fontSize: 11, color: Colors.orange[600]),
                           ),

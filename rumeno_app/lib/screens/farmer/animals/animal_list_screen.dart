@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../mock/mock_kids.dart';
 import '../../../models/models.dart';
@@ -148,10 +149,11 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('My Animals'),
+        title: Text(l10n.animalListTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
@@ -168,9 +170,15 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           PopupMenuButton<String>(
             icon: const Icon(Icons.sort),
             onSelected: (v) => setState(() => _sortBy = v),
-            itemBuilder: (context) => ['Tag', 'Name', 'Age', 'Status']
-                .map((s) => PopupMenuItem(value: s, child: Text('Sort by $s')))
-                .toList(),
+            itemBuilder: (context) {
+              final sl10n = AppLocalizations.of(context);
+              return [
+                PopupMenuItem(value: 'Tag', child: Text(sl10n.animalListSortByTag)),
+                PopupMenuItem(value: 'Name', child: Text(sl10n.animalListSortByName)),
+                PopupMenuItem(value: 'Age', child: Text(sl10n.animalListSortByAge)),
+                PopupMenuItem(value: 'Status', child: Text(sl10n.animalListSortByStatus)),
+              ];
+            },
           ),
         ],
       ),
@@ -197,7 +205,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                     child: TextField(
                       onChanged: (v) => setState(() => _searchQuery = v),
                       decoration: InputDecoration(
-                        hintText: 'Search by tag or breed...',
+                        hintText: l10n.animalListSearchHint,
                         hintStyle: TextStyle(color: RumenoTheme.textLight),
                         prefixIcon: Icon(Icons.search, color: RumenoTheme.textGrey),
                         suffixIcon: Badge(
@@ -228,7 +236,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
-                _FilterChip(label: 'All', selected: _selectedSpecies == null, onTap: () => setState(() => _selectedSpecies = null)),
+                _FilterChip(label: l10n.commonAll, selected: _selectedSpecies == null, onTap: () => setState(() => _selectedSpecies = null)),
                 _FilterChip(label: 'Cow', selected: _selectedSpecies == Species.cow, onTap: () => setState(() => _selectedSpecies = Species.cow)),
                 _FilterChip(label: 'Buffalo', selected: _selectedSpecies == Species.buffalo, onTap: () => setState(() => _selectedSpecies = Species.buffalo)),
                 _FilterChip(label: 'Goat', selected: _selectedSpecies == Species.goat, onTap: () => setState(() => _selectedSpecies = Species.goat)),
@@ -254,7 +262,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                     ),
                   if (_selectedGender != null)
                     _ActiveFilterTag(
-                      label: _selectedGender == Gender.male ? 'Male' : 'Female',
+                      label: _selectedGender == Gender.male ? l10n.commonMale : l10n.commonFemale,
                       onRemove: () => setState(() => _selectedGender = null),
                     ),
                   if (_selectedPurpose != null)
@@ -275,7 +283,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                       _selectedAgeRange = null;
                     }),
                     child: Chip(
-                      label: const Text('Clear all', style: TextStyle(fontSize: 12, color: Colors.red)),
+                      label: Text(l10n.animalListClearAll, style: const TextStyle(fontSize: 12, color: Colors.red)),
                       backgroundColor: Colors.red.shade50,
                       side: BorderSide(color: Colors.red.shade200),
                       deleteIcon: const Icon(Icons.close, size: 16, color: Colors.red),
@@ -315,7 +323,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.go('/farmer/animals/add'),
         icon: const Icon(Icons.add),
-        label: const Text('Add Animal'),
+        label: Text(l10n.animalListAddFab),
       ),
     );
   }
