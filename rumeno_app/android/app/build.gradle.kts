@@ -30,16 +30,6 @@ android {
         versionName = flutter.versionName
     }
 
-    // APK splits - only for APK builds (comment out for App Bundle builds)
-    splits {
-        abi {
-            isEnable = true
-            reset()
-            include("armeabi-v7a", "arm64-v8a", "x86_64")
-            isUniversalApk = false
-        }
-    }
-
     buildTypes {
         release {
             // Minification disabled for compatibility - APK splits provide the main size reduction
