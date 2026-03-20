@@ -65,6 +65,9 @@ import '../screens/admin/admin_farmers_screen.dart';
 import '../screens/admin/admin_animals_screen.dart';
 import '../screens/admin/admin_health_config_screen.dart';
 import '../screens/admin/admin_more_screen.dart';
+import '../screens/admin/admin_farm_screen.dart';
+import '../screens/admin/admin_shop_screen.dart';
+import '../screens/admin/admin_vets_screen.dart';
 import '../screens/admin/more/admin_subscriptions_screen.dart';
 import '../screens/admin/more/admin_payments_screen.dart';
 import '../screens/admin/more/admin_partners_screen.dart';
@@ -348,13 +351,32 @@ GoRouter createRouter(AuthProvider authProvider) {
             path: '/admin/farmers',
             builder: (_, _) => const AdminFarmersScreen(),
           ),
+          // Farm module (animals + health merged)
           GoRoute(
-            path: '/admin/animals',
-            builder: (_, _) => const AdminAnimalsScreen(),
+            path: '/admin/farm',
+            builder: (_, _) => const AdminFarmScreen(),
+            routes: [
+              GoRoute(
+                path: 'health-config',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminHealthConfigScreen(),
+              ),
+              GoRoute(
+                path: 'animals',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminAnimalsScreen(),
+              ),
+            ],
           ),
+          // Shop / Ecommerce module
           GoRoute(
-            path: '/admin/health',
-            builder: (_, _) => const AdminHealthConfigScreen(),
+            path: '/admin/shop',
+            builder: (_, _) => const AdminShopScreen(),
+          ),
+          // Vets module
+          GoRoute(
+            path: '/admin/vets',
+            builder: (_, _) => const AdminVetsScreen(),
           ),
           GoRoute(
             path: '/admin/more',
