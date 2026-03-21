@@ -36,7 +36,7 @@ class _AdminShopScreenState extends State<AdminShopScreen>
         headerSliverBuilder: (context, _) => [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 180,
+            expandedHeight: 192,
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
