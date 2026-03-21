@@ -339,15 +339,39 @@ class EcommerceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateProduct(String id, {String? name, double? price, int? stockQuantity, bool? isFeatured, bool? isApproved}) {
+  void updateProduct(String id, {
+    String? name,
+    String? description,
+    double? price,
+    double? mrp,
+    ProductCategory? category,
+    int? stockQuantity,
+    String? imageUrl,
+    String? unit,
+    double? weightKg,
+    String? hsnCode,
+    bool? isFeatured,
+    bool? isApproved,
+    List<String>? tags,
+    List<ProductAnimal>? targetAnimals,
+  }) {
     final idx = _allProducts.indexWhere((p) => p.id == id);
     if (idx == -1) return;
     _allProducts[idx] = _allProducts[idx].copyWith(
       name: name,
+      description: description,
       price: price,
+      mrp: mrp,
+      category: category,
       stockQuantity: stockQuantity,
+      imageUrl: imageUrl,
+      unit: unit,
+      weightKg: weightKg,
+      hsnCode: hsnCode,
       isFeatured: isFeatured,
       isApproved: isApproved,
+      tags: tags,
+      targetAnimals: targetAnimals,
     );
     notifyListeners();
   }
