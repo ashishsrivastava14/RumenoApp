@@ -428,6 +428,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageHindi => 'हिन्दी';
 
   @override
+  String get languageUrdu => 'اردو';
+
+  @override
   String get exportTitle => 'Export Data';
 
   @override

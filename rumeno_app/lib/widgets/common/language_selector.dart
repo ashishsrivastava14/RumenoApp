@@ -5,7 +5,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers/locale_provider.dart';
 
 /// Shows a bottom sheet language picker.
-/// Supports English and Hindi.
+/// Supports English, Hindi, and Urdu.
 Future<void> showLanguageSelectorSheet(BuildContext context) {
   return showModalBottomSheet(
     context: context,
@@ -91,6 +91,17 @@ class _LanguageSelectorSheet extends StatelessWidget {
             isSelected: current == 'hi',
             onTap: () async {
               await context.read<LocaleProvider>().setLocale(const Locale('hi'));
+              if (context.mounted) Navigator.pop(context);
+            },
+          ),
+          // Urdu option
+          _LanguageOption(
+            flag: '�🇳',
+            label: l10n.languageUrdu,
+            sublabel: 'Urdu',
+            isSelected: current == 'ur',
+            onTap: () async {
+              await context.read<LocaleProvider>().setLocale(const Locale('ur'));
               if (context.mounted) Navigator.pop(context);
             },
           ),

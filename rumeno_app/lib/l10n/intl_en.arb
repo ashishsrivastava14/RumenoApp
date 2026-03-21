@@ -340,6 +340,10 @@
   "@languageHindi": {
     "description": "Hindi language option – keep as-is"
   },
+  "languageUrdu": "اردو",
+  "@languageUrdu": {
+    "description": "Urdu language option – keep as-is"
+  },
   "exportTitle": "Export Data",
   "@exportTitle": {},
   "exportBannerHeadline": "Save Your Farm Data",
