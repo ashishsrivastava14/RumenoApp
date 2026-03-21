@@ -115,7 +115,10 @@ class _VendorCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.read<EcommerceProvider>().rejectVendor(vendor.id);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${vendor.businessName} rejected'), backgroundColor: RumenoTheme.errorRed));
+                    },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: RumenoTheme.errorRed,
                       side: const BorderSide(color: RumenoTheme.errorRed),
@@ -124,7 +127,10 @@ class _VendorCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.read<EcommerceProvider>().approveVendor(vendor.id);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${vendor.businessName} approved!'), backgroundColor: Colors.green));
+                    },
                     child: const Text('Approve'),
                   ),
                 ],

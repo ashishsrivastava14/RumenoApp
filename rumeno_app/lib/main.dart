@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'config/theme.dart';
 import 'config/router.dart';
 import 'l10n/app_localizations.dart';
+import 'providers/admin_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/ecommerce_provider.dart';
 import 'providers/locale_provider.dart';
@@ -24,6 +25,7 @@ class RumenoApp extends StatefulWidget {
 }
 
 class _RumenoAppState extends State<RumenoApp> with WidgetsBindingObserver {
+  late final AdminProvider _adminProvider;
   late final AuthProvider _authProvider;
   late final EcommerceProvider _ecommerceProvider;
   late final LocaleProvider _localeProvider;
@@ -33,6 +35,7 @@ class _RumenoAppState extends State<RumenoApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _adminProvider = AdminProvider();
     _authProvider = AuthProvider();
     _ecommerceProvider = EcommerceProvider();
     _localeProvider = LocaleProvider();
@@ -53,6 +56,7 @@ class _RumenoAppState extends State<RumenoApp> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _router.dispose();
+    _adminProvider.dispose();
     _authProvider.dispose();
     _ecommerceProvider.dispose();
     _localeProvider.dispose();
@@ -63,6 +67,7 @@ class _RumenoAppState extends State<RumenoApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: _adminProvider),
         ChangeNotifierProvider.value(value: _authProvider),
         ChangeNotifierProvider.value(value: _ecommerceProvider),
         ChangeNotifierProvider.value(value: _localeProvider),

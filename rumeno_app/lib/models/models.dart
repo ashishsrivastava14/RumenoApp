@@ -650,6 +650,45 @@ class Product {
         return 'Farm Equipment';
     }
   }
+
+  Product copyWith({
+    String? name,
+    String? description,
+    double? price,
+    double? mrp,
+    ProductCategory? category,
+    int? stockQuantity,
+    String? imageUrl,
+    bool? isFeatured,
+    bool? isApproved,
+    String? unit,
+    List<String>? tags,
+  }) {
+    return Product(
+      id: id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      price: price ?? this.price,
+      mrp: mrp ?? this.mrp,
+      category: category ?? this.category,
+      vendorId: vendorId,
+      vendorName: vendorName,
+      isRumenoOwned: isRumenoOwned,
+      stockQuantity: stockQuantity ?? this.stockQuantity,
+      imageUrl: imageUrl ?? this.imageUrl,
+      youtubeVideoUrl: youtubeVideoUrl,
+      rating: rating,
+      reviewCount: reviewCount,
+      isFeatured: isFeatured ?? this.isFeatured,
+      isApproved: isApproved ?? this.isApproved,
+      unit: unit ?? this.unit,
+      weightKg: weightKg,
+      createdAt: createdAt,
+      tags: tags ?? this.tags,
+      targetAnimals: targetAnimals,
+      hsnCode: hsnCode,
+    );
+  }
 }
 
 class CartItem {
@@ -768,6 +807,34 @@ class Order {
         return 'Returned';
     }
   }
+
+  Order copyWith({
+    OrderStatus? status,
+    String? trackingNumber,
+    DateTime? packedDate,
+    DateTime? shippedDate,
+    DateTime? deliveredDate,
+  }) {
+    return Order(
+      id: id,
+      userId: userId,
+      items: items,
+      address: address,
+      subtotal: subtotal,
+      discount: discount,
+      deliveryCharge: deliveryCharge,
+      totalAmount: totalAmount,
+      status: status ?? this.status,
+      couponCode: couponCode,
+      paymentMethod: paymentMethod,
+      paymentId: paymentId,
+      trackingNumber: trackingNumber ?? this.trackingNumber,
+      orderDate: orderDate,
+      packedDate: packedDate ?? this.packedDate,
+      shippedDate: shippedDate ?? this.shippedDate,
+      deliveredDate: deliveredDate ?? this.deliveredDate,
+    );
+  }
 }
 
 class OrderItem {
@@ -860,6 +927,33 @@ class Vendor {
       case VendorStatus.suspended:
         return 'Suspended';
     }
+  }
+
+  Vendor copyWith({VendorStatus? status}) {
+    return Vendor(
+      id: id,
+      businessName: businessName,
+      ownerName: ownerName,
+      phone: phone,
+      email: email,
+      gstNumber: gstNumber,
+      panNumber: panNumber,
+      bankAccountNumber: bankAccountNumber,
+      ifscCode: ifscCode,
+      bankName: bankName,
+      address: address,
+      city: city,
+      state: state,
+      pincode: pincode,
+      idProofUrl: idProofUrl,
+      status: status ?? this.status,
+      commissionPercent: commissionPercent,
+      walletBalance: walletBalance,
+      totalEarnings: totalEarnings,
+      totalProducts: totalProducts,
+      totalOrders: totalOrders,
+      joinedDate: joinedDate,
+    );
   }
 }
 

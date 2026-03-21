@@ -1,5 +1,7 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../providers/admin_provider.dart';
 
 class AdminVetsScreen extends StatefulWidget {
   const AdminVetsScreen({super.key});
@@ -147,6 +149,15 @@ class _AdminVetsScreenState extends State<AdminVetsScreen>
             style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFAD1457)),
             onPressed: () {
+              if (nameCtrl.text.trim().isEmpty) return;
+              final admin = context.read<AdminProvider>();
+              admin.addVet(VetModel(
+                id: 'V${DateTime.now().millisecondsSinceEpoch}',
+                name: nameCtrl.text.trim(),
+                specialization: specCtrl.text.trim().isEmpty ? 'General' : specCtrl.text.trim(),
+                licenseNumber: 'VET-NEW-${DateTime.now().year}-${DateTime.now().millisecond}',
+                status: VetStatus.pending,
+              ));
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Invite sent to ${nameCtrl.text}!')));
@@ -167,48 +178,29 @@ class _VetsTab extends StatefulWidget {
 
 class _VetsTabState extends State<_VetsTab> {
   String _search = '';
-  _VetStatus? _statusFilter;
-
-  final _vets = const [
-    _VetModel('V001', 'Dr. Emily Thompson', 'Large Animal Medicine',
-        'VET-MH-2019-0456', _VetStatus.active, 28, 12400, 4.9),
-    _VetModel('V002', 'Dr. Rajesh Kumar', 'Bovine & Caprine',
-        'VET-UP-2018-0231', _VetStatus.active, 34, 15600, 4.7),
-    _VetModel('V003', 'Dr. Priya Sharma', 'Small Ruminants',
-        'VET-MP-2020-0589', _VetStatus.active, 22, 9800, 4.8),
-    _VetModel('V004', 'Dr. Anil Verma', 'Equine Medicine',
-        'VET-HR-2017-0123', _VetStatus.inactive, 0, 3200, 4.5),
-    _VetModel('V005', 'Dr. Meena Patel', 'Poultry & Swine',
-        'VET-GJ-2021-0044', _VetStatus.pending, 0, 0, 0.0),
-    _VetModel('V006', 'Dr. Suresh Nair', 'Large Animal Surgery',
-        'VET-KL-2016-0678', _VetStatus.active, 41, 18200, 4.6),
-  ];
+  VetStatus? _statusFilter;
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _vets.where((v) {
+    final admin = context.watch<AdminProvider>();
+    final allVets = admin.vets;
+
+    final filtered = allVets.where((v) {
       final matchSearch =
           v.name.toLowerCase().contains(_search.toLowerCase()) ||
-              v.specialization
-                  .toLowerCase()
-                  .contains(_search.toLowerCase());
-      return matchSearch &&
-          (_statusFilter == null || v.status == _statusFilter);
+              v.specialization.toLowerCase().contains(_search.toLowerCase());
+      return matchSearch && (_statusFilter == null || v.status == _statusFilter);
     }).toList();
 
-    final active =
-        _vets.where((v) => v.status == _VetStatus.active).length;
-    final pending =
-        _vets.where((v) => v.status == _VetStatus.pending).length;
-    final total = _vets.length;
+    final active = allVets.where((v) => v.status == VetStatus.active).length;
+    final pending = allVets.where((v) => v.status == VetStatus.pending).length;
+    final total = allVets.length;
 
     return Column(
       children: [
-        // Stats bar
         Container(
           color: Colors.white,
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
             children: [
               _statPill('Active', '$active', Colors.green),
@@ -227,8 +219,7 @@ class _VetsTabState extends State<_VetsTab> {
               prefixIcon: const Icon(Icons.search, size: 20),
               filled: true,
               fillColor: Colors.white,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none),
@@ -242,23 +233,10 @@ class _VetsTabState extends State<_VetsTab> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
-              _chip('All', _statusFilter == null,
-                  () => setState(() => _statusFilter = null)),
-              _chip(
-                  'Active',
-                  _statusFilter == _VetStatus.active,
-                  () =>
-                      setState(() => _statusFilter = _VetStatus.active)),
-              _chip(
-                  'Pending',
-                  _statusFilter == _VetStatus.pending,
-                  () => setState(
-                      () => _statusFilter = _VetStatus.pending)),
-              _chip(
-                  'Inactive',
-                  _statusFilter == _VetStatus.inactive,
-                  () => setState(
-                      () => _statusFilter = _VetStatus.inactive)),
+              _chip('All', _statusFilter == null, () => setState(() => _statusFilter = null)),
+              _chip('Active', _statusFilter == VetStatus.active, () => setState(() => _statusFilter = VetStatus.active)),
+              _chip('Pending', _statusFilter == VetStatus.pending, () => setState(() => _statusFilter = VetStatus.pending)),
+              _chip('Inactive', _statusFilter == VetStatus.inactive, () => setState(() => _statusFilter = VetStatus.inactive)),
             ],
           ),
         ),
@@ -267,8 +245,7 @@ class _VetsTabState extends State<_VetsTab> {
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: filtered.length,
-            itemBuilder: (context, i) =>
-                _VetCard(vet: filtered[i]),
+            itemBuilder: (context, i) => _VetCard(vet: filtered[i]),
           ),
         ),
       ],
@@ -286,18 +263,9 @@ class _VetsTabState extends State<_VetsTab> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration:
-                BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
+          Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
           const SizedBox(width: 6),
-          Text(' ',
-              style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: color)),
+          Text('$label $value', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color)),
         ],
       ),
     );
@@ -317,20 +285,20 @@ class _VetsTabState extends State<_VetsTab> {
 }
 
 class _VetCard extends StatelessWidget {
-  final _VetModel vet;
+  final VetModel vet;
   const _VetCard({required this.vet});
 
   @override
   Widget build(BuildContext context) {
     Color c;
     switch (vet.status) {
-      case _VetStatus.active:
+      case VetStatus.active:
         c = RumenoTheme.successGreen;
         break;
-      case _VetStatus.pending:
+      case VetStatus.pending:
         c = RumenoTheme.warningYellow;
         break;
-      case _VetStatus.inactive:
+      case VetStatus.inactive:
         c = Colors.grey;
         break;
     }
@@ -350,10 +318,7 @@ class _VetCard extends StatelessWidget {
                   backgroundColor: const Color(0xFFAD1457).withValues(alpha: 0.1),
                   child: Text(
                     vet.name.split(' ').last[0],
-                    style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFAD1457)),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFAD1457)),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -361,15 +326,9 @@ class _VetCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(vet.name,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15)),
-                      Text(vet.specialization,
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.grey[600])),
-                      Text(vet.licenseNumber,
-                          style: TextStyle(
-                              fontSize: 10, color: Colors.grey[500])),
+                      Text(vet.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                      Text(vet.specialization, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                      Text(vet.licenseNumber, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
                     ],
                   ),
                 ),
@@ -377,59 +336,36 @@ class _VetCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: c.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                            color: c.withValues(alpha: 0.3)),
+                        border: Border.all(color: c.withValues(alpha: 0.3)),
                       ),
-                      child: Text(vet.status.name,
-                          style: TextStyle(
-                              color: c,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold)),
+                      child: Text(vet.status.name, style: TextStyle(color: c, fontSize: 10, fontWeight: FontWeight.bold)),
                     ),
                     if (vet.rating > 0) ...[
                       const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(Icons.star_rounded,
-                              color: Colors.amber, size: 14),
-                          Text('${vet.rating}',
-                              style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold)),
-                        ],
-                      ),
+                      Row(children: [
+                        const Icon(Icons.star_rounded, color: Colors.amber, size: 14),
+                        Text('${vet.rating}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                      ]),
                     ],
                   ],
                 ),
               ],
             ),
-            if (vet.status == _VetStatus.active) ...[
+            if (vet.status == VetStatus.active) ...[
               const Divider(height: 14),
               Row(
                 children: [
-                  _stat(context, '${vet.consultations}', 'Consults',
-                      Icons.event_note_rounded),
-                  _stat(
-                    context,
-                    '₹${(vet.earnings / 1000).toStringAsFixed(1)}K',
-                    'Earned',
-                    Icons.account_balance_wallet_rounded,
-                  ),
-                  _stat(
-                    context,
-                    '${vet.rating}★',
-                    'Rating',
-                    Icons.star_rounded,
-                  ),
+                  _stat(context, '${vet.consultations}', 'Consults', Icons.event_note_rounded),
+                  _stat(context, '₹${(vet.earnings / 1000).toStringAsFixed(1)}K', 'Earned', Icons.account_balance_wallet_rounded),
+                  _stat(context, '${vet.rating}★', 'Rating', Icons.star_rounded),
                 ],
               ),
             ],
-            if (vet.status == _VetStatus.pending) ...[
+            if (vet.status == VetStatus.pending) ...[
               const Divider(height: 14),
               Container(
                 padding: const EdgeInsets.all(10),
@@ -437,16 +373,11 @@ class _VetCard extends StatelessWidget {
                   color: RumenoTheme.warningYellow.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline_rounded,
-                        color: RumenoTheme.warningYellow, size: 16),
-                    const SizedBox(width: 8),
-                    const Text('License verification pending',
-                        style:
-                            TextStyle(fontSize: 11, color: Colors.orange)),
-                  ],
-                ),
+                child: Row(children: [
+                  Icon(Icons.info_outline_rounded, color: RumenoTheme.warningYellow, size: 16),
+                  const SizedBox(width: 8),
+                  const Text('License verification pending', style: TextStyle(fontSize: 11, color: Colors.orange)),
+                ]),
               ),
             ],
             const Divider(height: 14),
@@ -455,55 +386,34 @@ class _VetCard extends StatelessWidget {
               children: [
                 OutlinedButton.icon(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text('View ${vet.name} details')));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('View ${vet.name} details')));
                   },
                   icon: const Icon(Icons.visibility_rounded, size: 14),
                   label: const Text('View', style: TextStyle(fontSize: 12)),
-                  style: OutlinedButton.styleFrom(
-                      visualDensity: VisualDensity.compact),
+                  style: OutlinedButton.styleFrom(visualDensity: VisualDensity.compact),
                 ),
                 const SizedBox(width: 8),
-                if (vet.status == _VetStatus.pending)
+                if (vet.status == VetStatus.pending)
                   ElevatedButton.icon(
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content:
-                                  Text('${vet.name} approved!')));
+                      context.read<AdminProvider>().approveVet(vet.id);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${vet.name} approved!')));
                     },
                     icon: const Icon(Icons.verified_rounded, size: 14),
-                    label: const Text('Approve',
-                        style: TextStyle(fontSize: 12)),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: RumenoTheme.successGreen,
-                        visualDensity: VisualDensity.compact),
+                    label: const Text('Approve', style: TextStyle(fontSize: 12)),
+                    style: ElevatedButton.styleFrom(backgroundColor: RumenoTheme.successGreen, visualDensity: VisualDensity.compact),
                   )
                 else
                   ElevatedButton.icon(
                     onPressed: () {
+                      context.read<AdminProvider>().toggleVetStatus(vet.id);
                       ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text(
-                                  vet.status == _VetStatus.active
-                                      ? 'Vet deactivated'
-                                      : 'Vet activated')));
+                        SnackBar(content: Text(vet.status == VetStatus.active ? '${vet.name} deactivated' : '${vet.name} activated')),
+                      );
                     },
-                    icon: Icon(
-                      vet.status == _VetStatus.active
-                          ? Icons.pause_circle_rounded
-                          : Icons.play_circle_rounded,
-                      size: 14,
-                    ),
-                    label: Text(
-                      vet.status == _VetStatus.active
-                          ? 'Deactivate'
-                          : 'Activate',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                        visualDensity: VisualDensity.compact),
+                    icon: Icon(vet.status == VetStatus.active ? Icons.pause_circle_rounded : Icons.play_circle_rounded, size: 14),
+                    label: Text(vet.status == VetStatus.active ? 'Deactivate' : 'Activate', style: const TextStyle(fontSize: 12)),
+                    style: ElevatedButton.styleFrom(visualDensity: VisualDensity.compact),
                   ),
               ],
             ),
@@ -513,8 +423,7 @@ class _VetCard extends StatelessWidget {
     );
   }
 
-  Widget _stat(BuildContext context, String value, String label,
-      IconData icon) {
+  Widget _stat(BuildContext context, String value, String label, IconData icon) {
     return Expanded(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -524,12 +433,8 @@ class _VetCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(value,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 13)),
-              Text(label,
-                  style: TextStyle(
-                      fontSize: 9, color: Colors.grey[500])),
+              Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              Text(label, style: TextStyle(fontSize: 9, color: Colors.grey[500])),
             ],
           ),
         ],
@@ -540,115 +445,71 @@ class _VetCard extends StatelessWidget {
 
 // ─── Consultations Tab ────────────────────────────────────────────────────────
 class _ConsultationsTab extends StatelessWidget {
-  final _consultations = const [
-    _ConsultData('C001', 'Dr. Emily Thompson', 'Ramesh Patel Farm',
-        'Vaccination - FMD', '18 Mar 2026', _ConsultStatus.completed, 800),
-    _ConsultData('C002', 'Dr. Rajesh Kumar', 'Singh Dairy',
-        'Treatment - Mastitis', '19 Mar 2026', _ConsultStatus.completed, 1200),
-    _ConsultData('C003', 'Dr. Priya Sharma', 'Green Pastures Farm',
-        'Deworming Check', '20 Mar 2026', _ConsultStatus.scheduled, 600),
-    _ConsultData('C004', 'Dr. Emily Thompson', 'Sharma Buffalo Farm',
-        'Pregnancy Check', '20 Mar 2026', _ConsultStatus.scheduled, 900),
-    _ConsultData('C005', 'Dr. Suresh Nair', 'Jain Cattle Co.',
-        'Emergency - Bloat', '17 Mar 2026', _ConsultStatus.completed, 2500),
-    _ConsultData('C006', 'Dr. Rajesh Kumar', 'Kapoor Dairy',
-        'Annual Health Checkup', '21 Mar 2026', _ConsultStatus.pending, 1000),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final total = _consultations.length;
-    final completed =
-        _consultations.where((c) => c.status == _ConsultStatus.completed).length;
-    final scheduled =
-        _consultations.where((c) => c.status == _ConsultStatus.scheduled).length;
-    final totalRevenue =
-        _consultations.fold<int>(0, (s, c) => s + c.fee);
+    final admin = context.watch<AdminProvider>();
+    final consultations = admin.consultations;
+
+    final total = consultations.length;
+    final completed = consultations.where((c) => c.status == ConsultStatus.completed).length;
+    final scheduled = consultations.where((c) => c.status == ConsultStatus.scheduled).length;
+    final totalRevenue = consultations.fold<int>(0, (s, c) => s + c.fee);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Stats row
           Row(
             children: [
-              _kpi(context, '$total', 'Total', Icons.event_note_rounded,
-                  RumenoTheme.infoBlue),
+              _kpi(context, '$total', 'Total', Icons.event_note_rounded, RumenoTheme.infoBlue),
               const SizedBox(width: 10),
-              _kpi(context, '$completed', 'Done',
-                  Icons.check_circle_rounded, RumenoTheme.successGreen),
+              _kpi(context, '$completed', 'Done', Icons.check_circle_rounded, RumenoTheme.successGreen),
               const SizedBox(width: 10),
-              _kpi(context, '$scheduled', 'Scheduled',
-                  Icons.schedule_rounded, RumenoTheme.warningYellow),
+              _kpi(context, '$scheduled', 'Scheduled', Icons.schedule_rounded, RumenoTheme.warningYellow),
             ],
           ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF880E4F), Color(0xFFAD1457)],
-              ),
+              gradient: const LinearGradient(colors: [Color(0xFF880E4F), Color(0xFFAD1457)]),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
               children: [
-                const Icon(Icons.account_balance_wallet_rounded,
-                    color: Colors.white70, size: 28),
+                const Icon(Icons.account_balance_wallet_rounded, color: Colors.white70, size: 28),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '₹$totalRevenue',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const Text('Total Consultation Revenue',
-                        style: TextStyle(
-                            color: Colors.white70, fontSize: 12)),
+                    Text('₹$totalRevenue', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                    const Text('Total Consultation Revenue', style: TextStyle(color: Colors.white70, fontSize: 12)),
                   ],
                 ),
               ],
             ),
           ),
           const SizedBox(height: 16),
-          Text('Recent Consultations',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold)),
+          Text('Recent Consultations', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
-          ..._consultations.map((c) => _ConsultCard(data: c)),
+          ...consultations.map((c) => _ConsultCard(data: c)),
         ],
       ),
     );
   }
 
-  Widget _kpi(BuildContext context, String value, String label,
-      IconData icon, Color color) {
+  Widget _kpi(BuildContext context, String value, String label, IconData icon, Color color) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
         child: Column(
           children: [
             Icon(icon, color: color, size: 24),
             const SizedBox(height: 4),
-            Text(value,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: color)),
-            Text(label,
-                style:
-                    TextStyle(fontSize: 10, color: Colors.grey[600])),
+            Text(value, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: color)),
+            Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
           ],
         ),
       ),
@@ -657,7 +518,7 @@ class _ConsultationsTab extends StatelessWidget {
 }
 
 class _ConsultCard extends StatelessWidget {
-  final _ConsultData data;
+  final ConsultModel data;
   const _ConsultCard({required this.data});
 
   @override
@@ -665,15 +526,15 @@ class _ConsultCard extends StatelessWidget {
     Color c;
     IconData ico;
     switch (data.status) {
-      case _ConsultStatus.completed:
+      case ConsultStatus.completed:
         c = RumenoTheme.successGreen;
         ico = Icons.check_circle_rounded;
         break;
-      case _ConsultStatus.scheduled:
+      case ConsultStatus.scheduled:
         c = RumenoTheme.infoBlue;
         ico = Icons.schedule_rounded;
         break;
-      case _ConsultStatus.pending:
+      case ConsultStatus.pending:
         c = RumenoTheme.warningYellow;
         ico = Icons.pending_rounded;
         break;
@@ -687,10 +548,7 @@ class _ConsultCard extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: c.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
+              decoration: BoxDecoration(color: c.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
               child: Icon(ico, color: c, size: 20),
             ),
             const SizedBox(width: 12),
@@ -698,38 +556,20 @@ class _ConsultCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${data.type}',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 13)),
-                  Text('${data.vetName} · ${data.farmName}',
-                      style: TextStyle(
-                          fontSize: 11, color: Colors.grey[600])),
-                  Text(data.date,
-                      style: TextStyle(
-                          fontSize: 10, color: Colors.grey[500])),
+                  Text(data.type, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  Text('${data.vetName} · ${data.farmName}', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                  Text(data.date, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
                 ],
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('₹${data.fee}',
-                    style: TextStyle(
-                        color: c,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14)),
+                Text('₹${data.fee}', style: TextStyle(color: c, fontWeight: FontWeight.bold, fontSize: 14)),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 5, vertical: 1),
-                  decoration: BoxDecoration(
-                    color: c.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(data.status.name,
-                      style: TextStyle(
-                          color: c,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold)),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: BoxDecoration(color: c.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
+                  child: Text(data.status.name, style: TextStyle(color: c, fontSize: 9, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -742,28 +582,20 @@ class _ConsultCard extends StatelessWidget {
 
 // ─── Earnings Tab ─────────────────────────────────────────────────────────────
 class _EarningsTab extends StatelessWidget {
-  final _earningsData = const [
-    _VetEarningModel('Dr. Emily Thompson', 28, 22400, 80),
-    _VetEarningModel('Dr. Rajesh Kumar', 34, 27200, 80),
-    _VetEarningModel('Dr. Priya Sharma', 22, 13200, 60),
-    _VetEarningModel('Dr. Suresh Nair', 41, 32800, 80),
-    _VetEarningModel('Dr. Anil Verma', 8, 6400, 80),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final total =
-        _earningsData.fold<double>(0, (s, v) => s + v.earned);
-    final totalConsults =
-        _earningsData.fold<int>(0, (s, v) => s + v.consultations);
-    final activeVets = _earningsData.length;
+    final admin = context.watch<AdminProvider>();
+    final vets = admin.vets.where((v) => v.status == VetStatus.active || v.earnings > 0).toList();
+
+    final total = vets.fold<double>(0, (s, v) => s + v.earnings);
+    final totalConsults = vets.fold<int>(0, (s, v) => s + v.consultations);
+    final activeVets = vets.where((v) => v.status == VetStatus.active).length;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Total earnings banner
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -780,78 +612,33 @@ class _EarningsTab extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Total Vet Earnings',
-                          style: TextStyle(
-                              color: Colors.white70, fontSize: 13)),
-                      Text(
-                        '₹${(total / 1000).toStringAsFixed(1)}K',
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      const Text('This Month',
-                          style: TextStyle(
-                              color: Colors.white60, fontSize: 11)),
+                      const Text('Total Vet Earnings', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                      Text('₹${(total / 1000).toStringAsFixed(1)}K', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+                      const Text('This Month', style: TextStyle(color: Colors.white60, fontSize: 11)),
                     ],
                   ),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    _earningBadge(
-                        '$activeVets',
-                        'Active Vets',
-                        Icons.people_rounded),
+                    _earningBadge('$activeVets', 'Active Vets', Icons.people_rounded),
                     const SizedBox(height: 8),
-                    _earningBadge(
-                        '$totalConsults',
-                        'Consults',
-                        Icons.event_note_rounded),
+                    _earningBadge('$totalConsults', 'Consults', Icons.event_note_rounded),
                   ],
                 ),
               ],
             ),
           ),
           const SizedBox(height: 20),
-          Text('Vet Earnings Breakdown',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold)),
+          Text('Vet Earnings Breakdown', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
-          ..._earningsData.map((v) => _EarningCard(data: v, total: total)),
+          ...vets.map((v) => _EarningCard(vet: v, total: total)),
           const SizedBox(height: 20),
-          Text('Commission Settings',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold)),
+          Text('Commission Settings', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
-          _commissionCard(
-            context,
-            icon: Icons.percent_rounded,
-            color: const Color(0xFFAD1457),
-            label: 'Platform Commission',
-            value: '20% per consultation',
-            canEdit: true,
-          ),
-          _commissionCard(
-            context,
-            icon: Icons.account_balance_rounded,
-            color: RumenoTheme.infoBlue,
-            label: 'Payout Cycle',
-            value: 'Weekly (every Monday)',
-            canEdit: true,
-          ),
-          _commissionCard(
-            context,
-            icon: Icons.verified_rounded,
-            color: RumenoTheme.successGreen,
-            label: 'Minimum Payout',
-            value: '₹500',
-            canEdit: true,
-          ),
+          _commissionCard(context, icon: Icons.percent_rounded, color: const Color(0xFFAD1457), label: 'Platform Commission', value: '20% per consultation'),
+          _commissionCard(context, icon: Icons.account_balance_rounded, color: RumenoTheme.infoBlue, label: 'Payout Cycle', value: 'Weekly (every Monday)'),
+          _commissionCard(context, icon: Icons.verified_rounded, color: RumenoTheme.successGreen, label: 'Minimum Payout', value: '₹500'),
         ],
       ),
     );
@@ -872,14 +659,8 @@ class _EarningsTab extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(value,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14)),
-              Text(label,
-                  style: const TextStyle(
-                      color: Colors.white70, fontSize: 9)),
+              Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+              Text(label, style: const TextStyle(color: Colors.white70, fontSize: 9)),
             ],
           ),
         ],
@@ -887,61 +668,41 @@ class _EarningsTab extends StatelessWidget {
     );
   }
 
-  Widget _commissionCard(
-    BuildContext context, {
-    required IconData icon,
-    required Color color,
-    required String label,
-    required String value,
-    required bool canEdit,
-  }) {
+  Widget _commissionCard(BuildContext context, {required IconData icon, required Color color, required String label, required String value}) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
           child: Icon(icon, color: color, size: 20),
         ),
-        title: Text(label,
-            style:
-                const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-        subtitle: Text(value,
-            style:
-                TextStyle(fontSize: 12, color: RumenoTheme.primaryGreen)),
-        trailing: canEdit
-            ? IconButton(
-                icon: const Icon(Icons.edit_rounded, size: 18),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Edit ')));
-                },
-              )
-            : null,
+        title: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        subtitle: Text(value, style: TextStyle(fontSize: 12, color: RumenoTheme.primaryGreen)),
+        trailing: IconButton(
+          icon: const Icon(Icons.edit_rounded, size: 18),
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Edit $label')));
+          },
+        ),
       ),
     );
   }
 }
 
 class _EarningCard extends StatelessWidget {
-  final _VetEarningModel data;
+  final VetModel vet;
   final double total;
-  const _EarningCard({required this.data, required this.total});
+  const _EarningCard({required this.vet, required this.total});
 
   @override
   Widget build(BuildContext context) {
-    final pct = total > 0 ? data.earned / total : 0.0;
+    final pct = total > 0 ? vet.earnings / total : 0.0;
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -950,39 +711,23 @@ class _EarningCard extends StatelessWidget {
               CircleAvatar(
                 radius: 18,
                 backgroundColor: const Color(0xFFAD1457).withValues(alpha: 0.1),
-                child: Text(
-                  data.name.split(' ').last[0],
-                  style: const TextStyle(
-                      color: Color(0xFFAD1457),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14),
-                ),
+                child: Text(vet.name.split(' ').last[0], style: const TextStyle(color: Color(0xFFAD1457), fontWeight: FontWeight.bold, fontSize: 14)),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(data.name,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 13)),
-                    Text(' consultations',
-                        style: TextStyle(
-                            fontSize: 11, color: Colors.grey[600])),
+                    Text(vet.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                    Text('${vet.consultations} consultations', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
                   ],
                 ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('₹',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: Color(0xFFAD1457))),
-                  Text('% comm.',
-                      style: TextStyle(
-                          fontSize: 9, color: Colors.grey[500])),
+                  Text('₹${vet.earnings.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFFAD1457))),
+                  Text('${vet.commissionPercent}% comm.', style: TextStyle(fontSize: 9, color: Colors.grey[500])),
                 ],
               ),
             ],
@@ -993,56 +738,15 @@ class _EarningCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: pct,
               backgroundColor: Colors.grey[200],
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color(0xFFAD1457)),
+              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFAD1457)),
               minHeight: 6,
             ),
           ),
           const SizedBox(height: 4),
-          Text('% of total earnings',
-              style: TextStyle(fontSize: 9, color: Colors.grey[500])),
+          Text('${(pct * 100).toStringAsFixed(1)}% of total earnings', style: TextStyle(fontSize: 9, color: Colors.grey[500])),
         ],
       ),
     );
   }
 }
 
-// ─── Data models ─────────────────────────────────────────────────────────────
-enum _VetStatus { active, pending, inactive }
-
-enum _ConsultStatus { completed, scheduled, pending }
-
-class _VetModel {
-  final String id;
-  final String name;
-  final String specialization;
-  final String licenseNumber;
-  final _VetStatus status;
-  final int consultations;
-  final double earnings;
-  final double rating;
-  const _VetModel(this.id, this.name, this.specialization,
-      this.licenseNumber, this.status, this.consultations,
-      this.earnings, this.rating);
-}
-
-class _ConsultData {
-  final String id;
-  final String vetName;
-  final String farmName;
-  final String type;
-  final String date;
-  final _ConsultStatus status;
-  final int fee;
-  const _ConsultData(this.id, this.vetName, this.farmName, this.type,
-      this.date, this.status, this.fee);
-}
-
-class _VetEarningModel {
-  final String name;
-  final int consultations;
-  final double earned;
-  final int commission;
-  const _VetEarningModel(
-      this.name, this.consultations, this.earned, this.commission);
-}

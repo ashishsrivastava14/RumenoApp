@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../../../config/theme.dart';
+import '../../../providers/admin_provider.dart';
 
 class AdminNotificationsScreen extends StatefulWidget {
   const AdminNotificationsScreen({super.key});
@@ -13,13 +16,6 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
   final _titleCtrl = TextEditingController();
   final _bodyCtrl = TextEditingController();
 
-  final _history = [
-    {'title': 'FMD Vaccination Drive', 'body': 'Govt. FMD vaccination camp on 20 Jul...', 'audience': 'All Farmers', 'sent': '14 Jul 2025', 'reach': '248'},
-    {'title': 'New Pro Features!', 'body': 'Breeding management now available...', 'audience': 'Pro & Business', 'sent': '10 Jul 2025', 'reach': '68'},
-    {'title': 'Vet Payout Processed', 'body': 'June payouts have been credited...', 'audience': 'All Vets', 'sent': '01 Jul 2025', 'reach': '18'},
-    {'title': 'App Update v2.1', 'body': 'Bug fixes and performance improvements', 'audience': 'All Users', 'sent': '28 Jun 2025', 'reach': '266'},
-  ];
-
   @override
   void dispose() {
     _titleCtrl.dispose();
@@ -29,6 +25,9 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final admin = context.watch<AdminProvider>();
+    final history = admin.notifications;
+
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(title: const Text('Push Notifications')),
@@ -47,7 +46,7 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
                   Text('Send Notification', style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    initialValue: _audience,
+                    value: _audience,
                     decoration: const InputDecoration(labelText: 'Audience'),
                     items: ['All Users', 'All Farmers', 'All Vets', 'Free Plan', 'Starter Plan', 'Pro & Business']
                         .map((a) => DropdownMenuItem(value: a, child: Text(a)))
@@ -63,9 +62,18 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notification sent!'), backgroundColor: Colors.green));
+                        if (_titleCtrl.text.trim().isEmpty || _bodyCtrl.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill title and message'), backgroundColor: Colors.orange));
+                          return;
+                        }
+                        admin.sendNotification(
+                          title: _titleCtrl.text.trim(),
+                          body: _bodyCtrl.text.trim(),
+                          audience: _audience,
+                        );
                         _titleCtrl.clear();
                         _bodyCtrl.clear();
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notification sent!'), backgroundColor: Colors.green));
                       },
                       icon: const Icon(Icons.send_rounded),
                       label: const Text('Send'),
@@ -77,9 +85,11 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
             const SizedBox(height: 20),
 
             // History
-            Text('History', style: Theme.of(context).textTheme.titleMedium),
+            Text('History (${history.length})', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
-            ..._history.map((n) => Container(
+            if (history.isEmpty)
+              Center(child: Text('No notifications sent yet', style: TextStyle(color: Colors.grey[500]))),
+            ...history.map((n) => Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
@@ -88,24 +98,24 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
                 children: [
                   Row(
                     children: [
-                      Expanded(child: Text(n['title']!, style: Theme.of(context).textTheme.titleSmall)),
-                      Text(n['sent']!, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+                      Expanded(child: Text(n.title, style: Theme.of(context).textTheme.titleSmall)),
+                      Text(DateFormat('dd MMM yyyy').format(n.sentAt), style: TextStyle(fontSize: 10, color: Colors.grey[500])),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(n['body']!, style: Theme.of(context).textTheme.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(n.body, style: Theme.of(context).textTheme.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 6),
                   Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(color: RumenoTheme.primaryGreen.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
-                        child: Text(n['audience']!, style: TextStyle(fontSize: 10, color: RumenoTheme.primaryGreen)),
+                        child: Text(n.audience, style: TextStyle(fontSize: 10, color: RumenoTheme.primaryGreen)),
                       ),
                       const SizedBox(width: 8),
                       Icon(Icons.group, size: 12, color: Colors.grey[500]),
                       const SizedBox(width: 4),
-                      Text('${n['reach']} reached', style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+                      Text('${n.reach} reached', style: TextStyle(fontSize: 10, color: Colors.grey[500])),
                     ],
                   ),
                 ],

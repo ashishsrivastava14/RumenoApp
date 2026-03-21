@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:provider/provider.dart';
 import '../../../config/theme.dart';
+import '../../../providers/admin_provider.dart';
 import '../../../widgets/charts/line_chart_widget.dart';
 
 class AdminPaymentsScreen extends StatelessWidget {
   const AdminPaymentsScreen({super.key});
 
-  static final _payments = [
-    {'user': 'John Smith', 'plan': 'Pro', 'amount': '₹999', 'date': '15 Jul 2025', 'status': 'Success', 'method': 'UPI'},
-    {'user': 'Victor Clark', 'plan': 'Starter', 'amount': '₹499', 'date': '14 Jul 2025', 'status': 'Success', 'method': 'Card'},
-    {'user': 'James Wilson', 'plan': 'Business', 'amount': '₹2499', 'date': '13 Jul 2025', 'status': 'Success', 'method': 'UPI'},
-    {'user': 'Patricia Miller', 'plan': 'Starter', 'amount': '₹499', 'date': '12 Jul 2025', 'status': 'Failed', 'method': 'Net Banking'},
-    {'user': 'Lisa Davis', 'plan': 'Pro', 'amount': '₹999', 'date': '11 Jul 2025', 'status': 'Success', 'method': 'UPI'},
-    {'user': 'Robert Taylor', 'plan': 'Starter', 'amount': '₹499', 'date': '10 Jul 2025', 'status': 'Refunded', 'method': 'Card'},
-    {'user': 'Brian Roberts', 'plan': 'Pro', 'amount': '₹999', 'date': '09 Jul 2025', 'status': 'Success', 'method': 'UPI'},
-  ];
+  String _formatCurrency(double val) {
+    if (val >= 100000) return '₹${(val / 100000).toStringAsFixed(1)}L';
+    if (val >= 1000) return '₹${(val / 1000).toStringAsFixed(1)}K';
+    return '₹${val.toStringAsFixed(0)}';
+  }
 
   Color _statusColor(String status) {
     switch (status) {
@@ -31,6 +29,8 @@ class AdminPaymentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final admin = context.watch<AdminProvider>();
+    final payments = admin.payments;
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(title: const Text('Payments')),
@@ -42,17 +42,17 @@ class AdminPaymentsScreen extends StatelessWidget {
             // Revenue summary
             Row(
               children: [
-                Expanded(child: _summaryCard(context, '₹4.2L', 'Total Revenue', Icons.currency_rupee, Colors.green)),
+                Expanded(child: _summaryCard(context, _formatCurrency(admin.totalRevenue), 'Total Revenue', Icons.currency_rupee, Colors.green)),
                 const SizedBox(width: 10),
-                Expanded(child: _summaryCard(context, '₹68K', 'This Month', Icons.calendar_today, Colors.blue)),
+                Expanded(child: _summaryCard(context, _formatCurrency(admin.monthlyRevenue), 'This Month', Icons.calendar_today, Colors.blue)),
               ],
             ),
             const SizedBox(height: 10),
             Row(
               children: [
-                Expanded(child: _summaryCard(context, '3', 'Failed', Icons.error_outline, Colors.red)),
+                Expanded(child: _summaryCard(context, '${admin.failedPayments}', 'Failed', Icons.error_outline, Colors.red)),
                 const SizedBox(width: 10),
-                Expanded(child: _summaryCard(context, '1', 'Refunds', Icons.undo, Colors.orange)),
+                Expanded(child: _summaryCard(context, '${admin.refundedPayments}', 'Refunds', Icons.undo, Colors.orange)),
               ],
             ),
             const SizedBox(height: 20),
@@ -73,7 +73,7 @@ class AdminPaymentsScreen extends StatelessWidget {
             // Recent payments
             Text('Recent Payments', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
-            ...AdminPaymentsScreen._payments.map((p) => Container(
+            ...payments.map((p) => Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
@@ -81,11 +81,11 @@ class AdminPaymentsScreen extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 16,
-                    backgroundColor: _statusColor(p['status']!).withValues(alpha: 0.12),
+                    backgroundColor: _statusColor(p.status).withValues(alpha: 0.12),
                     child: Icon(
-                      p['status'] == 'Success' ? Icons.check : p['status'] == 'Failed' ? Icons.close : Icons.undo,
+                      p.status == 'Success' ? Icons.check : p.status == 'Failed' ? Icons.close : Icons.undo,
                       size: 16,
-                      color: _statusColor(p['status']!),
+                      color: _statusColor(p.status),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -93,16 +93,16 @@ class AdminPaymentsScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(p['user']!, style: Theme.of(context).textTheme.titleSmall),
-                        Text('${p['plan']} • ${p['method']}', style: Theme.of(context).textTheme.bodySmall),
+                        Text(p.userName, style: Theme.of(context).textTheme.titleSmall),
+                        Text('${p.plan} • ${p.method}', style: Theme.of(context).textTheme.bodySmall),
                       ],
                     ),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(p['amount']!, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: _statusColor(p['status']!))),
-                      Text(p['date']!, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+                      Text('₹${p.amount.toStringAsFixed(0)}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: _statusColor(p.status))),
+                      Text(_formatDate(p.date), style: TextStyle(fontSize: 10, color: Colors.grey[500])),
                     ],
                   ),
                 ],
@@ -112,6 +112,11 @@ class AdminPaymentsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime dt) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return '${dt.day.toString().padLeft(2, '0')} ${months[dt.month - 1]} ${dt.year}';
   }
 
   Widget _summaryCard(BuildContext context, String value, String label, IconData icon, Color color) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../../config/theme.dart';
 import '../../../models/models.dart';
 import '../../../providers/ecommerce_provider.dart';
@@ -76,12 +77,14 @@ class AdminMarketplaceScreen extends StatelessWidget {
               spacing: 10,
               runSpacing: 10,
               children: [
-                _ActionChip(icon: Icons.add_box, label: 'Add Product', onTap: () {}),
-                _ActionChip(icon: Icons.local_offer, label: 'Manage Coupons', onTap: () {}),
-                _ActionChip(icon: Icons.star, label: 'Featured Products', onTap: () {}),
-                _ActionChip(icon: Icons.percent, label: 'Commission Settings', onTap: () {}),
-                _ActionChip(icon: Icons.analytics, label: 'Sales Report', onTap: () {}),
-                _ActionChip(icon: Icons.category, label: 'Categories', onTap: () {}),
+                _ActionChip(icon: Icons.add_box, label: 'Add Product', onTap: () => context.go('/admin/shop')),
+                _ActionChip(icon: Icons.local_offer, label: 'Manage Coupons', onTap: () => context.go('/admin/shop')),
+                _ActionChip(icon: Icons.star, label: 'Featured Products', onTap: () => context.go('/admin/shop')),
+                _ActionChip(icon: Icons.percent, label: 'Commission Settings', onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Commission settings available in Vet management')));
+                }),
+                _ActionChip(icon: Icons.analytics, label: 'Sales Report', onTap: () => context.go('/admin/more/reports')),
+                _ActionChip(icon: Icons.category, label: 'Categories', onTap: () => context.go('/admin/shop')),
               ],
             ),
 
@@ -104,7 +107,7 @@ class AdminMarketplaceScreen extends StatelessWidget {
               children: [
                 Text('Recent Orders', style: Theme.of(context).textTheme.titleMedium),
                 const Spacer(),
-                TextButton(onPressed: () {}, child: const Text('View All')),
+                TextButton(onPressed: () => context.go('/admin/shop'), child: const Text('View All')),
               ],
             ),
             ...orders.take(5).map((order) => _OrderTile(order: order)),
@@ -116,7 +119,7 @@ class AdminMarketplaceScreen extends StatelessWidget {
               children: [
                 Text('Product Overview', style: Theme.of(context).textTheme.titleMedium),
                 const Spacer(),
-                TextButton(onPressed: () {}, child: const Text('View All')),
+                TextButton(onPressed: () => context.go('/admin/shop'), child: const Text('View All')),
               ],
             ),
             ...products.take(5).map((product) => _ProductTile(product: product)),

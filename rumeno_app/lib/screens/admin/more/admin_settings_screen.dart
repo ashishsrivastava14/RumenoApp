@@ -1,22 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../config/theme.dart';
+import '../../../providers/admin_provider.dart';
 
-class AdminSettingsScreen extends StatefulWidget {
+class AdminSettingsScreen extends StatelessWidget {
   const AdminSettingsScreen({super.key});
 
   @override
-  State<AdminSettingsScreen> createState() => _AdminSettingsScreenState();
-}
-
-class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
-  bool _maintenanceMode = false;
-  bool _newSignups = true;
-  bool _emailNotifications = true;
-  bool _smsEnabled = true;
-  String _defaultLanguage = 'English';
-
-  @override
   Widget build(BuildContext context) {
+    final admin = context.watch<AdminProvider>();
+    final s = admin.settings;
+
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(title: const Text('App Settings')),
@@ -24,14 +18,20 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           _section(context, 'General', [
-            _settingTile('App Name', subtitle: 'Rumeno', icon: Icons.apps_rounded, onTap: () {}),
-            _settingTile('Default Language', subtitle: _defaultLanguage, icon: Icons.language_rounded, onTap: () {
+            _settingTile('App Name', subtitle: 'Rumeno', icon: Icons.apps_rounded),
+            _settingTile('Default Language', subtitle: s.defaultLanguage, icon: Icons.language_rounded, onTap: () {
               showDialog(
                 context: context,
                 builder: (ctx) => SimpleDialog(
                   title: const Text('Select Language'),
                   children: ['English', 'Hindi', 'Gujarati', 'Marathi', 'Tamil']
-                      .map((l) => SimpleDialogOption(onPressed: () { setState(() => _defaultLanguage = l); Navigator.pop(ctx); }, child: Text(l)))
+                      .map((l) => SimpleDialogOption(
+                            onPressed: () {
+                              context.read<AdminProvider>().updateSettings(defaultLanguage: l);
+                              Navigator.pop(ctx);
+                            },
+                            child: Text(l),
+                          ))
                       .toList(),
                 ),
               );
@@ -44,16 +44,16 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
             SwitchListTile(
               title: const Text('Allow New Sign-ups', style: TextStyle(fontSize: 14)),
               subtitle: const Text('Users can register new accounts'),
-              value: _newSignups,
-              onChanged: (v) => setState(() => _newSignups = v),
+              value: s.allowNewSignups,
+              onChanged: (v) => context.read<AdminProvider>().updateSettings(allowNewSignups: v),
               secondary: Icon(Icons.person_add_rounded, color: RumenoTheme.primaryGreen),
             ),
             SwitchListTile(
               title: const Text('Maintenance Mode', style: TextStyle(fontSize: 14)),
               subtitle: const Text('Show maintenance screen to users'),
-              value: _maintenanceMode,
-              onChanged: (v) => setState(() => _maintenanceMode = v),
-              secondary: Icon(Icons.build_rounded, color: _maintenanceMode ? Colors.orange : RumenoTheme.primaryGreen),
+              value: s.maintenanceMode,
+              onChanged: (v) => context.read<AdminProvider>().updateSettings(maintenanceMode: v),
+              secondary: Icon(Icons.build_rounded, color: s.maintenanceMode ? Colors.orange : RumenoTheme.primaryGreen),
             ),
           ]),
           const SizedBox(height: 16),
@@ -61,14 +61,14 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
           _section(context, 'Notifications', [
             SwitchListTile(
               title: const Text('Email Notifications', style: TextStyle(fontSize: 14)),
-              value: _emailNotifications,
-              onChanged: (v) => setState(() => _emailNotifications = v),
+              value: s.emailNotifications,
+              onChanged: (v) => context.read<AdminProvider>().updateSettings(emailNotifications: v),
               secondary: Icon(Icons.email_rounded, color: RumenoTheme.primaryGreen),
             ),
             SwitchListTile(
               title: const Text('SMS Enabled', style: TextStyle(fontSize: 14)),
-              value: _smsEnabled,
-              onChanged: (v) => setState(() => _smsEnabled = v),
+              value: s.smsEnabled,
+              onChanged: (v) => context.read<AdminProvider>().updateSettings(smsEnabled: v),
               secondary: Icon(Icons.sms_rounded, color: RumenoTheme.primaryGreen),
             ),
           ]),

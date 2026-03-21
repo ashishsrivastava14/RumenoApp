@@ -303,6 +303,67 @@ class EcommerceProvider extends ChangeNotifier {
     }
   }
 
+  void approveVendor(String id) {
+    final idx = _vendors.indexWhere((v) => v.id == id);
+    if (idx == -1) return;
+    _vendors[idx] = _vendors[idx].copyWith(status: VendorStatus.approved);
+    notifyListeners();
+  }
+
+  void rejectVendor(String id) {
+    final idx = _vendors.indexWhere((v) => v.id == id);
+    if (idx == -1) return;
+    _vendors[idx] = _vendors[idx].copyWith(status: VendorStatus.rejected);
+    notifyListeners();
+  }
+
+  // ─── Order Admin ───
+
+  void updateOrderStatus(String orderId, OrderStatus newStatus) {
+    final idx = _orders.indexWhere((o) => o.id == orderId);
+    if (idx == -1) return;
+    final order = _orders[idx];
+    _orders[idx] = order.copyWith(
+      status: newStatus,
+      packedDate: newStatus == OrderStatus.packed ? DateTime.now() : null,
+      shippedDate: newStatus == OrderStatus.shipped ? DateTime.now() : null,
+      deliveredDate: newStatus == OrderStatus.delivered ? DateTime.now() : null,
+    );
+    notifyListeners();
+  }
+
+  // ─── Product Admin ───
+
+  void addProduct(Product product) {
+    _allProducts.add(product);
+    notifyListeners();
+  }
+
+  void updateProduct(String id, {String? name, double? price, int? stockQuantity, bool? isFeatured, bool? isApproved}) {
+    final idx = _allProducts.indexWhere((p) => p.id == id);
+    if (idx == -1) return;
+    _allProducts[idx] = _allProducts[idx].copyWith(
+      name: name,
+      price: price,
+      stockQuantity: stockQuantity,
+      isFeatured: isFeatured,
+      isApproved: isApproved,
+    );
+    notifyListeners();
+  }
+
+  void deleteProduct(String id) {
+    _allProducts.removeWhere((p) => p.id == id);
+    notifyListeners();
+  }
+
+  void toggleProductFeatured(String id) {
+    final idx = _allProducts.indexWhere((p) => p.id == id);
+    if (idx == -1) return;
+    _allProducts[idx] = _allProducts[idx].copyWith(isFeatured: !_allProducts[idx].isFeatured);
+    notifyListeners();
+  }
+
   // ─── Reviews ───
 
   List<ProductReview> getReviewsForProduct(String productId) {

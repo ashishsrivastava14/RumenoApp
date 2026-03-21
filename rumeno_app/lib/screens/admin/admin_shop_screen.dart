@@ -411,10 +411,25 @@ class _ProductsTabState extends State<_ProductsTab> {
             style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1976D2)),
             onPressed: () {
+              if (nameCtrl.text.trim().isEmpty) return;
+              context.read<EcommerceProvider>().addProduct(Product(
+                id: 'P${DateTime.now().millisecondsSinceEpoch}',
+                name: nameCtrl.text.trim(),
+                description: 'New product',
+                price: 0,
+                mrp: 0,
+                category: ProductCategory.supplements,
+                vendorId: 'admin',
+                vendorName: 'Admin',
+                imageUrl: '',
+                stockQuantity: 0,
+                unit: 'piece',
+                createdAt: DateTime.now(),
+              ));
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text(
-                      '${nameCtrl.text} added to product queue!')));
+                      '${nameCtrl.text} added!'), backgroundColor: Colors.green));
             },
             child: const Text('Add'),
           ),
@@ -513,23 +528,24 @@ class _ProductCard extends StatelessWidget {
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert_rounded, size: 18),
               onSelected: (val) {
+                final eco = context.read<EcommerceProvider>();
                 switch (val) {
                   case 'edit':
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text('Editing ${product.name}')));
                     break;
                   case 'stock':
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('Update stock for ${product.name}')));
+                    _showStockDialog(context, product);
                     break;
                   case 'featured':
+                    eco.toggleProductFeatured(product.id);
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(product.isFeatured
                             ? '${product.name} removed from featured'
                             : '${product.name} marked as featured')));
                     break;
                   case 'delete':
-                    _confirmDelete(context, product.name);
+                    _confirmDelete(context, product);
                     break;
                 }
               },
@@ -574,7 +590,34 @@ class _ProductCard extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, String name) {
+  void _showStockDialog(BuildContext context, Product product) {
+    final stockCtrl = TextEditingController(text: '${product.stockQuantity}');
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Update Stock: ${product.name}'),
+        content: TextField(
+          controller: stockCtrl,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(labelText: 'Stock Quantity', prefixIcon: Icon(Icons.inventory)),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              final qty = int.tryParse(stockCtrl.text) ?? product.stockQuantity;
+              context.read<EcommerceProvider>().updateProduct(product.id, stockQuantity: qty);
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Stock updated to $qty'), backgroundColor: Colors.green));
+            },
+            child: const Text('Update'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, Product product) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -585,7 +628,7 @@ class _ProductCard extends StatelessWidget {
             const Text('Delete Product?'),
           ],
         ),
-        content: Text('Are you sure you want to delete "$name"?'),
+        content: Text('Are you sure you want to delete "${product.name}"?'),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
@@ -594,9 +637,10 @@ class _ProductCard extends StatelessWidget {
             style: ElevatedButton.styleFrom(
                 backgroundColor: RumenoTheme.errorRed),
             onPressed: () {
+              context.read<EcommerceProvider>().deleteProduct(product.id);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('$name deleted')));
+                  SnackBar(content: Text('${product.name} deleted')));
             },
             child: const Text('Delete'),
           ),
@@ -810,6 +854,7 @@ class _OrderCard extends StatelessWidget {
                 children: [
                   OutlinedButton.icon(
                     onPressed: () {
+                      context.read<EcommerceProvider>().updateOrderStatus(order.id, OrderStatus.cancelled);
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content:
                               Text('Order #${order.id} cancelled')));
@@ -824,9 +869,11 @@ class _OrderCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   ElevatedButton.icon(
                     onPressed: () {
+                      final nextStatus = order.status == OrderStatus.pending ? OrderStatus.confirmed : OrderStatus.packed;
+                      context.read<EcommerceProvider>().updateOrderStatus(order.id, nextStatus);
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content:
-                              Text('Order #${order.id} confirmed & packed')));
+                              Text('Order #${order.id} ${nextStatus.name}')));
                     },
                     icon: const Icon(Icons.check_circle_rounded, size: 14),
                     label: const Text('Confirm',
@@ -1021,6 +1068,7 @@ class _VendorCard extends StatelessWidget {
                 if (vendor.status == VendorStatus.pending)
                   ElevatedButton.icon(
                     onPressed: () {
+                      context.read<EcommerceProvider>().approveVendor(vendor.id);
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(
                               '${vendor.businessName} approved!')));
@@ -1036,6 +1084,7 @@ class _VendorCard extends StatelessWidget {
                 else if (vendor.status == VendorStatus.approved)
                   ElevatedButton.icon(
                     onPressed: () {
+                      context.read<EcommerceProvider>().rejectVendor(vendor.id);
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(
                               '${vendor.businessName} suspended')));
@@ -1051,6 +1100,7 @@ class _VendorCard extends StatelessWidget {
                 else if (vendor.status == VendorStatus.suspended)
                   ElevatedButton.icon(
                     onPressed: () {
+                      context.read<EcommerceProvider>().approveVendor(vendor.id);
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(
                               '${vendor.businessName} reinstated')));

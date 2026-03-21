@@ -3192,4 +3192,1543 @@ class AppLocalizationsEn extends AppLocalizations {
   String vetAnimalHealthWithdrawalValue(Object days) {
     return '$days days (no milk/meat)';
   }
+
+  @override
+  String get appName => 'Rumeno';
+
+  @override
+  String get appTitle => 'Rumeno - Farm Management';
+
+  @override
+  String get version => 'Version 1.0.0';
+
+  @override
+  String get gotIt => 'Got it';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get searchHint => 'Search here...';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get continueText => 'Continue';
+
+  @override
+  String get submit => 'Submit';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get viewAll => 'View All';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String get noResults => 'No results found';
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get success => 'Success';
+
+  @override
+  String get warning => 'Warning';
+
+  @override
+  String get info => 'Info';
+
+  @override
+  String get selectLanguage => 'Select Language';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String languageSetTo(String language) {
+    return 'Language set to $language';
+  }
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get overdue => 'Overdue';
+
+  @override
+  String get due => 'Due';
+
+  @override
+  String get paid => 'Paid';
+
+  @override
+  String get male => 'Male';
+
+  @override
+  String get female => 'Female';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get details => 'Details';
+
+  @override
+  String get hide => 'Hide';
+
+  @override
+  String get items => 'items';
+
+  @override
+  String get records => 'Records';
+
+  @override
+  String get noData => 'No data available';
+
+  @override
+  String get outOfStock => 'Out of Stock';
+
+  @override
+  String get addedToCart => 'Added to cart!';
+
+  @override
+  String get rupeeSymbol => '₹';
+
+  @override
+  String get goodMorning => 'Good Morning';
+
+  @override
+  String get goodAfternoon => 'Good Afternoon';
+
+  @override
+  String get goodEvening => 'Good Evening';
+
+  @override
+  String get totalAnimals => 'Total Animals';
+
+  @override
+  String get totalAnimalsDesc =>
+      'Total number of animals currently registered in your farm including all species and statuses.';
+
+  @override
+  String get milkToday => 'Milk Today';
+
+  @override
+  String get milkTodayDesc =>
+      'Total milk collected today from morning and evening sessions across all milking animals.';
+
+  @override
+  String get tasksDue => 'Tasks Due';
+
+  @override
+  String get tasksDueDesc =>
+      'Number of pending tasks including upcoming vaccinations, treatments, breeding checks, and follow-ups.';
+
+  @override
+  String get healthAlerts => 'Health Alerts';
+
+  @override
+  String get healthAlertsDesc =>
+      'Active health alerts requiring attention — sick animals, overdue treatments, or abnormal observations.';
+
+  @override
+  String get milkingCows => 'Milking Cows';
+
+  @override
+  String get milkingCowsDesc =>
+      'Number of cows currently in lactation and actively being milked.';
+
+  @override
+  String get pregnant => 'Pregnant';
+
+  @override
+  String get pregnantDesc =>
+      'Number of animals confirmed pregnant through examination or AI records.';
+
+  @override
+  String get underTreatment => 'Under Treatment';
+
+  @override
+  String get underTreatmentDesc =>
+      'Animals currently receiving medical treatment or on medication.';
+
+  @override
+  String get vaccinatedThirtyDays => 'Vaccinated (30d)';
+
+  @override
+  String get vaccinatedThirtyDaysDesc =>
+      'Animals that have been vaccinated within the last 30 days.';
+
+  @override
+  String get farmOverview => 'Farm Overview';
+
+  @override
+  String get quickActions => 'Quick Actions';
+
+  @override
+  String get activeAlerts => 'Active Alerts';
+
+  @override
+  String get upcomingEvents => 'Upcoming Events';
+
+  @override
+  String get addAnimal => 'Add Animal';
+
+  @override
+  String get logMilk => 'Log Milk';
+
+  @override
+  String get feedMix => 'Feed Mix';
+
+  @override
+  String get reportSickAnimal => 'Report Sick Animal';
+
+  @override
+  String get setFarmLogo => 'Set Farm Logo';
+
+  @override
+  String get chooseFromGallery => 'Choose from Gallery';
+
+  @override
+  String get selectExistingPhoto => 'Select an existing photo';
+
+  @override
+  String get takePhoto => 'Take a Photo';
+
+  @override
+  String get useYourCamera => 'Use your camera';
+
+  @override
+  String get addFarmLogo => 'Add Farm Logo';
+
+  @override
+  String get pro => 'Pro';
+
+  @override
+  String get addNewAnimal => 'Add New Animal';
+
+  @override
+  String get whichAnimal => 'Which Animal?';
+
+  @override
+  String get typeBasicInfo => 'Type & basic info';
+
+  @override
+  String get howItLooks => 'How it looks?';
+
+  @override
+  String get sizeAndColor => 'Size & color';
+
+  @override
+  String get family => 'Family';
+
+  @override
+  String get parentsOptional => 'Parents (optional)';
+
+  @override
+  String get whereItLives => 'Where it lives?';
+
+  @override
+  String get shedAndPurpose => 'Shed & purpose';
+
+  @override
+  String get purchase => 'Purchase';
+
+  @override
+  String get optional => 'Optional';
+
+  @override
+  String get animalNotFound => 'Animal Not Found';
+
+  @override
+  String get animalId => 'Animal ID';
+
+  @override
+  String get tagNumber => 'Tag Number';
+
+  @override
+  String get species => 'Species';
+
+  @override
+  String get breed => 'Breed';
+
+  @override
+  String get gender => 'Gender';
+
+  @override
+  String get dateOfBirth => 'Date of Birth';
+
+  @override
+  String get weight => 'Weight';
+
+  @override
+  String get color => 'Color';
+
+  @override
+  String get purpose => 'Purpose';
+
+  @override
+  String get shed => 'Shed';
+
+  @override
+  String get underOneMonth => 'Under 1 month';
+
+  @override
+  String get oneToThreeMonths => '1 – 3 months';
+
+  @override
+  String get threeToSixMonths => '3 – 6 months';
+
+  @override
+  String get sixToNineMonths => '6 – 9 months';
+
+  @override
+  String get nineToTwelveMonths => '9 – 12 months';
+
+  @override
+  String get twelveToEighteenMonths => '12 – 18 months';
+
+  @override
+  String get eighteenToTwentyFourMonths => '18 – 24 months';
+
+  @override
+  String get overTwentyFourMonths => '24+ months';
+
+  @override
+  String get cow => 'Cow';
+
+  @override
+  String get buffalo => 'Buffalo';
+
+  @override
+  String get goat => 'Goat';
+
+  @override
+  String get sheep => 'Sheep';
+
+  @override
+  String get pig => 'Pig';
+
+  @override
+  String get horse => 'Horse';
+
+  @override
+  String get statusActive => 'Active';
+
+  @override
+  String get statusPregnant => 'Pregnant';
+
+  @override
+  String get statusDry => 'Dry';
+
+  @override
+  String get statusSick => 'Sick';
+
+  @override
+  String get statusUnderTreatment => 'Under Treatment';
+
+  @override
+  String get statusQuarantine => 'Quarantine';
+
+  @override
+  String get statusDeceased => 'Deceased';
+
+  @override
+  String get statusDead => 'Dead';
+
+  @override
+  String get purposeDairy => 'Dairy';
+
+  @override
+  String get purposeMeat => 'Meat';
+
+  @override
+  String get purposeBreeding => 'Breeding';
+
+  @override
+  String get purposeMixed => 'Mixed';
+
+  @override
+  String get diseaseAndTreatment => 'Disease & Treatment';
+
+  @override
+  String get vaccinations => 'Vaccinations';
+
+  @override
+  String get deworming => 'Deworming';
+
+  @override
+  String get labReports => 'Lab Reports';
+
+  @override
+  String get reportSick => 'Report Sick Animal';
+
+  @override
+  String get saveTreatment => 'Save Treatment';
+
+  @override
+  String get treatmentRecordAdded => 'Treatment record added!';
+
+  @override
+  String get labReportUploadComingSoon => 'Lab report upload coming soon!';
+
+  @override
+  String get diagnosis => 'Diagnosis';
+
+  @override
+  String get diagnosisHint => 'e.g. Fever & infection';
+
+  @override
+  String get medicine => 'Medicine / Treatment';
+
+  @override
+  String get vetName => 'Vet Name';
+
+  @override
+  String get withdrawalPeriod => 'Withdrawal period in days (optional)';
+
+  @override
+  String get attachLabReport => 'Attach Lab Report (optional)';
+
+  @override
+  String get pleaseEnterAnimalId => 'Please enter Animal ID';
+
+  @override
+  String get pleaseEnterDiagnosis => 'Please enter a diagnosis';
+
+  @override
+  String get animalIdHint => 'Animal ID (e.g. C-001)';
+
+  @override
+  String get noTreatmentsFound => 'No treatments found';
+
+  @override
+  String get allAnimalsHealthy => 'All animals look healthy!';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterActive => 'Active';
+
+  @override
+  String get filterFollowUp => 'Follow-up';
+
+  @override
+  String get filterRecovered => 'Recovered';
+
+  @override
+  String get addVaccinationRecord => 'Add Vaccination Record';
+
+  @override
+  String get selectVaccine => 'Select Vaccine';
+
+  @override
+  String get vaccinationDate => 'Vaccination Date';
+
+  @override
+  String get givenToday => 'Given Today';
+
+  @override
+  String get scheduleLater => 'Schedule Later';
+
+  @override
+  String get saveRecord => 'Save Record';
+
+  @override
+  String get addRecord => 'Add Record';
+
+  @override
+  String vaccinationAdded(String vaccine) {
+    return '$vaccine vaccination added!';
+  }
+
+  @override
+  String get noUpcomingVaccinations => 'No upcoming vaccinations';
+
+  @override
+  String get tapToSchedule => 'Tap + to schedule one';
+
+  @override
+  String get noVaccinationHistory => 'No vaccination history yet';
+
+  @override
+  String get recordsAppearHere => 'Records appear here after administration';
+
+  @override
+  String get allVaccinationsUpToDate => 'All vaccinations up to date!';
+
+  @override
+  String get greatJobHealthy => 'Great job keeping your animals healthy';
+
+  @override
+  String get schedule => 'Schedule';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get alerts => 'Alerts';
+
+  @override
+  String get vaccineFMD => 'FMD';
+
+  @override
+  String get vaccineFMDFull => 'Foot & Mouth';
+
+  @override
+  String get vaccineBQ => 'BQ';
+
+  @override
+  String get vaccineBQFull => 'Black Quarter';
+
+  @override
+  String get vaccineHS => 'HS';
+
+  @override
+  String get vaccineHSFull => 'Hemorrhagic Sep.';
+
+  @override
+  String get vaccinePPR => 'PPR';
+
+  @override
+  String get vaccinePPRFull => 'Sheep / Goat';
+
+  @override
+  String get vaccineBrucellaFull => 'Brucellosis';
+
+  @override
+  String get vaccineDeworming => 'Deworming';
+
+  @override
+  String get vaccineDewormingFull => 'Parasites';
+
+  @override
+  String get statusDone => 'Done';
+
+  @override
+  String get statusDueSoon => 'Due Soon';
+
+  @override
+  String get statusOverdue => 'Overdue!';
+
+  @override
+  String get givenLabel => 'Given:';
+
+  @override
+  String get dueLabel => 'Due:';
+
+  @override
+  String get nextLabel => 'Next:';
+
+  @override
+  String get finance => 'Finance';
+
+  @override
+  String get allExpenses => 'All Expenses';
+
+  @override
+  String get totalSpent => 'Total Spent';
+
+  @override
+  String get searchExpenses => 'Search expenses...';
+
+  @override
+  String get moneySpent => 'Money Spent';
+
+  @override
+  String get moneyEarned => 'Money Earned';
+
+  @override
+  String get profit => 'Profit';
+
+  @override
+  String get loss => 'Loss';
+
+  @override
+  String get reports => 'Reports';
+
+  @override
+  String get totalEarned => 'Total Earned';
+
+  @override
+  String get perMonth => 'Per Month';
+
+  @override
+  String get whereMoneyGoes => 'Where Money Goes';
+
+  @override
+  String get howYouPay => 'How You Pay';
+
+  @override
+  String get downloadSheet => 'Download\nSheet';
+
+  @override
+  String get downloadPDF => 'Download\nPDF';
+
+  @override
+  String get csvDownloaded => 'CSV file downloaded!';
+
+  @override
+  String get pdfDownloaded => 'PDF file downloaded!';
+
+  @override
+  String get noExpensesFound => 'No expenses found';
+
+  @override
+  String get expFeed => 'Feed';
+
+  @override
+  String get expMedicine => 'Medicine';
+
+  @override
+  String get expDoctor => 'Doctor';
+
+  @override
+  String get expLabour => 'Labour';
+
+  @override
+  String get expEquipment => 'Equip';
+
+  @override
+  String get expTravel => 'Travel';
+
+  @override
+  String get expOther => 'Other';
+
+  @override
+  String get payCash => 'Cash';
+
+  @override
+  String get payUPI => 'UPI';
+
+  @override
+  String get payBank => 'Bank';
+
+  @override
+  String get payCredit => 'Credit';
+
+  @override
+  String get feedCalculator => 'Feed Calculator';
+
+  @override
+  String get dairyCow => 'Dairy Cow';
+
+  @override
+  String get milkingCow => 'Milking Cow';
+
+  @override
+  String get waterBuffalo => 'Water Buffalo';
+
+  @override
+  String get farmGoat => 'Farm Goat';
+
+  @override
+  String get farmSheep => 'Farm Sheep';
+
+  @override
+  String get farmPig => 'Farm Pig';
+
+  @override
+  String get farmHorse => 'Farm Horse';
+
+  @override
+  String get breeding => 'Breeding';
+
+  @override
+  String get breedingDashboard => 'Breeding Dashboard';
+
+  @override
+  String get heatDetection => 'Heat Detection';
+
+  @override
+  String get pregnancyTracking => 'Pregnancy Tracking';
+
+  @override
+  String get milkLog => 'Milk Log';
+
+  @override
+  String get morning => 'Morning';
+
+  @override
+  String get evening => 'Evening';
+
+  @override
+  String get liters => 'Liters';
+
+  @override
+  String get myFarm => 'My Farm';
+
+  @override
+  String get farmDetails => 'Farm Details';
+
+  @override
+  String get myTeam => 'My Team';
+
+  @override
+  String get workers => 'Workers';
+
+  @override
+  String get myPlan => 'My Plan';
+
+  @override
+  String get subscription => 'Subscription';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get changeLanguage => 'Change Language';
+
+  @override
+  String get export => 'Export';
+
+  @override
+  String get saveData => 'Save Data';
+
+  @override
+  String get sanitization => 'Sanitization';
+
+  @override
+  String get farmCleaning => 'Farm Cleaning';
+
+  @override
+  String get help => 'Help';
+
+  @override
+  String get support => 'Support';
+
+  @override
+  String get logout => 'Logout';
+
+  @override
+  String get signOut => 'Sign Out';
+
+  @override
+  String get logoutQuestion => 'Logout?';
+
+  @override
+  String get logoutConfirm => 'Are you sure you want to sign out?';
+
+  @override
+  String get noStay => 'No, Stay';
+
+  @override
+  String get yesLogout => 'Yes, Logout';
+
+  @override
+  String get farmName => 'Farm Name';
+
+  @override
+  String get typeYourFarmName => 'Type your farm name';
+
+  @override
+  String get ownerName => 'Owner Name';
+
+  @override
+  String get yourFullName => 'Your full name';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get villageTalukaDistrict => 'Village, Taluka, District';
+
+  @override
+  String get geographicalLocation => 'Geographical Location';
+
+  @override
+  String get tapToGetLocation => 'Tap to get location';
+
+  @override
+  String get managerName => 'Manager Name';
+
+  @override
+  String get farmManagerName => 'Farm manager name';
+
+  @override
+  String get veterinarian => 'Veterinarian';
+
+  @override
+  String get doctorNamePhone => 'Doctor name & phone';
+
+  @override
+  String get youtubeChannel => 'YouTube Channel';
+
+  @override
+  String get channelUrlOptional => 'Your channel URL (optional)';
+
+  @override
+  String get tapToAddFarmPhoto => 'Tap to add farm photo';
+
+  @override
+  String get cameraOpening => 'Camera opening...';
+
+  @override
+  String get locationCaptured => 'Location captured!';
+
+  @override
+  String get saveProfile => 'Save Profile';
+
+  @override
+  String get profileSaved => 'Profile saved successfully!';
+
+  @override
+  String get teamMembers => 'Team Members';
+
+  @override
+  String get manageWorkers => 'Manage your farm workers';
+
+  @override
+  String get owner => 'Owner';
+
+  @override
+  String get manager => 'Manager';
+
+  @override
+  String get staffEdit => 'Staff (Edit)';
+
+  @override
+  String get staffView => 'Staff (View)';
+
+  @override
+  String get addNewWorker => 'Add New Worker';
+
+  @override
+  String get workerName => 'Worker name';
+
+  @override
+  String get phoneNumber => 'Phone Number';
+
+  @override
+  String get role => 'Role';
+
+  @override
+  String get addWorker => 'Add Worker';
+
+  @override
+  String get pleaseFillNameAndPhone => 'Please fill name and phone';
+
+  @override
+  String get workerAdded => 'Worker added!';
+
+  @override
+  String get alertsAndNotifications => 'Alerts & Notifications';
+
+  @override
+  String get chooseAlerts => 'Choose what alerts you want';
+
+  @override
+  String get animalAlerts => 'Animal Alerts';
+
+  @override
+  String get dailyReminders => 'Daily Reminders';
+
+  @override
+  String get howToAlert => 'How to Alert';
+
+  @override
+  String get vaccinationDue => 'Vaccination Due';
+
+  @override
+  String get whenVaccinationDue => 'When vaccination is due';
+
+  @override
+  String get healthAlertsTitle => 'Health Alerts';
+
+  @override
+  String get whenAnimalSick => 'When animal is sick';
+
+  @override
+  String get breedingAlerts => 'Breeding Alerts';
+
+  @override
+  String get heatPregnancyUpdates => 'Heat & pregnancy updates';
+
+  @override
+  String get moneyAlerts => 'Money Alerts';
+
+  @override
+  String get paymentExpenseReminders => 'Payment & expense reminders';
+
+  @override
+  String get milkingTime => 'Milking Time';
+
+  @override
+  String get morningEveningReminder => 'Morning & evening reminder';
+
+  @override
+  String get feedingTime => 'Feeding Time';
+
+  @override
+  String get feedYourAnimals => 'Feed your animals';
+
+  @override
+  String get smsMessages => 'SMS Messages';
+
+  @override
+  String get getAlertsViaSms => 'Get alerts via SMS';
+
+  @override
+  String get sound => 'Sound';
+
+  @override
+  String get playAlertSound => 'Play alert sound';
+
+  @override
+  String get saveSettings => 'Save Settings';
+
+  @override
+  String get notificationSettingsSaved => 'Notification settings saved!';
+
+  @override
+  String get yourCurrentPlan => 'Your Current Plan';
+
+  @override
+  String get allPlans => 'All Plans';
+
+  @override
+  String get planFree => 'Free';
+
+  @override
+  String get planStarter => 'Starter';
+
+  @override
+  String get planPro => 'Pro';
+
+  @override
+  String get planBusiness => 'Business';
+
+  @override
+  String get forever => 'Forever';
+
+  @override
+  String get perMonthLabel => '/month';
+
+  @override
+  String get animals => 'animals';
+
+  @override
+  String upToAnimals(int count) {
+    return 'Up to $count animals';
+  }
+
+  @override
+  String get unlimitedAnimals => 'Unlimited animals';
+
+  @override
+  String get currentPlan => 'Current Plan';
+
+  @override
+  String get upgrade => 'Upgrade';
+
+  @override
+  String get selectPlan => 'Select Plan';
+
+  @override
+  String switchedToPlan(String plan) {
+    return 'Switched to $plan plan!';
+  }
+
+  @override
+  String get basicRecords => 'Basic records';
+
+  @override
+  String get communityHelp => 'Community help';
+
+  @override
+  String get healthMoneyTracking => 'Health + Money tracking';
+
+  @override
+  String get smsReminders => 'SMS reminders';
+
+  @override
+  String vetCallsPerMonth(int count) {
+    return '$count Vet calls/month';
+  }
+
+  @override
+  String get advancedReports => 'Advanced reports';
+
+  @override
+  String get breedingRecords => 'Breeding records';
+
+  @override
+  String get unlimitedVetCalls => 'Unlimited vet calls';
+
+  @override
+  String get exportData => 'Export data';
+
+  @override
+  String get multiFarm => 'Multi-farm';
+
+  @override
+  String get teamManagement => 'Team management';
+
+  @override
+  String get prioritySupport => 'Priority support';
+
+  @override
+  String get customReports => 'Custom reports';
+
+  @override
+  String renewsOn(String date) {
+    return 'Renews on $date';
+  }
+
+  @override
+  String get helpAndSupport => 'Help & Support';
+
+  @override
+  String get howCanWeHelp => 'How can we help?';
+
+  @override
+  String get chooseOptionBelow => 'Choose an option below';
+
+  @override
+  String get callUs => 'Call Us';
+
+  @override
+  String get talkToTeam => 'Talk to our team';
+
+  @override
+  String get whatsapp => 'WhatsApp';
+
+  @override
+  String get chatWithUs => 'Chat with us';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get sendUsMessage => 'Send us a message';
+
+  @override
+  String get callingSupport => 'Calling support';
+
+  @override
+  String get openingWhatsApp => 'Opening WhatsApp...';
+
+  @override
+  String get openingEmail => 'Opening email...';
+
+  @override
+  String get commonQuestions => 'Common Questions';
+
+  @override
+  String get faqAddAnimal => 'How to add an animal?';
+
+  @override
+  String get faqAddAnimalAnswer =>
+      'Go to Animals tab → Tap the + button → Follow the 4 steps to add your animal.';
+
+  @override
+  String get faqTrackVaccination => 'How to track vaccination?';
+
+  @override
+  String get faqTrackVaccinationAnswer =>
+      'Go to Health tab → Tap Vaccination → Add new vaccination record for your animal.';
+
+  @override
+  String get faqAddExpenses => 'How to add expenses?';
+
+  @override
+  String get faqAddExpensesAnswer =>
+      'Go to Finance tab → Tap + button → Select category → Enter amount → Save.';
+
+  @override
+  String get faqAddTeamMembers => 'How to add team members?';
+
+  @override
+  String get faqAddTeamMembersAnswer =>
+      'Go to More → My Team → Tap Add Worker → Fill name, phone, and role.';
+
+  @override
+  String get faqSeeReports => 'How to see reports?';
+
+  @override
+  String get faqSeeReportsAnswer =>
+      'Go to Finance tab → Tap Reports → Select date range to see your farm reports.';
+
+  @override
+  String get faqChangeLanguage => 'How to change language?';
+
+  @override
+  String get faqChangeLanguageAnswer =>
+      'Go to More → Language → Select your preferred language.';
+
+  @override
+  String get videoTutorials => 'Video Tutorials';
+
+  @override
+  String get gettingStarted => 'Getting started with Rumeno';
+
+  @override
+  String get managingAnimals => 'Managing your animals';
+
+  @override
+  String get trackHealthVaccination => 'Track health & vaccination';
+
+  @override
+  String get openingVideoTutorial => 'Opening video tutorial...';
+
+  @override
+  String get minutes => 'min';
+
+  @override
+  String get dataExport => 'Data Export';
+
+  @override
+  String get farmSanitization => 'Farm Sanitization';
+
+  @override
+  String get shopTitle => 'Rumeno Shop';
+
+  @override
+  String get cart => 'Cart';
+
+  @override
+  String cartCount(int count) {
+    return 'Cart ($count)';
+  }
+
+  @override
+  String get orders => 'Orders';
+
+  @override
+  String get myOrders => 'My Orders';
+
+  @override
+  String get startShopping => 'Start Shopping';
+
+  @override
+  String get addProductsToStart => 'Add products to get started';
+
+  @override
+  String get checkout => 'Checkout';
+
+  @override
+  String get orderPlaced => 'Order Placed!';
+
+  @override
+  String orderIdLabel(String orderId) {
+    return 'Order ID: $orderId';
+  }
+
+  @override
+  String get receiveConfirmation => 'You will receive confirmation shortly';
+
+  @override
+  String get deliveryUpdates => 'Delivery updates will be sent';
+
+  @override
+  String get trackOrder => 'Track Order';
+
+  @override
+  String get continueShopping => 'Continue Shopping';
+
+  @override
+  String get noOrdersYet => 'No Orders Yet';
+
+  @override
+  String get viewDetails => 'View Details';
+
+  @override
+  String get invoice => 'Invoice';
+
+  @override
+  String get tracking => 'Tracking';
+
+  @override
+  String get trackingUpdatedSoon => 'Tracking will be updated soon';
+
+  @override
+  String get orderProgress => 'Order Progress';
+
+  @override
+  String get placed => 'Placed';
+
+  @override
+  String get packed => 'Packed';
+
+  @override
+  String get shipped => 'Shipped';
+
+  @override
+  String get delivered => 'Delivered';
+
+  @override
+  String get cancelled => 'Cancelled';
+
+  @override
+  String get returned => 'Returned';
+
+  @override
+  String get addToCart => 'Add to cart';
+
+  @override
+  String productsFound(int count) {
+    return '$count products found';
+  }
+
+  @override
+  String get noProductsFound => 'No products found';
+
+  @override
+  String get noProductsInCategory => 'No products in this category';
+
+  @override
+  String get categoryAnimalFeed => 'Animal Feed';
+
+  @override
+  String get categorySupplements => 'Supplements';
+
+  @override
+  String get categoryMedicine => 'Medicine';
+
+  @override
+  String get categoryTools => 'Tools';
+
+  @override
+  String get categoryTonic => 'Tonic';
+
+  @override
+  String get categoryVetMedicines => 'Veterinary Medicines';
+
+  @override
+  String get categoryFarmEquipment => 'Farm Equipment';
+
+  @override
+  String get animalCattle => 'Cattle';
+
+  @override
+  String get animalGoat => 'Goat';
+
+  @override
+  String get animalSheep => 'Sheep';
+
+  @override
+  String get animalPoultry => 'Poultry';
+
+  @override
+  String get animalPig => 'Pig';
+
+  @override
+  String get animalHorse => 'Horse';
+
+  @override
+  String get allAnimals => 'All Animals';
+
+  @override
+  String get vendorRegistration => 'Vendor Registration';
+
+  @override
+  String get businessInformation => 'Business Information';
+
+  @override
+  String get documents => 'Documents';
+
+  @override
+  String get bankDetails => 'Bank Details';
+
+  @override
+  String get businessName => 'Business Name';
+
+  @override
+  String get phoneNumberRequired => 'Phone Number *';
+
+  @override
+  String get emailRequired => 'Email *';
+
+  @override
+  String get gstNumber => 'GST Number *';
+
+  @override
+  String get panNumber => 'PAN Number *';
+
+  @override
+  String get uploadIdProof => 'Upload ID Proof';
+
+  @override
+  String get bankName => 'Bank Name *';
+
+  @override
+  String get accountNumber => 'Account Number *';
+
+  @override
+  String get ifscCode => 'IFSC Code *';
+
+  @override
+  String get businessAddress => 'Business Address *';
+
+  @override
+  String get city => 'City *';
+
+  @override
+  String get state => 'State *';
+
+  @override
+  String get pincode => 'Pincode *';
+
+  @override
+  String get submitApplication => 'Submit Application';
+
+  @override
+  String get applicationSubmitted => 'Application Submitted';
+
+  @override
+  String get applicationSubmittedMsg =>
+      'Your vendor registration has been submitted for review. Our team will verify your documents and approve your account within 2-3 business days. You will be notified via email.';
+
+  @override
+  String get deliveryAddress => 'Delivery Address';
+
+  @override
+  String get paymentMethod => 'Payment Method';
+
+  @override
+  String get orderSummary => 'Order Summary';
+
+  @override
+  String get subtotal => 'Subtotal';
+
+  @override
+  String get deliveryFee => 'Delivery Fee';
+
+  @override
+  String get tax => 'Tax';
+
+  @override
+  String get discount => 'Discount';
+
+  @override
+  String get placeOrder => 'Place Order';
+
+  @override
+  String get applyCoupon => 'Apply Coupon';
+
+  @override
+  String get couponCode => 'Coupon Code';
+
+  @override
+  String get apply => 'Apply';
+
+  @override
+  String get removeCoupon => 'Remove';
+
+  @override
+  String get vetDashboard => 'Dashboard';
+
+  @override
+  String get vetFarms => 'Farms';
+
+  @override
+  String get vetHealth => 'Health';
+
+  @override
+  String get vetEarnings => 'Earnings';
+
+  @override
+  String get totalFarms => 'Total Farms';
+
+  @override
+  String get totalAnimalsVet => 'Total Animals';
+
+  @override
+  String get activeTreatments => 'Active Treatments';
+
+  @override
+  String get todaySchedule => 'Today\'s Schedule';
+
+  @override
+  String get allConsultations => 'All Consultations';
+
+  @override
+  String get searchDiagnosisTreatment => 'Search diagnosis or treatment...';
+
+  @override
+  String get noConsultationsMatch => 'No consultations match your filter.';
+
+  @override
+  String recordCount(int count) {
+    return '$count records';
+  }
+
+  @override
+  String get referredFarms => 'Referred Farms';
+
+  @override
+  String get searchFarms => 'Search farms...';
+
+  @override
+  String get viewAnimals => 'View Animals';
+
+  @override
+  String animalCount(int count) {
+    return '$count animals';
+  }
+
+  @override
+  String get tabAnimals => 'Animals';
+
+  @override
+  String get tabTreatments => 'Treatments';
+
+  @override
+  String get tabVaccinations => 'Vaccinations';
+
+  @override
+  String get noAnimalsRecorded => 'No animals recorded for this farm.';
+
+  @override
+  String get noTreatmentRecords => 'No treatment records for this farm.';
+
+  @override
+  String get noVaccinationRecords => 'No vaccination records for this farm.';
+
+  @override
+  String get upcomingSchedule => 'Upcoming Schedule';
+
+  @override
+  String get visitsAndEvents => 'Visits & Events';
+
+  @override
+  String get pendingVaccinations => 'Pending Vaccinations';
+
+  @override
+  String get eventVaccination => 'Vaccination';
+
+  @override
+  String get eventBreeding => 'Breeding';
+
+  @override
+  String get eventTreatment => 'Treatment';
+
+  @override
+  String get eventHealth => 'Health';
+
+  @override
+  String get earnings => 'Earnings';
+
+  @override
+  String get thisMonth => 'This Month';
+
+  @override
+  String get totalEarnedVet => 'Total Earned';
+
+  @override
+  String get pendingAmount => 'Pending';
+
+  @override
+  String get commissionPercent => 'Commission %';
+
+  @override
+  String get monthlyEarnings => 'Monthly Earnings';
+
+  @override
+  String get commissionBreakdown => 'Commission Breakdown';
+
+  @override
+  String get payoutHistory => 'Payout History';
+
+  @override
+  String paidOnDate(String date) {
+    return 'Paid on $date';
+  }
+
+  @override
+  String get marketplaceTooltip => 'Marketplace';
+
+  @override
+  String get veterinarianTooltip => 'Veterinarian';
+
+  @override
+  String get farmTooltip => 'Farm';
+
+  @override
+  String get marketplaceDialogTitle => 'Marketplace';
+
+  @override
+  String get veterinarianDialogTitle => 'Veterinarian';
+
+  @override
+  String get farmDialogTitle => 'Farm Dashboard';
+
+  @override
+  String get veterinarianDialogDesc =>
+      'Tap the icon to connect with licensed veterinarians to book appointments, request farm visits, and get expert advice on your animals\' health and treatments.';
+
+  @override
+  String get marketplaceDialogDesc =>
+      'Tap the icon to browse and purchase farm supplies, animal feed, medicines, and equipment. Sell your farm produce directly to buyers through the Rumeno marketplace.';
+
+  @override
+  String get farmDialogDesc =>
+      'Tap the icon to access your Farm Management Dashboard — the central hub for all your farming activities.';
+
+  @override
+  String get treatment => 'Treatment:';
+
+  @override
+  String get withdrawal => 'Withdrawal:';
+
+  @override
+  String get ended => 'Ended:';
+
+  @override
+  String get notes => 'Notes:';
+
+  @override
+  String get account => 'Account';
 }

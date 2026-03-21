@@ -1,15 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../config/theme.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import '../../config/theme.dart';
+import '../../providers/admin_provider.dart';
+import '../../providers/ecommerce_provider.dart';
+import '../../models/models.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
+
+  String _formatCurrency(double val) {
+    if (val >= 100000) return '₹${(val / 100000).toStringAsFixed(1)}L';
+    if (val >= 1000) return '₹${(val / 1000).toStringAsFixed(1)}K';
+    return '₹${val.toStringAsFixed(0)}';
+  }
 
   @override
   Widget build(BuildContext context) {
     final today = DateFormat('EEE, dd MMM yyyy').format(DateTime.now());
     final greeting = _getGreeting();
+    final admin = context.watch<AdminProvider>();
+    final eco = context.watch<EcommerceProvider>();
+    final pendingOrders = eco.orders.where((o) => o.status == OrderStatus.pending).length;
+    final pendingVendors = eco.pendingVendors.length;
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
@@ -122,31 +136,28 @@ class AdminDashboardScreen extends StatelessWidget {
                       _BigKpiCard(
                         emoji: '👨‍🌾',
                         label: 'Farmers',
-                        value: '248',
-                        trend: '+12',
+                        value: '${admin.totalFarmers}',
                         color: const Color(0xFF1565C0),
                         onTap: () => context.go('/admin/farmers'),
                       ),
                       _BigKpiCard(
                         emoji: '🐄',
                         label: 'Animals',
-                        value: '3,456',
-                        trend: '+89',
+                        value: '${admin.totalAnimals}',
                         color: const Color(0xFF2E7D32),
                         onTap: () => context.go('/admin/farm'),
                       ),
                       _BigKpiCard(
                         emoji: '👨‍⚕️',
                         label: 'Vets',
-                        value: '18',
+                        value: '${admin.vets.length}',
                         color: const Color(0xFFAD1457),
                         onTap: () => context.go('/admin/vets'),
                       ),
                       _BigKpiCard(
                         emoji: '💰',
                         label: 'Revenue',
-                        value: '₹4.2L',
-                        trend: '+18%',
+                        value: _formatCurrency(admin.totalRevenue),
                         color: const Color(0xFFE65100),
                         onTap: () => context.go('/admin/more/payments'),
                       ),
@@ -226,32 +237,48 @@ class AdminDashboardScreen extends StatelessWidget {
                         ),
                   ),
                   const SizedBox(height: 12),
-                  _AlertBanner(
-                    emoji: '⚠️',
-                    icon: Icons.warning_rounded,
-                    title: '3 Overdue Vaccinations',
-                    subtitle: 'Needs immediate attention',
-                    color: RumenoTheme.errorRed,
-                    onTap: () => context.go('/admin/farm'),
-                  ),
-                  const SizedBox(height: 8),
-                  _AlertBanner(
-                    emoji: '📦',
-                    icon: Icons.pending_actions_rounded,
-                    title: '2 Pending Orders',
-                    subtitle: 'Review and process orders',
-                    color: RumenoTheme.warningYellow,
-                    onTap: () => context.go('/admin/shop'),
-                  ),
-                  const SizedBox(height: 8),
-                  _AlertBanner(
-                    emoji: '🏪',
-                    icon: Icons.store_mall_directory_rounded,
-                    title: '1 Vendor Waiting Approval',
-                    subtitle: 'New vendor registration',
-                    color: RumenoTheme.infoBlue,
-                    onTap: () => context.go('/admin/more/vendors'),
-                  ),
+                  if (pendingOrders > 0) ...[
+                    _AlertBanner(
+                      emoji: '📦',
+                      icon: Icons.pending_actions_rounded,
+                      title: '$pendingOrders Pending Order${pendingOrders > 1 ? 's' : ''}',
+                      subtitle: 'Review and process orders',
+                      color: RumenoTheme.warningYellow,
+                      onTap: () => context.go('/admin/shop'),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  if (pendingVendors > 0) ...[
+                    _AlertBanner(
+                      emoji: '🏪',
+                      icon: Icons.store_mall_directory_rounded,
+                      title: '$pendingVendors Vendor${pendingVendors > 1 ? 's' : ''} Waiting Approval',
+                      subtitle: 'New vendor registration',
+                      color: RumenoTheme.infoBlue,
+                      onTap: () => context.go('/admin/more/vendors'),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  if (admin.failedPayments > 0) ...[
+                    _AlertBanner(
+                      emoji: '⚠️',
+                      icon: Icons.warning_rounded,
+                      title: '${admin.failedPayments} Failed Payment${admin.failedPayments > 1 ? 's' : ''}',
+                      subtitle: 'Needs attention',
+                      color: RumenoTheme.errorRed,
+                      onTap: () => context.go('/admin/more/payments'),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  if (pendingOrders == 0 && pendingVendors == 0 && admin.failedPayments == 0)
+                    _AlertBanner(
+                      emoji: '✅',
+                      icon: Icons.check_circle_rounded,
+                      title: 'All Clear!',
+                      subtitle: 'No pending actions',
+                      color: Colors.green,
+                      onTap: () {},
+                    ),
                   const SizedBox(height: 24),
 
                   // ─── Subscription Overview ──────────────────────────────
@@ -264,15 +291,14 @@ class AdminDashboardScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Row(
-                    children: [
-                      _PlanPill(label: 'Free', count: 98, color: RumenoTheme.planFree),
-                      const SizedBox(width: 8),
-                      _PlanPill(label: 'Starter', count: 82, color: RumenoTheme.planStarter),
-                      const SizedBox(width: 8),
-                      _PlanPill(label: 'Pro', count: 45, color: RumenoTheme.planPro),
-                      const SizedBox(width: 8),
-                      _PlanPill(label: 'Business', count: 23, color: RumenoTheme.planBusiness),
-                    ],
+                    children: admin.plans.map((plan) {
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: _PlanPill(label: plan.name, count: plan.userCount, color: plan.color),
+                        ),
+                      );
+                    }).toList(),
                   ),
                   const SizedBox(height: 24),
 
@@ -285,7 +311,52 @@ class AdminDashboardScreen extends StatelessWidget {
                         ),
                   ),
                   const SizedBox(height: 12),
-                  ..._buildActivity(context),
+                  ...admin.recentActivity.map((a) => Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: (a['color'] as Color).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Text(a['emoji'] as String, style: const TextStyle(fontSize: 20)),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(a['text'] as String,
+                                  style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFF2D2D2D))),
+                              const SizedBox(height: 2),
+                              Text(a['time'] as String,
+                                  style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -301,62 +372,6 @@ class AdminDashboardScreen extends StatelessWidget {
     if (hour < 12) return 'Good Morning';
     if (hour < 17) return 'Good Afternoon';
     return 'Good Evening';
-  }
-
-  List<Widget> _buildActivity(BuildContext context) {
-    final activities = [
-      _ActivityItem(emoji: '⬆️', text: 'John Smith upgraded to Pro plan', time: '2 min ago', color: Colors.green),
-      _ActivityItem(emoji: '👤', text: 'New farmer: Mary Davis', time: '15 min ago', color: Colors.blue),
-      _ActivityItem(emoji: '🩺', text: 'Dr. Emily referred 2 farms', time: '1 hr ago', color: Colors.orange),
-      _ActivityItem(emoji: '💸', text: 'Payment: ₹999 from Victor Clark', time: '2 hrs ago', color: Colors.green),
-      _ActivityItem(emoji: '✅', text: 'Ticket #145 resolved', time: '3 hrs ago', color: Colors.teal),
-    ];
-    return activities.map((a) => Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: a.color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(a.emoji, style: const TextStyle(fontSize: 20)),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(a.text,
-                    style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF2D2D2D))),
-                const SizedBox(height: 2),
-                Text(a.time,
-                    style: TextStyle(fontSize: 11, color: Colors.grey[500])),
-              ],
-            ),
-          ),
-        ],
-      ),
-    )).toList();
   }
 }
 
@@ -614,50 +629,34 @@ class _PlanPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withValues(alpha: 0.25)),
-        ),
-        child: Column(
-          children: [
-            Text(
-              '$count',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            '$count',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: color,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-}
-
-// ─── Activity Item ────────────────────────────────────────────────────────────
-class _ActivityItem {
-  final String emoji;
-  final String text;
-  final String time;
-  final Color color;
-  const _ActivityItem({
-    required this.emoji,
-    required this.text,
-    required this.time,
-    required this.color,
-  });
 }
