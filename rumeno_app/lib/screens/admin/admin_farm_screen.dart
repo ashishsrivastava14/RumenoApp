@@ -37,7 +37,7 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
         headerSliverBuilder: (context, _) => [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 160,
+            expandedHeight: 240,
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
@@ -48,7 +48,7 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
                     colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
                   ),
                 ),
-                padding: const EdgeInsets.fromLTRB(20, 56, 20, 60),
+                padding: const EdgeInsets.fromLTRB(20, 56, 20, 80),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,

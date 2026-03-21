@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:home_widget/home_widget.dart';
 import '../mock/mock_animals.dart';
 import '../mock/mock_health.dart';
@@ -17,6 +18,7 @@ class HomeWidgetService {
 
   /// Start auto-refresh every 2 seconds (demo mode).
   static void startDemoRefresh() {
+    if (kIsWeb) return;
     _demoTimer?.cancel();
     updateWidget();
     _demoTimer = Timer.periodic(const Duration(seconds: 2), (_) => updateWidget());
@@ -44,6 +46,7 @@ class HomeWidgetService {
   /// Push current farm stats to native widget.
   /// All values saved as String to prevent type mismatch on Android.
   static Future<void> updateWidget() async {
+    if (kIsWeb) return;
     final baseTotal = mockAnimals.length;
     final basePregnant = mockAnimals.where((a) => a.status == AnimalStatus.pregnant).length;
     final baseActive = mockAnimals.where((a) => a.status == AnimalStatus.active).length;
