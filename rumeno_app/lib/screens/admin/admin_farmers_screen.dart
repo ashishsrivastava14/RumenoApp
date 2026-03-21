@@ -35,7 +35,7 @@ class _AdminFarmersScreenState extends State<AdminFarmersScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 160,
+            expandedHeight: 220,
             pinned: true,
             leading: IconButton(
               icon: Container(
@@ -188,12 +188,9 @@ class _AdminFarmersScreenState extends State<AdminFarmersScreen> {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 final farmer = filtered[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: FarmerCard(
-                    farmer: farmer,
-                    onTap: () => _showFarmerDetail(context, farmer),
-                  ),
+                return FarmerCard(
+                  farmer: farmer,
+                  onTap: () => _showFarmerDetail(context, farmer),
                 );
               },
               childCount: filtered.length,
