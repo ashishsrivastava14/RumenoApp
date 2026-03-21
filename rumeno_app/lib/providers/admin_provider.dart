@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import '../mock/mock_animals.dart';
-import '../mock/mock_farmers.dart';
-import '../mock/mock_health.dart';
-import '../models/models.dart';
 
 // ─── Health Config Item Model ─────────────────────────────────────────────────
 class HealthConfigItem {
@@ -196,7 +193,7 @@ class AdminProvider extends ChangeNotifier {
   final List<PaymentModel> _payments = [];
 
   // ─── Settings ───────────────────────────────────────────────────────────
-  AppSettings _settings = AppSettings();
+  final AppSettings _settings = AppSettings();
 
   AdminProvider() {
     _loadMockData();

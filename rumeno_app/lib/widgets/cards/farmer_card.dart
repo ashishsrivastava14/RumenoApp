@@ -18,12 +18,12 @@ class FarmerCard extends StatelessWidget {
     }
   }
 
-  IconData _planIcon(SubscriptionPlan p) {
+  String _planEmoji(SubscriptionPlan p) {
     switch (p) {
-      case SubscriptionPlan.free: return Icons.card_giftcard_rounded;
-      case SubscriptionPlan.starter: return Icons.rocket_launch_rounded;
-      case SubscriptionPlan.pro: return Icons.star_rounded;
-      case SubscriptionPlan.business: return Icons.diamond_rounded;
+      case SubscriptionPlan.free: return '🆓';
+      case SubscriptionPlan.starter: return '🚀';
+      case SubscriptionPlan.pro: return '⭐';
+      case SubscriptionPlan.business: return '💎';
     }
   }
 
@@ -37,61 +37,61 @@ class FarmerCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: farmer.isActive ? Colors.transparent : RumenoTheme.errorRed.withValues(alpha: 0.3),
-            width: farmer.isActive ? 0 : 1.5,
+            width: farmer.isActive ? 0 : 2,
           ),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(0, 3))],
         ),
         child: Column(
           children: [
-            // Main card content
+            // Main card content - bigger, more visual
             Padding(
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
               child: Row(
                 children: [
-                  // Large avatar with status ring
+                  // Large avatar with prominent status ring
                   Stack(
                     children: [
                       Container(
-                        width: 56,
-                        height: 56,
+                        width: 62,
+                        height: 62,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: farmer.isActive ? RumenoTheme.successGreen : RumenoTheme.errorRed,
-                            width: 2.5,
+                            width: 3,
                           ),
                         ),
                         child: CircleAvatar(
-                          radius: 24,
+                          radius: 27,
                           backgroundColor: RumenoTheme.primaryGreen.withValues(alpha: 0.12),
                           child: Text(
                             farmer.name[0],
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: RumenoTheme.primaryGreen,
                               fontWeight: FontWeight.bold,
-                              fontSize: 22,
+                              fontSize: 26,
                             ),
                           ),
                         ),
                       ),
-                      // Active status dot
+                      // Bigger status indicator with emoji
                       Positioned(
-                        bottom: 0,
-                        right: 0,
+                        bottom: -1,
+                        right: -1,
                         child: Container(
-                          width: 16,
-                          height: 16,
+                          width: 22,
+                          height: 22,
                           decoration: BoxDecoration(
                             color: farmer.isActive ? RumenoTheme.successGreen : RumenoTheme.errorRed,
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
+                            border: Border.all(color: Colors.white, width: 2.5),
                           ),
                           child: Icon(
                             farmer.isActive ? Icons.check : Icons.close,
-                            size: 9,
+                            size: 12,
                             color: Colors.white,
                           ),
                         ),
@@ -99,79 +99,90 @@ class FarmerCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(width: 14),
-                  // Farmer info
+                  // Farmer info - bigger text
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           farmer.name,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                         ),
-                        const SizedBox(height: 3),
+                        const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(Icons.home_work_rounded, size: 14, color: Colors.grey[500]),
-                            const SizedBox(width: 4),
+                            Icon(Icons.home_work_rounded, size: 16, color: Colors.grey[500]),
+                            const SizedBox(width: 5),
                             Expanded(
                               child: Text(
                                 farmer.farmName,
-                                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 3),
                         Row(
                           children: [
-                            Icon(Icons.location_on_rounded, size: 14, color: Colors.grey[500]),
-                            const SizedBox(width: 4),
+                            Icon(Icons.location_on_rounded, size: 16, color: Colors.grey[500]),
+                            const SizedBox(width: 5),
                             Text(
                               farmer.state,
-                              style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                              style: TextStyle(fontSize: 13, color: Colors.grey[500]),
                             ),
                           ],
                         ),
                       ],
                     ),
                   ),
-                  // Quick call button
+                  // Big call button - obvious and tappable
                   if (onCall != null)
                     Material(
-                      color: RumenoTheme.successGreen.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      color: RumenoTheme.successGreen.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(14),
                       child: InkWell(
                         onTap: onCall,
-                        borderRadius: BorderRadius.circular(12),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Icon(Icons.phone_rounded, color: RumenoTheme.successGreen, size: 22),
+                        borderRadius: BorderRadius.circular(14),
+                        child: const Padding(
+                          padding: EdgeInsets.all(14),
+                          child: Icon(Icons.phone_rounded, color: RumenoTheme.successGreen, size: 26),
                         ),
                       ),
                     ),
                 ],
               ),
             ),
-            // Bottom info strip with visual indicators
+            // Bottom strip - visual indicators
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: Colors.grey.withValues(alpha: 0.04),
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(18)),
               ),
               child: Row(
                 children: [
-                  // Animal count with icon
-                  _InfoChip(
-                    icon: Icons.pets_rounded,
-                    label: '${farmer.animalCount}',
-                    color: const Color(0xFF8D6E63),
-                  ),
-                  const SizedBox(width: 12),
-                  // Plan badge
+                  // Animal count with big icon
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF8D6E63).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('🐾', style: TextStyle(fontSize: 14)),
+                        const SizedBox(width: 5),
+                        Text('${farmer.animalCount}',
+                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF8D6E63))),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  // Plan badge with emoji
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: planClr.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
@@ -179,44 +190,48 @@ class FarmerCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(_planIcon(farmer.plan), size: 14, color: planClr),
+                        Text(_planEmoji(farmer.plan), style: const TextStyle(fontSize: 12)),
                         const SizedBox(width: 4),
                         Text(
                           farmer.planName,
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: planClr),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: planClr),
                         ),
                       ],
                     ),
                   ),
                   const Spacer(),
-                  // Arrow indicator for "tap to see more"
-                  Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey[400]),
+                  // Status text
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: (farmer.isActive ? RumenoTheme.successGreen : RumenoTheme.errorRed).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(farmer.isActive ? '✅' : '❌', style: const TextStyle(fontSize: 11)),
+                        const SizedBox(width: 4),
+                        Text(
+                          farmer.isActive ? 'Active' : 'Inactive',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: farmer.isActive ? RumenoTheme.successGreen : RumenoTheme.errorRed,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Tap arrow
+                  const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
                 ],
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _InfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  const _InfoChip({required this.icon, required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 16, color: color),
-        const SizedBox(width: 4),
-        Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: color)),
-      ],
     );
   }
 }

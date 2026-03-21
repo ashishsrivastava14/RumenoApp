@@ -46,7 +46,7 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
                   Text('Send Notification', style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: _audience,
+                    initialValue: _audience,
                     decoration: const InputDecoration(labelText: 'Audience'),
                     items: ['All Users', 'All Farmers', 'All Vets', 'Free Plan', 'Starter Plan', 'Pro & Business']
                         .map((a) => DropdownMenuItem(value: a, child: Text(a)))

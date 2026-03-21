@@ -1292,7 +1292,7 @@ class _AdgSectionState extends State<_AdgSection> {
                 ),
                 child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
                   Text(
-                    adg! >= 0 ? '📈' : '📉',
+                    adg >= 0 ? '📈' : '📉',
                     style: const TextStyle(fontSize: 28),
                   ),
                   const SizedBox(width: 12),
@@ -1318,7 +1318,7 @@ class _AdgSectionState extends State<_AdgSection> {
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Column(children: [
                     Icon(
-                      totalGain! >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                      totalGain >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
                       color: ratingColor,
                       size: 32,
                     ),
@@ -1351,7 +1351,7 @@ class _AdgSectionState extends State<_AdgSection> {
               Expanded(child: _AdgMiniCard(
                 emoji: '📊',
                 title: 'Overall',
-                value: '${adg!.abs().toStringAsFixed(2)} kg/day',
+                value: '${adg.abs().toStringAsFixed(2)} kg/day',
                 isPositive: adg >= 0,
               )),
             ]),

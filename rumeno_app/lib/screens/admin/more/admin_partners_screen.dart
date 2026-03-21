@@ -137,7 +137,7 @@ class AdminPartnersScreen extends StatelessWidget {
               TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Name', prefixIcon: Icon(Icons.person))),
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
-                value: type,
+                initialValue: type,
                 decoration: const InputDecoration(labelText: 'Type'),
                 items: ['Vet', 'Partner'].map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
                 onChanged: (v) => setDialogState(() => type = v!),

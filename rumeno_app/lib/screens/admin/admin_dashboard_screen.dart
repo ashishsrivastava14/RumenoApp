@@ -388,9 +388,9 @@ class _BigKpiCard extends StatelessWidget {
     required this.emoji,
     required this.label,
     required this.value,
+    this.trend,
     required this.color,
     required this.onTap,
-    this.trend,
   });
 
   @override
