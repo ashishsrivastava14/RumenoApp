@@ -11,9 +11,14 @@ import '../../../widgets/charts/pie_chart_widget.dart';
 import '../../../widgets/common/section_header.dart';
 import '../../../widgets/common/marketplace_button.dart';
 
-class FinanceDashboardScreen extends StatelessWidget {
+class FinanceDashboardScreen extends StatefulWidget {
   const FinanceDashboardScreen({super.key});
 
+  @override
+  State<FinanceDashboardScreen> createState() => _FinanceDashboardScreenState();
+}
+
+class _FinanceDashboardScreenState extends State<FinanceDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final totalExp = totalExpensesThisMonth;
@@ -45,7 +50,10 @@ class FinanceDashboardScreen extends StatelessWidget {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () async => await Future.delayed(const Duration(seconds: 1)),
+        onRefresh: () async {
+          await Future.delayed(const Duration(milliseconds: 300));
+          setState(() {});
+        },
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
@@ -234,7 +242,7 @@ class FinanceDashboardScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddExpenseSteps(context),
+        onPressed: () => _showAddExpenseStepsAndRefresh(context),
         icon: const Icon(Icons.add_circle_outline_rounded, size: 28),
         label: const Text(
           'Add Expense',
@@ -249,13 +257,22 @@ class FinanceDashboardScreen extends StatelessWidget {
     BuildContext context, {
     ExpenseCategory? preselectedCategory,
   }) {
-    showModalBottomSheet(
+    _showAddExpenseStepsAndRefresh(context, preselectedCategory: preselectedCategory);
+  }
+
+  void _showAddExpenseStepsAndRefresh(
+    BuildContext context, {
+    ExpenseCategory? preselectedCategory,
+  }) {
+    showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) =>
           _AddExpenseWizard(preselectedCategory: preselectedCategory),
-    );
+    ).then((saved) {
+      if (saved == true && mounted) setState(() {});
+    });
   }
 }
 
@@ -2475,7 +2492,30 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
               flex: 2,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.pop(context);
+                  // Persist the expense to the global mock list
+                  final payMode = switch (_paymentMode) {
+                    'UPI' => PaymentMode.upi,
+                    'Bank' => PaymentMode.bank,
+                    'Credit' => PaymentMode.credit,
+                    _ => PaymentMode.cash,
+                  };
+                  final record = ExpenseRecord(
+                    id: 'EXP_${DateTime.now().millisecondsSinceEpoch}',
+                    category: _category ?? ExpenseCategory.other,
+                    amount: double.tryParse(_amount) ?? 0,
+                    date: DateTime.now(),
+                    vendorName: _vendorController.text.trim().isEmpty
+                        ? null
+                        : _vendorController.text.trim(),
+                    paymentMode: payMode,
+                    notes: _notesController.text.trim().isEmpty
+                        ? null
+                        : _notesController.text.trim(),
+                    farmerId: 'F001',
+                  );
+                  mockExpenses.insert(0, record);
+
+                  Navigator.pop(context, true); // return true → triggers refresh
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Row(

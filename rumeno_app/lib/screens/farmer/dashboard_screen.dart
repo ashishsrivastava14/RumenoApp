@@ -1000,6 +1000,15 @@ class _QuickActionsSection extends StatelessWidget {
                 onTap: () => context.go('/farmer/finance/feed-calculator'),
                 description: 'Calculate the best feed combination for your animals based on nutrition needs and cost.',
               ),
+              const SizedBox(width: 12),
+              _QuickBtn(
+                icon: Icons.storefront_rounded,
+                label: '🛒 बेचें / Sell',
+                gradient: const LinearGradient(
+                    colors: [Color(0xFF2E7D32), Color(0xFF81C784)]),
+                onTap: () => context.push('/farmer/sale'),
+                description: 'Record animal, milk, and produce sales. Track buyers, amounts, and payment methods in one place.',
+              ),
             ],
           ),
         ],

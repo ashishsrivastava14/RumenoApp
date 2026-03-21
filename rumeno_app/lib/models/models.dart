@@ -566,6 +566,77 @@ class LabReport {
   });
 }
 
+// ─── Farm Sale / Shop Models ───
+
+enum SaleType { animal, milk, produce, other }
+
+class SaleRecord {
+  final String id;
+  final SaleType type;
+  final DateTime date;
+  final double amount;
+  final PaymentMode paymentMode;
+  final String buyerName;
+  final String? buyerPhone;
+
+  // Animal-specific
+  final String? animalId;
+  final String? animalTag;
+  final String? animalSpecies;
+
+  // Produce-specific
+  final String? produceType; // e.g. "Milk", "Egg", "Ghee"
+  final double? quantity;
+  final String? unit; // litre, kg, dozen
+
+  final String? notes;
+  final String farmerId;
+
+  const SaleRecord({
+    required this.id,
+    required this.type,
+    required this.date,
+    required this.amount,
+    required this.paymentMode,
+    required this.buyerName,
+    this.buyerPhone,
+    this.animalId,
+    this.animalTag,
+    this.animalSpecies,
+    this.produceType,
+    this.quantity,
+    this.unit,
+    this.notes,
+    required this.farmerId,
+  });
+
+  String get typeLabel {
+    switch (type) {
+      case SaleType.animal:
+        return 'Animal';
+      case SaleType.milk:
+        return 'Milk';
+      case SaleType.produce:
+        return 'Produce';
+      case SaleType.other:
+        return 'Other';
+    }
+  }
+
+  String get typeEmoji {
+    switch (type) {
+      case SaleType.animal:
+        return '🐄';
+      case SaleType.milk:
+        return '🥛';
+      case SaleType.produce:
+        return '🌾';
+      case SaleType.other:
+        return '💰';
+    }
+  }
+}
+
 // ─── Ecommerce Models ───
 
 enum ProductCategory { animalFeed, tonic, supplements, veterinaryMedicines, farmEquipment }

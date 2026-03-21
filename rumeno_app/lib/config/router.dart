@@ -47,6 +47,10 @@ import '../screens/farmer/more/notification_settings_screen.dart';
 import '../screens/farmer/more/help_support_screen.dart';
 import '../screens/farmer/more/data_export_screen.dart';
 import '../screens/farmer/more/farm_sanitization_screen.dart';
+import '../screens/farmer/sale/farm_shop_screen.dart';
+import '../screens/farmer/sale/sell_animal_screen.dart';
+import '../screens/farmer/sale/sell_produce_screen.dart';
+import '../screens/farmer/sale/sale_history_screen.dart';
 
 // Vet
 import '../screens/vet/vet_shell.dart';
@@ -288,6 +292,31 @@ GoRouter createRouter(AuthProvider authProvider) {
                 path: 'sanitization',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (_, _) => const FarmSanitizationScreen(),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/farmer/sale',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (_, _) => const FarmShopScreen(),
+            routes: [
+              GoRoute(
+                path: 'sell-animal',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const SellAnimalScreen(),
+              ),
+              GoRoute(
+                path: 'sell-produce',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, state) {
+                  final type = (state.extra as String?) ?? 'Produce';
+                  return SellProduceScreen(initialType: type);
+                },
+              ),
+              GoRoute(
+                path: 'history',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const SaleHistoryScreen(),
               ),
             ],
           ),

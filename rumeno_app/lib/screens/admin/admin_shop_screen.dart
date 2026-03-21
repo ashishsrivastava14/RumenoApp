@@ -36,7 +36,7 @@ class _AdminShopScreenState extends State<AdminShopScreen>
         headerSliverBuilder: (context, _) => [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 140,
+            expandedHeight: 180,
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
@@ -47,7 +47,7 @@ class _AdminShopScreenState extends State<AdminShopScreen>
                     colors: [Color(0xFF1565C0), Color(0xFF1976D2)],
                   ),
                 ),
-                padding: const EdgeInsets.fromLTRB(20, 56, 20, 60),
+                padding: const EdgeInsets.fromLTRB(20, 56, 20, 80),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
