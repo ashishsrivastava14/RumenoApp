@@ -131,15 +131,9 @@ class _FarmInfoBanner extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            radius: 26,
+            radius: 28,
             backgroundColor: RumenoTheme.primaryGreen.withValues(alpha: 0.12),
-            child: Text(
-              farmer.name[0],
-              style: TextStyle(
-                  color: RumenoTheme.primaryGreen,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18),
-            ),
+            child: const Text('🌾', style: TextStyle(fontSize: 28)),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -233,6 +227,17 @@ class _AnimalsTab extends StatelessWidget {
     }
   }
 
+  String _speciesEmoji(Species s) {
+    switch (s) {
+      case Species.cow:    return '🐄';
+      case Species.buffalo: return '🐃';
+      case Species.goat:   return '🐐';
+      case Species.sheep:  return '🐑';
+      case Species.pig:    return '🐷';
+      case Species.horse:  return '🐴';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (animals.isEmpty) {
@@ -245,24 +250,24 @@ class _AnimalsTab extends StatelessWidget {
         final a = animals[i];
         final color = _statusColor(a.status);
         return Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(14),
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border(left: BorderSide(color: color, width: 3)),
+            borderRadius: BorderRadius.circular(14),
+            border: Border(left: BorderSide(color: color, width: 4)),
           ),
           child: Row(
             children: [
               Container(
-                width: 42,
-                height: 42,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: color.withValues(alpha: 0.12),
                 ),
                 child: Center(
-                  child: Icon(Icons.pets_rounded, color: color, size: 20),
+                  child: Text(_speciesEmoji(a.species), style: const TextStyle(fontSize: 28)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -352,6 +357,17 @@ class _TreatmentsTab extends StatelessWidget {
     }
   }
 
+  String _statusEmoji(TreatmentStatus s) {
+    switch (s) {
+      case TreatmentStatus.active:
+        return '🚨';
+      case TreatmentStatus.completed:
+        return '✅';
+      case TreatmentStatus.followUp:
+        return '🔄';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -364,12 +380,13 @@ class _TreatmentsTab extends StatelessWidget {
       itemBuilder: (context, i) {
         final t = treatments[i];
         final color = _statusColor(t.status);
+        final emoji = _statusEmoji(t.status);
         return Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(14),
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             border: Border(left: BorderSide(color: color, width: 4)),
           ),
           child: Column(
@@ -377,49 +394,52 @@ class _TreatmentsTab extends StatelessWidget {
             children: [
               Row(
                 children: [
+                  Text(emoji, style: const TextStyle(fontSize: 20)),
+                  const SizedBox(width: 8),
                   Expanded(
                       child: Text(t.diagnosis,
                           style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14))),
+                              fontWeight: FontWeight.bold, fontSize: 15))),
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: color.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(_statusLabel(t.status, l10n),
                         style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 11,
                             color: color,
                             fontWeight: FontWeight.w600)),
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
-              Text(_animalName(t.animalId),
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: RumenoTheme.primaryGreen,
-                      fontWeight: FontWeight.w500)),
-              const SizedBox(height: 2),
-              Text(t.treatment,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Row(
                 children: [
-                  Icon(Icons.calendar_today_rounded,
-                      size: 12, color: Colors.grey[400]),
-                  const SizedBox(width: 4),
+                  const Text('🐾 ', style: TextStyle(fontSize: 14)),
+                  Text(_animalName(t.animalId),
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: RumenoTheme.primaryGreen,
+                          fontWeight: FontWeight.w500)),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(t.treatment,
+                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  const Text('📅 ', style: TextStyle(fontSize: 14)),
                   Text(DateFormat('dd MMM yyyy').format(t.startDate),
                       style: TextStyle(fontSize: 11, color: Colors.grey[500])),
                   if (t.followUpDate != null) ...[
                     const SizedBox(width: 10),
-                    Icon(Icons.update_rounded,
-                        size: 12, color: Colors.orange[400]),
-                    const SizedBox(width: 4),
+                    const Text('🔄 ', style: TextStyle(fontSize: 14)),
                     Text(
                         l10n.vetFarmDetailFollowUpDate(DateFormat('dd MMM').format(t.followUpDate!)),
                         style: TextStyle(
@@ -486,23 +506,24 @@ class _VaccinationsTab extends StatelessWidget {
       itemBuilder: (context, i) {
         final v = vaccinations[i];
         final color = _statusColor(v.status);
+        final emoji = v.status == VaccinationStatus.done ? '✅' : v.status == VaccinationStatus.overdue ? '🚨' : '⏳';
         return Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(14),
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             border: Border(left: BorderSide(color: color, width: 4)),
           ),
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(Icons.vaccines_rounded, color: color, size: 20),
+                child: Text(emoji, style: const TextStyle(fontSize: 22)),
               ),
               const SizedBox(width: 12),
               Expanded(

@@ -42,23 +42,71 @@ class VetShell extends StatelessWidget {
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         destinations: [
           NavigationDestination(
-            icon: const Icon(Icons.dashboard_outlined),
-            selectedIcon: const Icon(Icons.dashboard_rounded, color: Color(0xFF5B7A2E)),
+            icon: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('📊', style: TextStyle(fontSize: 22)),
+                Icon(Icons.dashboard_outlined, size: 18),
+              ],
+            ),
+            selectedIcon: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('📊', style: TextStyle(fontSize: 22)),
+                Icon(Icons.dashboard_rounded, color: Color(0xFF5B7A2E), size: 18),
+              ],
+            ),
             label: l10n.navVetDashboard,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.agriculture_outlined),
-            selectedIcon: const Icon(Icons.agriculture_rounded, color: Color(0xFF5B7A2E)),
+            icon: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('🌾', style: TextStyle(fontSize: 22)),
+                Icon(Icons.agriculture_outlined, size: 18),
+              ],
+            ),
+            selectedIcon: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('🌾', style: TextStyle(fontSize: 22)),
+                Icon(Icons.agriculture_rounded, color: Color(0xFF5B7A2E), size: 18),
+              ],
+            ),
             label: l10n.navVetFarms,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.medical_services_outlined),
-            selectedIcon: const Icon(Icons.medical_services_rounded, color: Color(0xFF5B7A2E)),
+            icon: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('🩺', style: TextStyle(fontSize: 22)),
+                Icon(Icons.medical_services_outlined, size: 18),
+              ],
+            ),
+            selectedIcon: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('🩺', style: TextStyle(fontSize: 22)),
+                Icon(Icons.medical_services_rounded, color: Color(0xFF5B7A2E), size: 18),
+              ],
+            ),
             label: l10n.navVetHealth,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF5B7A2E)),
+            icon: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('💰', style: TextStyle(fontSize: 22)),
+                Icon(Icons.account_balance_wallet_outlined, size: 18),
+              ],
+            ),
+            selectedIcon: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('💰', style: TextStyle(fontSize: 22)),
+                Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF5B7A2E), size: 18),
+              ],
+            ),
             label: l10n.navVetEarnings,
           ),
         ],

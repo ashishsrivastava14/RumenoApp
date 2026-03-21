@@ -34,7 +34,7 @@ class _AdminVetsScreenState extends State<AdminVetsScreen>
         headerSliverBuilder: (context, _) => [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 140,
+            expandedHeight: 180,
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
@@ -45,7 +45,7 @@ class _AdminVetsScreenState extends State<AdminVetsScreen>
                     colors: [Color(0xFF880E4F), Color(0xFFAD1457)],
                   ),
                 ),
-                padding: const EdgeInsets.fromLTRB(20, 56, 20, 60),
+                padding: const EdgeInsets.fromLTRB(20, 56, 20, 70),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -97,9 +97,10 @@ class _AdminVetsScreenState extends State<AdminVetsScreen>
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showInviteVetDialog(context),
-        icon: const Icon(Icons.person_add_rounded),
-        label: const Text('Invite Vet'),
+        icon: const Icon(Icons.person_add_rounded, size: 28),
+        label: const Text('➕ Invite Vet', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFFAD1457),
+        extendedPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       ),
     );
   }
@@ -113,9 +114,9 @@ class _AdminVetsScreenState extends State<AdminVetsScreen>
       builder: (ctx) => AlertDialog(
         title: const Row(
           children: [
-            Icon(Icons.person_add_rounded, color: Color(0xFFAD1457)),
-            SizedBox(width: 8),
-            Text('Invite Veterinarian'),
+            Text('👨‍⚕️', style: TextStyle(fontSize: 28)),
+            SizedBox(width: 10),
+            Text('Invite Veterinarian', style: TextStyle(fontSize: 18)),
           ],
         ),
         content: Column(
@@ -123,31 +124,42 @@ class _AdminVetsScreenState extends State<AdminVetsScreen>
           children: [
             TextField(
                 controller: nameCtrl,
+                style: const TextStyle(fontSize: 16),
                 decoration: const InputDecoration(
-                    labelText: 'Full Name',
-                    prefixIcon: Icon(Icons.person))),
-            const SizedBox(height: 10),
+                    labelText: '👤  Full Name',
+                    labelStyle: TextStyle(fontSize: 15),
+                    prefixIcon: Icon(Icons.person, size: 28, color: Color(0xFFAD1457)),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16))),
+            const SizedBox(height: 14),
             TextField(
                 controller: phoneCtrl,
                 keyboardType: TextInputType.phone,
+                style: const TextStyle(fontSize: 16),
                 decoration: const InputDecoration(
-                    labelText: 'Phone Number',
-                    prefixIcon: Icon(Icons.phone))),
-            const SizedBox(height: 10),
+                    labelText: '📞  Phone Number',
+                    labelStyle: TextStyle(fontSize: 15),
+                    prefixIcon: Icon(Icons.phone, size: 28, color: Color(0xFFAD1457)),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16))),
+            const SizedBox(height: 14),
             TextField(
                 controller: specCtrl,
+                style: const TextStyle(fontSize: 16),
                 decoration: const InputDecoration(
-                    labelText: 'Specialization',
-                    prefixIcon: Icon(Icons.medical_information))),
+                    labelText: '🏥  Specialization',
+                    labelStyle: TextStyle(fontSize: 15),
+                    prefixIcon: Icon(Icons.medical_information, size: 28, color: Color(0xFFAD1457)),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16))),
           ],
         ),
         actions: [
-          TextButton(
+          TextButton.icon(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel')),
-          ElevatedButton(
+              icon: const Icon(Icons.close_rounded, size: 20),
+              label: const Text('Cancel', style: TextStyle(fontSize: 14))),
+          ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFAD1457)),
+                backgroundColor: const Color(0xFFAD1457),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
             onPressed: () {
               if (nameCtrl.text.trim().isEmpty) return;
               final admin = context.read<AdminProvider>();
@@ -162,7 +174,8 @@ class _AdminVetsScreenState extends State<AdminVetsScreen>
               ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Invite sent to ${nameCtrl.text}!')));
             },
-            child: const Text('Send Invite'),
+            icon: const Icon(Icons.send_rounded, size: 20),
+            label: const Text('📨 Send Invite', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -253,32 +266,38 @@ class _VetsTabState extends State<_VetsTab> {
   }
 
   Widget _statPill(String label, String value, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-          const SizedBox(width: 6),
-          Text('$label $value', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color)),
-        ],
+    final emoji = label == 'Active' ? '✅' : label == 'Pending' ? '⏳' : '📊';
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 22)),
+            const SizedBox(height: 4),
+            Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
+            Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color)),
+          ],
+        ),
       ),
     );
   }
 
   Widget _chip(String label, bool selected, VoidCallback onTap) {
+    final emoji = label == 'All' ? '📋' : label == 'Active' ? '✅' : label == 'Pending' ? '⏳' : '⛔';
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: ChoiceChip(
-        label: Text(label, style: const TextStyle(fontSize: 11)),
+        avatar: Text(emoji, style: const TextStyle(fontSize: 16)),
+        label: Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         selected: selected,
         selectedColor: const Color(0xFFAD1457).withValues(alpha: 0.15),
         onSelected: (_) => onTap(),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       ),
     );
   }
@@ -291,44 +310,63 @@ class _VetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color c;
+    String statusEmoji;
     switch (vet.status) {
       case VetStatus.active:
         c = RumenoTheme.successGreen;
+        statusEmoji = '✅';
         break;
       case VetStatus.pending:
         c = RumenoTheme.warningYellow;
+        statusEmoji = '⏳';
         break;
       case VetStatus.inactive:
         c = Colors.grey;
+        statusEmoji = '⛔';
         break;
     }
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 2,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border(left: BorderSide(color: c, width: 5)),
+        ),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 CircleAvatar(
-                  radius: 24,
+                  radius: 30,
                   backgroundColor: const Color(0xFFAD1457).withValues(alpha: 0.1),
-                  child: Text(
-                    vet.name.split(' ').last[0],
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFAD1457)),
-                  ),
+                  child: const Text('👨‍⚕️', style: TextStyle(fontSize: 28)),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(vet.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                      Text(vet.specialization, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                      Text(vet.licenseNumber, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+                      Text(vet.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          const Icon(Icons.medical_services_rounded, size: 14, color: Color(0xFFAD1457)),
+                          const SizedBox(width: 4),
+                          Text(vet.specialization, style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Icon(Icons.badge_rounded, size: 14, color: Colors.grey),
+                          const SizedBox(width: 4),
+                          Text(vet.licenseNumber, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -336,19 +374,27 @@ class _VetCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: c.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: c.withValues(alpha: 0.3)),
                       ),
-                      child: Text(vet.status.name, style: TextStyle(color: c, fontSize: 10, fontWeight: FontWeight.bold)),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(statusEmoji, style: const TextStyle(fontSize: 14)),
+                          const SizedBox(width: 4),
+                          Text(vet.status.name.toUpperCase(), style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
                     ),
                     if (vet.rating > 0) ...[
                       const SizedBox(height: 4),
                       Row(children: [
-                        const Icon(Icons.star_rounded, color: Colors.amber, size: 14),
-                        Text('${vet.rating}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                        const Text('⭐', style: TextStyle(fontSize: 16)),
+                        const SizedBox(width: 2),
+                        Text('${vet.rating}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                       ]),
                     ],
                   ],
@@ -366,54 +412,66 @@ class _VetCard extends StatelessWidget {
               ),
             ],
             if (vet.status == VetStatus.pending) ...[
-              const Divider(height: 14),
+              const Divider(height: 16),
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: RumenoTheme.warningYellow.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(8),
+                  color: RumenoTheme.warningYellow.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(children: [
-                  Icon(Icons.info_outline_rounded, color: RumenoTheme.warningYellow, size: 16),
-                  const SizedBox(width: 8),
-                  const Text('License verification pending', style: TextStyle(fontSize: 11, color: Colors.orange)),
+                  const Text('⏳', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: 10),
+                  const Expanded(child: Text('License verification pending', style: TextStyle(fontSize: 13, color: Colors.orange, fontWeight: FontWeight.w500))),
                 ]),
               ),
             ],
-            const Divider(height: 14),
+            const Divider(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                OutlinedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('View ${vet.name} details')));
-                  },
-                  icon: const Icon(Icons.visibility_rounded, size: 14),
-                  label: const Text('View', style: TextStyle(fontSize: 12)),
-                  style: OutlinedButton.styleFrom(visualDensity: VisualDensity.compact),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _showVetDetailSheet(context, vet),
+                    icon: const Icon(Icons.visibility_rounded, size: 20, color: Color(0xFFAD1457)),
+                    label: const Text('👁️ View', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: const BorderSide(color: Color(0xFFAD1457)),
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 if (vet.status == VetStatus.pending)
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<AdminProvider>().approveVet(vet.id);
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${vet.name} approved!')));
-                    },
-                    icon: const Icon(Icons.verified_rounded, size: 14),
-                    label: const Text('Approve', style: TextStyle(fontSize: 12)),
-                    style: ElevatedButton.styleFrom(backgroundColor: RumenoTheme.successGreen, visualDensity: VisualDensity.compact),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        context.read<AdminProvider>().approveVet(vet.id);
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${vet.name} approved!')));
+                      },
+                      icon: const Icon(Icons.verified_rounded, size: 20),
+                      label: const Text('✅ Approve', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: RumenoTheme.successGreen,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
                   )
                 else
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<AdminProvider>().toggleVetStatus(vet.id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(vet.status == VetStatus.active ? '${vet.name} deactivated' : '${vet.name} activated')),
-                      );
-                    },
-                    icon: Icon(vet.status == VetStatus.active ? Icons.pause_circle_rounded : Icons.play_circle_rounded, size: 14),
-                    label: Text(vet.status == VetStatus.active ? 'Deactivate' : 'Activate', style: const TextStyle(fontSize: 12)),
-                    style: ElevatedButton.styleFrom(visualDensity: VisualDensity.compact),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        context.read<AdminProvider>().toggleVetStatus(vet.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(vet.status == VetStatus.active ? '${vet.name} deactivated' : '${vet.name} activated')),
+                        );
+                      },
+                      icon: Icon(vet.status == VetStatus.active ? Icons.pause_circle_rounded : Icons.play_circle_rounded, size: 20),
+                      label: Text(vet.status == VetStatus.active ? '⏸️ Deactivate' : '▶️ Activate', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: vet.status == VetStatus.active ? Colors.orange : RumenoTheme.successGreen,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -423,21 +481,177 @@ class _VetCard extends StatelessWidget {
     );
   }
 
-  Widget _stat(BuildContext context, String value, String label, IconData icon) {
+  void _showVetDetailSheet(BuildContext context, VetModel vet) {
+    final statusColor = vet.status == VetStatus.active
+        ? RumenoTheme.successGreen
+        : vet.status == VetStatus.pending
+            ? RumenoTheme.warningYellow
+            : RumenoTheme.errorRed;
+    final statusEmoji = vet.status == VetStatus.active
+        ? '✅'
+        : vet.status == VetStatus.pending
+            ? '⏳'
+            : '⛔';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.75,
+        maxChildSize: 0.92,
+        minChildSize: 0.5,
+        builder: (_, controller) => Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: ListView(
+            controller: controller,
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+            children: [
+              // Drag handle
+              Center(
+                child: Container(
+                  width: 40, height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              // Avatar + Name
+              Center(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: const Color(0xFFAD1457).withValues(alpha: 0.12),
+                      child: const Text('👨‍⚕️', style: TextStyle(fontSize: 40)),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(vet.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    Text(vet.specialization, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(statusEmoji, style: const TextStyle(fontSize: 16)),
+                          const SizedBox(width: 6),
+                          Text(vet.status.name.toUpperCase(), style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: statusColor)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Stats row
+              Row(
+                children: [
+                  _detailStat('📋', '${vet.consultations}', 'Consults'),
+                  const SizedBox(width: 10),
+                  _detailStat('💰', '₹${(vet.earnings / 1000).toStringAsFixed(1)}K', 'Earned'),
+                  const SizedBox(width: 10),
+                  _detailStat('⭐', vet.rating > 0 ? '${vet.rating}' : '-', 'Rating'),
+                ],
+              ),
+              const SizedBox(height: 20),
+              // Info rows
+              _infoRow('🪪', 'License', vet.licenseNumber),
+              _infoRow('🏥', 'Specialization', vet.specialization),
+              _infoRow('💵', 'Commission', '${vet.commissionPercent}%'),
+              _infoRow('📊', 'Status', '${statusEmoji} ${vet.status.name}'),
+              const SizedBox(height: 24),
+              // Close button
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.pop(ctx),
+                  icon: const Icon(Icons.close_rounded, size: 22),
+                  label: const Text('Close', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFAD1457),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _detailStat(String emoji, String value, String label) {
     return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.grey.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 24)),
+            const SizedBox(height: 4),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _infoRow(String emoji, String label, String value) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 14, color: Colors.grey[500]),
-          const SizedBox(width: 4),
+          Text(emoji, style: const TextStyle(fontSize: 22)),
+          const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-              Text(label, style: TextStyle(fontSize: 9, color: Colors.grey[500])),
+              Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+              Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _stat(BuildContext context, String value, String label, IconData icon) {
+    final emoji = label == 'Consults' ? '📋' : label == 'Earned' ? '💰' : '⭐';
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.grey.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 20)),
+            const SizedBox(height: 2),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+          ],
+        ),
       ),
     );
   }
@@ -471,20 +685,20 @@ class _ConsultationsTab extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: const LinearGradient(colors: [Color(0xFF880E4F), Color(0xFFAD1457)]),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
               children: [
-                const Icon(Icons.account_balance_wallet_rounded, color: Colors.white70, size: 28),
-                const SizedBox(width: 12),
+                const Text('💰', style: TextStyle(fontSize: 36)),
+                const SizedBox(width: 14),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('₹$totalRevenue', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-                    const Text('Total Consultation Revenue', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    Text('₹$totalRevenue', style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+                    const Text('Total Consultation Revenue', style: TextStyle(color: Colors.white70, fontSize: 13)),
                   ],
                 ),
               ],
@@ -500,16 +714,19 @@ class _ConsultationsTab extends StatelessWidget {
   }
 
   Widget _kpi(BuildContext context, String value, String label, IconData icon, Color color) {
+    final emoji = label == 'Total' ? '📋' : label == 'Done' ? '✅' : '📅';
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
         child: Column(
           children: [
+            Text(emoji, style: const TextStyle(fontSize: 24)),
+            const SizedBox(height: 4),
             Icon(icon, color: color, size: 24),
             const SizedBox(height: 4),
-            Text(value, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: color)),
-            Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
+            Text(value, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, color: color)),
+            Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500)),
           ],
         ),
       ),
@@ -525,51 +742,76 @@ class _ConsultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Color c;
     IconData ico;
+    String emoji;
     switch (data.status) {
       case ConsultStatus.completed:
         c = RumenoTheme.successGreen;
         ico = Icons.check_circle_rounded;
+        emoji = '✅';
         break;
       case ConsultStatus.scheduled:
         c = RumenoTheme.infoBlue;
         ico = Icons.schedule_rounded;
+        emoji = '📅';
         break;
       case ConsultStatus.pending:
         c = RumenoTheme.warningYellow;
         ico = Icons.pending_rounded;
+        emoji = '⏳';
         break;
     }
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          border: Border(left: BorderSide(color: c, width: 4)),
+        ),
+        padding: const EdgeInsets.all(14),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: c.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-              child: Icon(ico, color: c, size: 20),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: c.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+              child: Text(emoji, style: const TextStyle(fontSize: 22)),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(data.type, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                  Text('${data.vetName} · ${data.farmName}', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
-                  Text(data.date, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+                  Text(data.type, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  Row(
+                    children: [
+                      const Text('👨‍⚕️ ', style: TextStyle(fontSize: 12)),
+                      Text(data.vetName, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Text('🏡 ', style: TextStyle(fontSize: 12)),
+                      Text(data.farmName, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Text('📆 ', style: TextStyle(fontSize: 12)),
+                      Text(data.date, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                    ],
+                  ),
                 ],
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('₹${data.fee}', style: TextStyle(color: c, fontWeight: FontWeight.bold, fontSize: 14)),
+                Text('₹${data.fee}', style: TextStyle(color: c, fontWeight: FontWeight.bold, fontSize: 16)),
+                const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                  decoration: BoxDecoration(color: c.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
-                  child: Text(data.status.name, style: TextStyle(color: c, fontSize: 9, fontWeight: FontWeight.bold)),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(color: c.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
+                  child: Text(data.status.name.toUpperCase(), style: TextStyle(color: c, fontSize: 10, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -608,13 +850,15 @@ class _EarningsTab extends StatelessWidget {
             ),
             child: Row(
               children: [
+                const Text('💰', style: TextStyle(fontSize: 40)),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Total Vet Earnings', style: TextStyle(color: Colors.white70, fontSize: 13)),
-                      Text('₹${(total / 1000).toStringAsFixed(1)}K', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
-                      const Text('This Month', style: TextStyle(color: Colors.white60, fontSize: 11)),
+                    const Text('Total Vet Earnings', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                    Text('₹${(total / 1000).toStringAsFixed(1)}K', style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold)),
+                    const Text('This Month', style: TextStyle(color: Colors.white60, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -645,22 +889,23 @@ class _EarningsTab extends StatelessWidget {
   }
 
   Widget _earningBadge(String value, String label, IconData icon) {
+    final emoji = label.contains('Vet') ? '👨‍⚕️' : '📋';
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white70, size: 14),
+          Text(emoji, style: const TextStyle(fontSize: 18)),
           const SizedBox(width: 6),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-              Text(label, style: const TextStyle(color: Colors.white70, fontSize: 9)),
+              Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10)),
             ],
           ),
         ],
@@ -669,19 +914,21 @@ class _EarningsTab extends StatelessWidget {
   }
 
   Widget _commissionCard(BuildContext context, {required IconData icon, required Color color, required String label, required String value}) {
+    final emoji = label.contains('Commission') ? '💸' : label.contains('Payout') ? '📅' : '✅';
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-          child: Icon(icon, color: color, size: 20),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+          child: Text(emoji, style: const TextStyle(fontSize: 24)),
         ),
-        title: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-        subtitle: Text(value, style: TextStyle(fontSize: 12, color: RumenoTheme.primaryGreen)),
+        title: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+        subtitle: Text(value, style: TextStyle(fontSize: 13, color: RumenoTheme.primaryGreen, fontWeight: FontWeight.w500)),
         trailing: IconButton(
-          icon: const Icon(Icons.edit_rounded, size: 18),
+          icon: const Icon(Icons.edit_rounded, size: 22, color: Color(0xFFAD1457)),
           onPressed: () {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Edit $label')));
           },
@@ -700,34 +947,43 @@ class _EarningCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final pct = total > 0 ? vet.earnings / total : 0.0;
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border(left: BorderSide(color: const Color(0xFFAD1457), width: 4)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               CircleAvatar(
-                radius: 18,
+                radius: 22,
                 backgroundColor: const Color(0xFFAD1457).withValues(alpha: 0.1),
-                child: Text(vet.name.split(' ').last[0], style: const TextStyle(color: Color(0xFFAD1457), fontWeight: FontWeight.bold, fontSize: 14)),
+                child: const Text('👨‍⚕️', style: TextStyle(fontSize: 22)),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(vet.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                    Text('${vet.consultations} consultations', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                    Text(vet.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                    Row(
+                      children: [
+                        const Text('📋 ', style: TextStyle(fontSize: 12)),
+                        Text('${vet.consultations} consultations', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                      ],
+                    ),
                   ],
                 ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('₹${vet.earnings.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFFAD1457))),
-                  Text('${vet.commissionPercent}% comm.', style: TextStyle(fontSize: 9, color: Colors.grey[500])),
+                Text('💰 ₹${vet.earnings.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: Color(0xFFAD1457))),
+                Text('${vet.commissionPercent}% comm.', style: TextStyle(fontSize: 10, color: Colors.grey[500])),
                 ],
               ),
             ],

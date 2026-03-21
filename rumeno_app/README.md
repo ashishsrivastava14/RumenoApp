@@ -29,14 +29,22 @@ Rumeno is a digital farm management platform that empowers farmers to manage the
 
 ## Screen Summary
 
-| Module | Total Screens |
-|---|---|
-| 🌾 Farm (Farmer) | **24** |
-| 🩺 Vet (Veterinarian) | **7** |
-| 🛒 Ecommerce (Shop) | **11** |
-| 🛠️ Admin | **16** |
-| 🔐 Auth | **3** |
-| **Total** | **61** |
+| Section | Screens | Count |
+|---|---|---|
+| 🔐 Auth | Login, OTP Verification, Role Selection | **3** |
+| 💫 Splash | Splash Screen | **1** |
+| 🌾 Farmer — Tabs | Dashboard, More | **2** |
+| 🌾 Farmer — Animals | Animal List, Add Animal, Animal Detail, Kid Management | **4** |
+| 🌾 Farmer — Health | Health Dashboard, Vaccination, Treatment, Deworming, Lab Reports | **5** |
+| 🌾 Farmer — Finance | Finance Dashboard, Expense List, Reports, Feed Calculator | **4** |
+| 🌾 Farmer — Milk | Milk Log | **1** |
+| 🌾 Farmer — Breeding | Breeding Dashboard | **1** |
+| 🌾 Farmer — More | Farm Profile, Subscription, Team Management, Notification Settings, Farm Sanitization, Data Export, Help & Support | **7** |
+| 🩺 Vet | Vet Dashboard, Farms List, Farm Detail, Animal Health, Consultations, Schedule, Earnings | **7** |
+| 🛠️ Admin — Tabs | Dashboard, Farmers, Farm, Animals, Vets, Shop, Health Config, More | **8** |
+| 🛠️ Admin — More | Vendors, Subscriptions, Settings, Reports, Payments, Partners, Notifications, Marketplace | **8** |
+| 🛒 Shop | Shop Home, Search, Category, Product Detail, Cart, Checkout, Order Success, Orders List, Order Detail, Account, Vendor Registration | **11** |
+| | **Total** | **62** |
 
 ---
 

@@ -187,33 +187,37 @@ class VetDashboardScreen extends StatelessWidget {
                     crossAxisCount: 2,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 1.6,
+                    mainAxisSpacing: 14,
+                    crossAxisSpacing: 14,
+                    childAspectRatio: 1.4,
                     children: [
                       _GradientStatCard(
                         title: l10n.vetDashboardStatReferredFarms,
                         value: '$totalFarms',
                         icon: Icons.agriculture_rounded,
                         gradientColors: const [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+                        emoji: '🏡',
                       ),
                       _GradientStatCard(
                         title: l10n.vetDashboardStatTotalAnimals,
                         value: '$totalAnimals',
                         icon: Icons.pets_rounded,
                         gradientColors: const [Color(0xFF26C6DA), Color(0xFF00838F)],
+                        emoji: '🐮',
                       ),
                       _GradientStatCard(
                         title: l10n.vetDashboardStatActiveCases,
                         value: '$activeTreatments',
                         icon: Icons.phone_in_talk_rounded,
                         gradientColors: const [Color(0xFFFF8A65), Color(0xFFE64A19)],
+                        emoji: '🚑',
                       ),
                       _GradientStatCard(
                         title: l10n.vetDashboardStatMonthlyEarnings,
                         value: '₹12.5K',
                         icon: Icons.currency_rupee_rounded,
                         gradientColors: const [Color(0xFFAB47BC), Color(0xFF6A1B9A)],
+                        emoji: '💰',
                       ),
                     ],
                   ),
@@ -229,6 +233,7 @@ class VetDashboardScreen extends StatelessWidget {
                         icon: Icons.add_circle_outline_rounded,
                         label: l10n.vetDashboardQuickActionNewVisit,
                         color: const Color(0xFF5B7A2E),
+                        emoji: '🆕',
                         onTap: () => _showNewVisitSheet(context),
                       ),
                       const SizedBox(width: 10),
@@ -236,6 +241,7 @@ class VetDashboardScreen extends StatelessWidget {
                         icon: Icons.vaccines_rounded,
                         label: l10n.vetDashboardQuickActionRecordHealth,
                         color: const Color(0xFF00838F),
+                        emoji: '💉',
                         onTap: () => context.go('/vet/health'),
                       ),
                       const SizedBox(width: 10),
@@ -243,6 +249,7 @@ class VetDashboardScreen extends StatelessWidget {
                         icon: Icons.agriculture_rounded,
                         label: l10n.vetDashboardQuickActionMyFarms,
                         color: const Color(0xFF6D4C41),
+                        emoji: '🌾',
                         onTap: () => context.go('/vet/farms'),
                       ),
                       const SizedBox(width: 10),
@@ -250,6 +257,7 @@ class VetDashboardScreen extends StatelessWidget {
                         icon: Icons.account_balance_wallet_rounded,
                         label: l10n.vetDashboardQuickActionEarnings,
                         color: const Color(0xFF6A1B9A),
+                        emoji: '💰',
                         onTap: () => context.go('/vet/earnings'),
                       ),
                     ],
@@ -658,12 +666,14 @@ class _GradientStatCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final List<Color> gradientColors;
+  final String emoji;
 
   const _GradientStatCard({
     required this.title,
     required this.value,
     required this.icon,
     required this.gradientColors,
+    this.emoji = '',
   });
 
   @override
@@ -684,33 +694,39 @@ class _GradientStatCard extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(7),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: Colors.white, size: 18),
+          Row(
+            children: [
+              if (emoji.isNotEmpty) Text(emoji, style: const TextStyle(fontSize: 24)),
+              if (emoji.isNotEmpty) const Spacer(),
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: Colors.white, size: 20),
+              ),
+            ],
           ),
           const Spacer(),
           Text(
             value,
             style: const TextStyle(
                 color: Colors.white,
-                fontSize: 20,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 height: 1.1,
                 letterSpacing: -0.5),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 3),
           Text(
             title,
             style: const TextStyle(
-                color: Colors.white70, fontSize: 11, height: 1.2),
+                color: Colors.white70, fontSize: 12, height: 1.2),
           ),
         ],
       ),
@@ -723,12 +739,14 @@ class _QuickAction extends StatelessWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
+  final String emoji;
 
   const _QuickAction({
     required this.icon,
     required this.label,
     required this.color,
     required this.onTap,
+    this.emoji = '',
   });
 
   @override
@@ -737,10 +755,10 @@ class _QuickAction extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),
@@ -752,20 +770,23 @@ class _QuickAction extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                padding: const EdgeInsets.all(9),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
+              if (emoji.isNotEmpty)
+                Text(emoji, style: const TextStyle(fontSize: 26)),
+              if (emoji.isEmpty)
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: color, size: 24),
                 ),
-                child: Icon(icon, color: color, size: 20),
-              ),
-              const SizedBox(height: 7),
+              const SizedBox(height: 8),
               Text(
                 label,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 11,
                     color: color,
                     fontWeight: FontWeight.w600,
                     height: 1.2),

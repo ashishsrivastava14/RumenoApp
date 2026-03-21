@@ -52,7 +52,7 @@ class VetScheduleScreen extends StatelessWidget {
         children: [
           // Upcoming Events section
           if (grouped.isNotEmpty) ...[
-            _SectionTitle(title: AppLocalizations.of(context).vetScheduleSectionVisits, count: sorted.length),
+            _SectionTitle(title: AppLocalizations.of(context).vetScheduleSectionVisits, count: sorted.length, emoji: '📅'),
             const SizedBox(height: 8),
             ...grouped.entries.map((entry) => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,7 +70,8 @@ class VetScheduleScreen extends StatelessWidget {
             const SizedBox(height: 4),
             _SectionTitle(
                 title: AppLocalizations.of(context).vetScheduleSectionVaccinations,
-                count: upcomingVaccinations.length),
+                count: upcomingVaccinations.length,
+                emoji: '💉'),
             const SizedBox(height: 8),
             ...upcomingVaccinations
                 .map((v) => _VaccinationEventCard(record: v)),
@@ -84,25 +85,30 @@ class VetScheduleScreen extends StatelessWidget {
 class _SectionTitle extends StatelessWidget {
   final String title;
   final int count;
-  const _SectionTitle({required this.title, required this.count});
+  final String? emoji;
+  const _SectionTitle({required this.title, required this.count, this.emoji});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
+        if (emoji != null) ...[
+          Text(emoji!, style: const TextStyle(fontSize: 20)),
+          const SizedBox(width: 6),
+        ],
         Text(title,
             style: const TextStyle(
-                fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
+                fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
         const SizedBox(width: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
           decoration: BoxDecoration(
             color: RumenoTheme.primaryGreen.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text('$count',
               style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold,
                   color: RumenoTheme.primaryGreen)),
         ),
@@ -118,16 +124,22 @@ class _DateHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
         color: RumenoTheme.primaryGreen.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(label,
-          style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: RumenoTheme.primaryGreen)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('📆 ', style: TextStyle(fontSize: 16)),
+          Text(label,
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: RumenoTheme.primaryGreen)),
+        ],
+      ),
     );
   }
 }
@@ -136,18 +148,18 @@ class _EventCard extends StatelessWidget {
   final UpcomingEvent event;
   const _EventCard({required this.event});
 
-  (Color, IconData) _typeInfo(String type) {
+  (Color, IconData, String) _typeInfo(String type) {
     switch (type) {
       case 'Vaccination':
-        return (Colors.teal, Icons.vaccines_rounded);
+        return (Colors.teal, Icons.vaccines_rounded, '💉');
       case 'Breeding':
-        return (Colors.purple, Icons.favorite_rounded);
+        return (Colors.purple, Icons.favorite_rounded, '❤️');
       case 'Treatment':
-        return (Colors.red, Icons.medical_services_rounded);
+        return (Colors.red, Icons.medical_services_rounded, '💊');
       case 'Health':
-        return (Colors.orange, Icons.health_and_safety_rounded);
+        return (Colors.orange, Icons.health_and_safety_rounded, '🩺');
       default:
-        return (RumenoTheme.primaryGreen, Icons.event_rounded);
+        return (RumenoTheme.primaryGreen, Icons.event_rounded, '📅');
     }
   }
 
@@ -163,16 +175,16 @@ class _EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (color, icon) = _typeInfo(event.eventType);
+    final (color, icon, emoji) = _typeInfo(event.eventType);
     final animalName = _animalName(event.animalId);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border(left: BorderSide(color: color, width: 4)),
+        borderRadius: BorderRadius.circular(14),
+        border: Border(left: BorderSide(color: color, width: 5)),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -183,25 +195,30 @@ class _EventCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8)),
-            child: Icon(icon, color: color, size: 20),
+                borderRadius: BorderRadius.circular(10)),
+            child: Text(emoji, style: const TextStyle(fontSize: 24)),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(event.title,
                     style: const TextStyle(
-                        fontWeight: FontWeight.w600, fontSize: 13)),
+                        fontWeight: FontWeight.w600, fontSize: 14)),
                 if (animalName.isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  Text(animalName,
-                      style: TextStyle(
-                          fontSize: 11, color: RumenoTheme.primaryGreen)),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: [
+                      const Text('🐾 ', style: TextStyle(fontSize: 14)),
+                      Text(animalName,
+                          style: TextStyle(
+                              fontSize: 13, color: RumenoTheme.primaryGreen, fontWeight: FontWeight.w500)),
+                    ],
+                  ),
                 ],
               ],
             ),
@@ -211,20 +228,20 @@ class _EventCard extends StatelessWidget {
             children: [
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(event.eventType,
                     style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 12,
                         color: color,
                         fontWeight: FontWeight.w600)),
               ),
               const SizedBox(height: 4),
-              Text(DateFormat('hh:mm a').format(event.date),
-                  style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+              Text('🕒 ${DateFormat('hh:mm a').format(event.date)}',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600])),
             ],
           ),
         ],
@@ -252,12 +269,12 @@ class _VaccinationEventCard extends StatelessWidget {
     final color = isOverdue ? Colors.red : Colors.orange;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border(left: BorderSide(color: color, width: 4)),
+        borderRadius: BorderRadius.circular(14),
+        border: Border(left: BorderSide(color: color, width: 5)),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -268,24 +285,29 @@ class _VaccinationEventCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8)),
-            child: Icon(Icons.vaccines_rounded, color: color, size: 20),
+                borderRadius: BorderRadius.circular(10)),
+            child: Text(isOverdue ? '🚨' : '⏳', style: const TextStyle(fontSize: 24)),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(record.vaccineName,
+                Text('💉 ${record.vaccineName}',
                     style: const TextStyle(
-                        fontWeight: FontWeight.w600, fontSize: 13)),
-                const SizedBox(height: 2),
-                Text(_animalName(record.animalId),
-                    style: TextStyle(
-                        fontSize: 11, color: RumenoTheme.primaryGreen)),
+                        fontWeight: FontWeight.w600, fontSize: 14)),
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    const Text('🐾 ', style: TextStyle(fontSize: 14)),
+                    Text(_animalName(record.animalId),
+                        style: TextStyle(
+                            fontSize: 13, color: RumenoTheme.primaryGreen, fontWeight: FontWeight.w500)),
+                  ],
+                ),
               ],
             ),
           ),
@@ -294,20 +316,20 @@ class _VaccinationEventCard extends StatelessWidget {
             children: [
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Text(isOverdue ? AppLocalizations.of(context).commonOverdue : AppLocalizations.of(context).commonDue,
+                child: Text(isOverdue ? '🚨 ${AppLocalizations.of(context).commonOverdue}' : '⏳ ${AppLocalizations.of(context).commonDue}',
                     style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 12,
                         color: color,
-                        fontWeight: FontWeight.w600)),
+                        fontWeight: FontWeight.w700)),
               ),
               const SizedBox(height: 4),
-              Text(DateFormat('dd MMM yyyy').format(record.dueDate),
-                  style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+              Text('📅 ${DateFormat('dd MMM yyyy').format(record.dueDate)}',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600])),
             ],
           ),
         ],

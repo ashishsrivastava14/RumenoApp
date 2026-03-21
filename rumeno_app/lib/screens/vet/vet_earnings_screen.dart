@@ -27,23 +27,28 @@ class VetEarningsScreen extends StatelessWidget {
             // Summary cards
             Row(
               children: [
-                Expanded(child: StatCard(title: l10n.vetEarningsStatThisMonth, value: '₹12,500', icon: Icons.currency_rupee)),
+                Expanded(child: StatCard(title: '💰 ${l10n.vetEarningsStatThisMonth}', value: '₹12,500', icon: Icons.currency_rupee)),
                 const SizedBox(width: 10),
-                Expanded(child: StatCard(title: l10n.vetEarningsStatTotalEarned, value: '₹68,400', icon: Icons.account_balance_wallet)),
+                Expanded(child: StatCard(title: '💳 ${l10n.vetEarningsStatTotalEarned}', value: '₹68,400', icon: Icons.account_balance_wallet)),
               ],
             ),
             const SizedBox(height: 10),
             Row(
               children: [
-                Expanded(child: StatCard(title: l10n.vetEarningsStatPending, value: '₹3,200', icon: Icons.hourglass_top)),
+                Expanded(child: StatCard(title: '⏳ ${l10n.vetEarningsStatPending}', value: '₹3,200', icon: Icons.hourglass_top)),
                 const SizedBox(width: 10),
-                Expanded(child: StatCard(title: l10n.vetEarningsStatCommission, value: '15%', icon: Icons.percent)),
+                Expanded(child: StatCard(title: '📊 ${l10n.vetEarningsStatCommission}', value: '15%', icon: Icons.percent)),
               ],
             ),
             const SizedBox(height: 24),
 
             // Monthly earnings chart
-            Text(l10n.vetEarningsChartTitle, style: Theme.of(context).textTheme.titleMedium),
+            Row(
+              children: [
+                const Text('📈 ', style: TextStyle(fontSize: 20)),
+                Text(l10n.vetEarningsChartTitle, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              ],
+            ),
             const SizedBox(height: 12),
             SizedBox(
               height: 200,
@@ -63,7 +68,12 @@ class VetEarningsScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Commission breakdown
-            Text(l10n.vetEarningsCommissionBreakdown, style: Theme.of(context).textTheme.titleMedium),
+            Row(
+              children: [
+                const Text('💸 ', style: TextStyle(fontSize: 20)),
+                Text(l10n.vetEarningsCommissionBreakdown, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              ],
+            ),
             const SizedBox(height: 12),
             SizedBox(
               height: 200,
@@ -76,7 +86,12 @@ class VetEarningsScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Payout history
-            Text(l10n.vetEarningsPayoutHistory, style: Theme.of(context).textTheme.titleMedium),
+            Row(
+              children: [
+                const Text('💵 ', style: TextStyle(fontSize: 20)),
+                Text(l10n.vetEarningsPayoutHistory, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              ],
+            ),
             const SizedBox(height: 12),
             ..._buildPayouts(context, l10n),
           ],
@@ -94,27 +109,34 @@ class VetEarningsScreen extends StatelessWidget {
       {'month': 'February 2025', 'amount': '₹8,800', 'date': '01 Mar 2025', 'status': 'Paid'},
     ];
     return payouts.map((p) => Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border(
+          left: BorderSide(color: Colors.green, width: 4),
+        ),
+      ),
       child: Row(
         children: [
           CircleAvatar(
-            radius: 18,
+            radius: 22,
             backgroundColor: Colors.green.withValues(alpha: 0.12),
-            child: const Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
+            child: const Text('✅', style: TextStyle(fontSize: 20)),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(p['month']!, style: Theme.of(context).textTheme.titleSmall),
+                Text('📅 ${p['month']!}', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 2),
                 Text(l10n.vetEarningsPayoutPaidOn(p['date']!), style: Theme.of(context).textTheme.bodySmall),
               ],
             ),
           ),
-          Text(p['amount']!, style: TextStyle(fontWeight: FontWeight.bold, color: RumenoTheme.primaryGreen)),
+          Text(p['amount']!, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: RumenoTheme.primaryGreen)),
         ],
       ),
     )).toList();

@@ -78,11 +78,12 @@ class _FarmCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
+        border: Border(left: BorderSide(color: _planColor, width: 4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,52 +91,58 @@ class _FarmCard extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
+                radius: 26,
                 backgroundColor: RumenoTheme.primaryGreen.withValues(alpha: 0.12),
-                child: Text(farmer.name[0], style: TextStyle(color: RumenoTheme.primaryGreen, fontWeight: FontWeight.bold)),
+                child: const Text('🌾', style: TextStyle(fontSize: 26)),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(farmer.farmName, style: Theme.of(context).textTheme.titleSmall),
-                    Text(farmer.name, style: Theme.of(context).textTheme.bodySmall),
+                    Text(farmer.farmName, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Row(
+                      children: [
+                        const Text('👤 ', style: TextStyle(fontSize: 14)),
+                        Text(farmer.name, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 13)),
+                      ],
+                    ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: _planColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
-                child: Text(farmer.planName, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: _planColor)),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(color: _planColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
+                child: Text(farmer.planName, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _planColor)),
               ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              const Text('📍', style: TextStyle(fontSize: 16)),
+              const SizedBox(width: 6),
+              Expanded(child: Text('${farmer.address}, ${farmer.state}', style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 13))),
+              const Text('🐾', style: TextStyle(fontSize: 16)),
+              const SizedBox(width: 4),
+              Text(AppLocalizations.of(context).vetFarmsAnimalCount(farmer.animalCount), style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 13, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 10),
           Row(
             children: [
-              Icon(Icons.location_on_rounded, size: 14, color: Colors.grey[500]),
-              const SizedBox(width: 4),
-              Text('${farmer.address}, ${farmer.state}', style: Theme.of(context).textTheme.bodySmall),
+              const Text('📞', style: TextStyle(fontSize: 16)),
+              const SizedBox(width: 6),
+              Text(farmer.phone, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 14)),
               const Spacer(),
-              Icon(Icons.pets_rounded, size: 14, color: Colors.grey[500]),
-              const SizedBox(width: 4),
-              Text(AppLocalizations.of(context).vetFarmsAnimalCount(farmer.animalCount), style: Theme.of(context).textTheme.bodySmall),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(Icons.phone_rounded, size: 14, color: Colors.grey[500]),
-              const SizedBox(width: 4),
-              Text(farmer.phone, style: Theme.of(context).textTheme.bodySmall),
-              const Spacer(),
-              TextButton.icon(
+              ElevatedButton.icon(
                 onPressed: () => context.go('/vet/farms/${farmer.id}'),
-                icon: const Icon(Icons.visibility_rounded, size: 16),
-                label: Text(AppLocalizations.of(context).vetFarmsViewAnimalsButton),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  textStyle: const TextStyle(fontSize: 12),
+                icon: const Icon(Icons.visibility_rounded, size: 20),
+                label: Text('👁️ ${AppLocalizations.of(context).vetFarmsViewAnimalsButton}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: RumenoTheme.primaryGreen,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 ),
               ),
             ],

@@ -157,18 +157,18 @@ class _StatusChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: selected ? color : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           border: Border.all(
-              color: selected ? color : Colors.grey.shade300, width: 1.2),
+              color: selected ? color : Colors.grey.shade300, width: 1.5),
         ),
         child: Text(label,
             style: TextStyle(
                 color: selected ? Colors.white : RumenoTheme.textDark,
                 fontWeight: FontWeight.w600,
-                fontSize: 12)),
+                fontSize: 13)),
       ),
     );
   }
@@ -188,6 +188,17 @@ class _ConsultationCard extends StatelessWidget {
         return Colors.green;
       case TreatmentStatus.followUp:
         return Colors.orange;
+    }
+  }
+
+  String _statusEmoji(TreatmentStatus s) {
+    switch (s) {
+      case TreatmentStatus.active:
+        return '🚨';
+      case TreatmentStatus.completed:
+        return '✅';
+      case TreatmentStatus.followUp:
+        return '🔄';
     }
   }
 
@@ -215,13 +226,14 @@ class _ConsultationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final color = _statusColor(record.status);
+    final emoji = _statusEmoji(record.status);
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border(left: BorderSide(color: color, width: 4)),
+        borderRadius: BorderRadius.circular(16),
+        border: Border(left: BorderSide(color: color, width: 5)),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -234,29 +246,32 @@ class _ConsultationCard extends StatelessWidget {
         children: [
           Row(
             children: [
+              Text(emoji, style: const TextStyle(fontSize: 20)),
+              const SizedBox(width: 8),
               Expanded(
                   child: Text(record.diagnosis,
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 14))),
+                          fontWeight: FontWeight.bold, fontSize: 15))),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(_statusLabel(record.status, l10n),
                     style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: color)),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.pets_rounded, size: 13, color: RumenoTheme.primaryGreen),
+              const Text('🐾 ', style: TextStyle(fontSize: 16)),
+              Icon(Icons.pets_rounded, size: 14, color: RumenoTheme.primaryGreen),
               const SizedBox(width: 4),
               Text(
                 _animalName(record.animalId),
@@ -267,35 +282,39 @@ class _ConsultationCard extends StatelessWidget {
               ),
               if (record.vetName.isNotEmpty) ...[
                 const SizedBox(width: 8),
-                Icon(Icons.person_rounded, size: 13, color: Colors.grey[400]),
-                const SizedBox(width: 4),
+                const Text('👨‍⚕️ ', style: TextStyle(fontSize: 14)),
                 Text(record.vetName,
                     style:
-                        TextStyle(fontSize: 12, color: Colors.grey[600])),
+                        TextStyle(fontSize: 13, color: Colors.grey[600], fontWeight: FontWeight.w500)),
               ],
             ],
           ),
-          const SizedBox(height: 4),
-          Text(record.treatment,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis),
           const SizedBox(height: 6),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.calendar_today_rounded,
-                  size: 12, color: Colors.grey[400]),
-              const SizedBox(width: 4),
+              const Text('💊 ', style: TextStyle(fontSize: 14)),
+              Expanded(
+                child: Text(record.treatment,
+                    style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Text('📅 ', style: TextStyle(fontSize: 14)),
               Text(DateFormat('dd MMM yyyy').format(record.startDate),
-                  style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500)),
               if (record.followUpDate != null) ...[
                 const SizedBox(width: 10),
-                Icon(Icons.update_rounded, size: 12, color: Colors.orange[400]),
-                const SizedBox(width: 4),
+                const Text('🔄 ', style: TextStyle(fontSize: 14)),
                 Text(
-                    'Follow-up: ${DateFormat('dd MMM').format(record.followUpDate!)}',
+                    DateFormat('dd MMM').format(record.followUpDate!),
                     style:
-                        TextStyle(fontSize: 11, color: Colors.orange[700])),
+                        TextStyle(fontSize: 12, color: Colors.orange[700], fontWeight: FontWeight.w500)),
               ],
               if (record.withdrawalDays != null) ...[
                 const Spacer(),
@@ -306,32 +325,33 @@ class _ConsultationCard extends StatelessWidget {
                     color: Colors.red.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Text('WD: ${record.withdrawalDays}d',
+                  child: Text('⚠️ WD: ${record.withdrawalDays}d',
                       style: const TextStyle(
-                          fontSize: 10,
+                          fontSize: 11,
                           color: Colors.red,
-                          fontWeight: FontWeight.w500)),
+                          fontWeight: FontWeight.w600)),
                 ),
               ],
             ],
           ),
           if (record.symptoms.isNotEmpty) ...[
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Wrap(
               spacing: 6,
-              runSpacing: 4,
+              runSpacing: 6,
               children: record.symptoms
                   .take(4)
                   .map((s) => Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
+                            horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(4),
+                          color: Colors.orange.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
                         ),
-                        child: Text(s,
-                            style: const TextStyle(
-                                fontSize: 10, color: Colors.grey)),
+                        child: Text('🤒 $s',
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.orange[800])),
                       ))
                   .toList(),
             ),
