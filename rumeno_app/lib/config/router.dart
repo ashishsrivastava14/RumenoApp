@@ -295,30 +295,32 @@ GoRouter createRouter(AuthProvider authProvider) {
               ),
             ],
           ),
+        ],
+      ),
+
+      // ─── Farmer sale routes (outside shell for full-screen navigation) ───
+      GoRoute(
+        path: '/farmer/sale',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, _) => const FarmShopScreen(),
+        routes: [
           GoRoute(
-            path: '/farmer/sale',
+            path: 'sell-animal',
             parentNavigatorKey: _rootNavigatorKey,
-            builder: (_, _) => const FarmShopScreen(),
-            routes: [
-              GoRoute(
-                path: 'sell-animal',
-                parentNavigatorKey: _rootNavigatorKey,
-                builder: (_, _) => const SellAnimalScreen(),
-              ),
-              GoRoute(
-                path: 'sell-produce',
-                parentNavigatorKey: _rootNavigatorKey,
-                builder: (_, state) {
-                  final type = (state.extra as String?) ?? 'Produce';
-                  return SellProduceScreen(initialType: type);
-                },
-              ),
-              GoRoute(
-                path: 'history',
-                parentNavigatorKey: _rootNavigatorKey,
-                builder: (_, _) => const SaleHistoryScreen(),
-              ),
-            ],
+            builder: (_, _) => const SellAnimalScreen(),
+          ),
+          GoRoute(
+            path: 'sell-produce',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (_, state) {
+              final type = (state.extra as String?) ?? 'Produce';
+              return SellProduceScreen(initialType: type);
+            },
+          ),
+          GoRoute(
+            path: 'history',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (_, _) => const SaleHistoryScreen(),
           ),
         ],
       ),

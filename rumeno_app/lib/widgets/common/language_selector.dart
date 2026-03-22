@@ -74,7 +74,6 @@ class _LanguageSelectorSheet extends StatelessWidget {
           const SizedBox(height: 8),
           // English option
           _LanguageOption(
-            flag: '🇬🇧',
             label: l10n.languageEnglish,
             sublabel: 'English',
             isSelected: current == 'en',
@@ -85,7 +84,6 @@ class _LanguageSelectorSheet extends StatelessWidget {
           ),
           // Hindi option
           _LanguageOption(
-            flag: '🇮🇳',
             label: l10n.languageHindi,
             sublabel: 'Hindi',
             isSelected: current == 'hi',
@@ -96,7 +94,7 @@ class _LanguageSelectorSheet extends StatelessWidget {
           ),
           // Urdu option
           _LanguageOption(
-            flag: '�🇳',
+
             label: l10n.languageUrdu,
             sublabel: 'Urdu',
             isSelected: current == 'ur',
@@ -114,14 +112,12 @@ class _LanguageSelectorSheet extends StatelessWidget {
 
 class _LanguageOption extends StatelessWidget {
   const _LanguageOption({
-    required this.flag,
     required this.label,
     required this.sublabel,
     required this.isSelected,
     required this.onTap,
   });
 
-  final String flag;
   final String label;
   final String sublabel;
   final bool isSelected;
@@ -146,8 +142,6 @@ class _LanguageOption extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Text(flag, style: const TextStyle(fontSize: 28)),
-            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
