@@ -194,28 +194,28 @@ class VetDashboardScreen extends StatelessWidget {
                       _GradientStatCard(
                         title: l10n.vetDashboardStatReferredFarms,
                         value: '$totalFarms',
-                        icon: Icons.agriculture_rounded,
+                        icon: Image.asset('assets/images/farm1.png', width: 20, height: 20),
                         gradientColors: const [Color(0xFF4CAF50), Color(0xFF2E7D32)],
                         emoji: '🏡',
                       ),
                       _GradientStatCard(
                         title: l10n.vetDashboardStatTotalAnimals,
                         value: '$totalAnimals',
-                        icon: Icons.pets_rounded,
+                        icon: const Icon(Icons.pets_rounded, color: Colors.white, size: 20),
                         gradientColors: const [Color(0xFF26C6DA), Color(0xFF00838F)],
                         emoji: '🐮',
                       ),
                       _GradientStatCard(
                         title: l10n.vetDashboardStatActiveCases,
                         value: '$activeTreatments',
-                        icon: Icons.phone_in_talk_rounded,
+                        icon: const Icon(Icons.phone_in_talk_rounded, color: Colors.white, size: 20),
                         gradientColors: const [Color(0xFFFF8A65), Color(0xFFE64A19)],
                         emoji: '🚑',
                       ),
                       _GradientStatCard(
                         title: l10n.vetDashboardStatMonthlyEarnings,
                         value: '₹12.5K',
-                        icon: Icons.currency_rupee_rounded,
+                        icon: const Icon(Icons.currency_rupee_rounded, color: Colors.white, size: 20),
                         gradientColors: const [Color(0xFFAB47BC), Color(0xFF6A1B9A)],
                         emoji: '💰',
                       ),
@@ -246,7 +246,7 @@ class VetDashboardScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       _QuickAction(
-                        icon: Icons.agriculture_rounded,
+                        icon: Icons.grass,
                         label: l10n.vetDashboardQuickActionMyFarms,
                         color: const Color(0xFF6D4C41),
                         emoji: '🌾',
@@ -664,7 +664,7 @@ class _InfoChip extends StatelessWidget {
 class _GradientStatCard extends StatelessWidget {
   final String title;
   final String value;
-  final IconData icon;
+  final Widget icon;
   final List<Color> gradientColors;
   final String emoji;
 
@@ -708,7 +708,7 @@ class _GradientStatCard extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, color: Colors.white, size: 20),
+                child: icon,
               ),
             ],
           ),
@@ -1085,25 +1085,25 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Step 1 ─ Farm
-                  _buildStepLabel('1', Icons.agriculture_rounded, l10n.vetDashboardScheduleFarm, const Color(0xFF5B7A2E)),
+                  _buildStepLabel('1', Image.asset('assets/images/farm1.png', width: 20, height: 20), l10n.vetDashboardScheduleFarm, const Color(0xFF5B7A2E)),
                   const SizedBox(height: 12),
                   _buildFarmSelector(),
                   const SizedBox(height: 26),
 
                   // Step 2 ─ Date
-                  _buildStepLabel('2', Icons.calendar_month_rounded, l10n.vetDashboardScheduleWhenToVisit, const Color(0xFF1E88E5)),
+                  _buildStepLabel('2', const Icon(Icons.calendar_month_rounded, color: Color(0xFF1E88E5), size: 20), l10n.vetDashboardScheduleWhenToVisit, const Color(0xFF1E88E5)),
                   const SizedBox(height: 12),
                   _buildDateSelector(),
                   const SizedBox(height: 26),
 
                   // Step 3 ─ Purpose
-                  _buildStepLabel('3', Icons.assignment_turned_in_rounded, l10n.vetDashboardScheduleReason, const Color(0xFF8E24AA)),
+                  _buildStepLabel('3', const Icon(Icons.assignment_turned_in_rounded, color: Color(0xFF8E24AA), size: 20), l10n.vetDashboardScheduleReason, const Color(0xFF8E24AA)),
                   const SizedBox(height: 12),
                   _buildPurposeGrid(),
                   const SizedBox(height: 26),
 
                   // Step 4 ─ Notes
-                  _buildStepLabel('4', Icons.edit_note_rounded, l10n.vetDashboardScheduleNotes, Colors.grey.shade600),
+                  _buildStepLabel('4', Icon(Icons.edit_note_rounded, color: Colors.grey.shade600, size: 20), l10n.vetDashboardScheduleNotes, Colors.grey.shade600),
                   const SizedBox(height: 12),
                   _buildNotesField(),
                   const SizedBox(height: 32),
@@ -1197,7 +1197,7 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
 
   // ── Step label ───────────────────────────────────────────────────────────
 
-  Widget _buildStepLabel(String step, IconData icon, String label, Color color) {
+  Widget _buildStepLabel(String step, Widget icon, String label, Color color) {
     return Row(
       children: [
         Container(
@@ -1212,7 +1212,7 @@ class _NewVisitSheetState extends State<_NewVisitSheet> {
           ),
         ),
         const SizedBox(width: 10),
-        Icon(icon, color: color, size: 20),
+        icon,
         const SizedBox(width: 8),
         Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 15)),
       ],

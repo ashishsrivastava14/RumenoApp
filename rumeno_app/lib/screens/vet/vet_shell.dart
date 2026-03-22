@@ -59,18 +59,18 @@ class VetShell extends StatelessWidget {
             label: l10n.navVetDashboard,
           ),
           NavigationDestination(
-            icon: const Column(
+            icon: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('🌾', style: TextStyle(fontSize: 22)),
-                Icon(Icons.agriculture_outlined, size: 18),
+                const Text('🌾', style: TextStyle(fontSize: 22)),
+                Image.asset('assets/images/farm1.png', width: 18, height: 18),
               ],
             ),
-            selectedIcon: const Column(
+            selectedIcon: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('🌾', style: TextStyle(fontSize: 22)),
-                Icon(Icons.agriculture_rounded, color: Color(0xFF5B7A2E), size: 18),
+                const Text('🌾', style: TextStyle(fontSize: 22)),
+                Image.asset('assets/images/farm1.png', width: 18, height: 18),
               ],
             ),
             label: l10n.navVetFarms,

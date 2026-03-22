@@ -189,7 +189,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
-                child: _SectionTitle(title: l10n.dashboardActiveAlerts, icon: Icons.warning_amber_rounded),
+                child: _SectionTitle(title: l10n.dashboardActiveAlerts, icon: const Icon(Icons.warning_amber_rounded, color: Color(0xFF3D5A1E), size: 20)),
               ),
             ),
             SliverList(
@@ -203,7 +203,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
-                child: _SectionTitle(title: l10n.dashboardUpcomingEvents, icon: Icons.event_rounded),
+                child: _SectionTitle(title: l10n.dashboardUpcomingEvents, icon: const Icon(Icons.event_rounded, color: Color(0xFF3D5A1E), size: 20)),
               ),
             ),
             SliverList(
@@ -394,7 +394,7 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
                         // Farm name row
                         Row(
                           children: [
-                            const Icon(Icons.agriculture_rounded, color: Colors.white54, size: 13),
+                            Image.asset('assets/images/farm1.png', width: 13, height: 13),
                             const SizedBox(width: 5),
                             Flexible(
                               child: Text(
@@ -484,7 +484,7 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.agriculture_rounded, color: Colors.white54, size: 12),
+                            Image.asset('assets/images/farm1.png', width: 12, height: 12),
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
@@ -791,7 +791,7 @@ class _FarmOverview extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionTitle(title: 'Farm Overview', icon: Icons.agriculture_rounded),
+          _SectionTitle(title: 'Farm Overview', icon: Image.asset('assets/images/farm1.png', width: 20, height: 20)),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -944,7 +944,7 @@ class _QuickActionsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionTitle(title: 'Quick Actions', icon: Icons.touch_app_rounded),
+          const _SectionTitle(title: 'Quick Actions', icon: Icon(Icons.touch_app_rounded, color: Color(0xFF3D5A1E), size: 20)),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -1306,7 +1306,7 @@ class _EventCard extends StatelessWidget {
 
 class _SectionTitle extends StatelessWidget {
   final String title;
-  final IconData? icon;
+  final Widget? icon;
   final String? actionLabel;
   final VoidCallback? onAction;
 
@@ -1320,7 +1320,7 @@ class _SectionTitle extends StatelessWidget {
         Row(
           children: [
             if (icon != null) ...[
-              Icon(icon, color: const Color(0xFF3D5A1E), size: 20),
+              icon!,
               const SizedBox(width: 6),
             ],
             Container(

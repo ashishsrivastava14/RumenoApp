@@ -50,7 +50,7 @@ class AnimalCollageBackground extends StatelessWidget {
       _goat,                // Goat-like
       _pig,                 // Pig-like
       Icons.grass,          // Grass / farm
-      Icons.agriculture,    // Tractor / farm
+      Icons.landscape,       // Farm landscape
       Icons.eco,            // Leaf / nature
       Icons.yard,           // Plant
       Icons.nature,         // Tree

@@ -82,19 +82,19 @@ class ShopAccountScreen extends StatelessWidget {
             _MenuCard(
               items: [
                 _MenuItem(
-                  icon: Icons.receipt_long_rounded,
+                  icon: const Icon(Icons.receipt_long_rounded, color: Color(0xFF2196F3), size: 22),
                   label: l10n.shopAccountMyOrders,
                   color: const Color(0xFF2196F3),
                   onTap: () => context.go('/shop/orders'),
                 ),
                 _MenuItem(
-                  icon: Icons.location_on_rounded,
+                  icon: const Icon(Icons.location_on_rounded, color: Color(0xFF4CAF50), size: 22),
                   label: l10n.shopAccountSavedAddresses,
                   color: const Color(0xFF4CAF50),
                   onTap: () => _showAddressesBottomSheet(context),
                 ),
                 _MenuItem(
-                  icon: Icons.favorite_rounded,
+                  icon: const Icon(Icons.favorite_rounded, color: Color(0xFFE91E63), size: 22),
                   label: l10n.shopAccountWishlist,
                   color: const Color(0xFFE91E63),
                   onTap: () => _showWishlistBottomSheet(context),
@@ -107,19 +107,19 @@ class ShopAccountScreen extends StatelessWidget {
             _MenuCard(
               items: [
                 _MenuItem(
-                  icon: Icons.agriculture_rounded,
+                  icon: Image.asset('assets/images/farm1.png', width: 22, height: 22),
                   label: l10n.shopAccountFarmManagement,
                   color: const Color(0xFF8BC34A),
                   onTap: () => context.go('/farmer/dashboard'),
                 ),
                 _MenuItem(
-                  icon: Icons.medical_services_rounded,
+                  icon: const Icon(Icons.medical_services_rounded, color: Color(0xFF009688), size: 22),
                   label: l10n.shopAccountSwitchToVet,
                   color: const Color(0xFF009688),
                   onTap: () => context.go('/vet/dashboard'),
                 ),
                 _MenuItem(
-                  icon: Icons.storefront_rounded,
+                  icon: const Icon(Icons.storefront_rounded, color: Color(0xFFFF9800), size: 22),
                   label: l10n.shopAccountBecomeVendor,
                   color: const Color(0xFFFF9800),
                   onTap: () => context.go('/shop/vendor-register'),
@@ -132,25 +132,25 @@ class ShopAccountScreen extends StatelessWidget {
             _MenuCard(
               items: [
                 _MenuItem(
-                  icon: Icons.language_rounded,
+                  icon: const Icon(Icons.language_rounded, color: Color(0xFF3F51B5), size: 22),
                   label: l10n.moreLanguage,
                   color: const Color(0xFF3F51B5),
                   onTap: () => showLanguageSelectorSheet(context),
                 ),
                 _MenuItem(
-                  icon: Icons.help_rounded,
+                  icon: const Icon(Icons.help_rounded, color: Color(0xFF00BCD4), size: 22),
                   label: l10n.shopAccountHelpSupport,
                   color: const Color(0xFF00BCD4),
                   onTap: () => _showHelpBottomSheet(context),
                 ),
                 _MenuItem(
-                  icon: Icons.info_rounded,
+                  icon: const Icon(Icons.info_rounded, color: Color(0xFF607D8B), size: 22),
                   label: l10n.shopAccountAbout,
                   color: const Color(0xFF607D8B),
                   onTap: () => _showAboutBottomSheet(context),
                 ),
                 _MenuItem(
-                  icon: Icons.logout_rounded,
+                  icon: Icon(Icons.logout_rounded, color: RumenoTheme.errorRed, size: 22),
                   label: l10n.shopAccountLogout,
                   color: RumenoTheme.errorRed,
                   onTap: () {
@@ -584,7 +584,7 @@ class _MenuCard extends StatelessWidget {
                     color: (item.color ?? RumenoTheme.primaryGreen).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(item.icon, color: item.color ?? RumenoTheme.primaryGreen, size: 22),
+                  child: item.icon,
                 ),
                 title: Text(item.label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                 trailing: Icon(Icons.chevron_right_rounded, color: RumenoTheme.textLight, size: 24),
@@ -600,7 +600,7 @@ class _MenuCard extends StatelessWidget {
 }
 
 class _MenuItem {
-  final IconData icon;
+  final Widget icon;
   final String label;
   final VoidCallback onTap;
   final Color? color;

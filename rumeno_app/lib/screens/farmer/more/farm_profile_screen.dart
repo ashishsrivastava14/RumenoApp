@@ -102,21 +102,21 @@ class _FarmProfileScreenState extends State<FarmProfileScreen> {
               label: 'Farm Name',
               hint: 'Type your farm name',
               controller: _farmNameCtrl,
-              icon: Icons.agriculture,
+              icon: Image.asset('assets/images/farm1.png', width: 24, height: 24),
             ),
             _VisualField(
               emoji: '👨‍🌾',
               label: 'Owner Name',
               hint: 'Your full name',
               controller: _ownerNameCtrl,
-              icon: Icons.person,
+              icon: Icon(Icons.person, color: RumenoTheme.primaryGreen),
             ),
             _VisualField(
               emoji: '📍',
               label: 'Address',
               hint: 'Village, Taluka, District',
               controller: _addressCtrl,
-              icon: Icons.location_on,
+              icon: Icon(Icons.location_on, color: RumenoTheme.primaryGreen),
               maxLines: 2,
             ),
             _VisualField(
@@ -124,7 +124,7 @@ class _FarmProfileScreenState extends State<FarmProfileScreen> {
               label: 'Geographical Location',
               hint: 'Tap to get location',
               controller: _gpsCtrl,
-              icon: Icons.my_location,
+              icon: Icon(Icons.my_location, color: RumenoTheme.primaryGreen),
               suffixWidget: GestureDetector(
                 onTap: () {
                   setState(() => _gpsCtrl.text = '23.0225° N, 72.5714° E');
@@ -150,14 +150,14 @@ class _FarmProfileScreenState extends State<FarmProfileScreen> {
               label: 'Manager Name',
               hint: 'Farm manager name',
               controller: _managerCtrl,
-              icon: Icons.engineering,
+              icon: Icon(Icons.engineering, color: RumenoTheme.primaryGreen),
             ),
             _VisualField(
               emoji: '🩺',
               label: 'Veterinarian',
               hint: 'Doctor name & phone',
               controller: _vetCtrl,
-              icon: Icons.local_hospital,
+              icon: Icon(Icons.local_hospital, color: RumenoTheme.primaryGreen),
               keyboardType: TextInputType.text,
             ),
             _VisualField(
@@ -165,7 +165,7 @@ class _FarmProfileScreenState extends State<FarmProfileScreen> {
               label: 'YouTube Channel',
               hint: 'Your channel URL (optional)',
               controller: _youtubeCtrl,
-              icon: Icons.play_circle,
+              icon: Icon(Icons.play_circle, color: RumenoTheme.primaryGreen),
             ),
 
             const SizedBox(height: 24),
@@ -215,7 +215,7 @@ class _VisualField extends StatelessWidget {
   final String label;
   final String hint;
   final TextEditingController controller;
-  final IconData icon;
+  final Widget icon;
   final int maxLines;
   final TextInputType? keyboardType;
   final Widget? suffixWidget;
@@ -268,7 +268,7 @@ class _VisualField extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: hint,
                     hintStyle: const TextStyle(color: RumenoTheme.textLight),
-                    prefixIcon: Icon(icon, color: RumenoTheme.primaryGreen),
+                    prefixIcon: icon,
                     filled: true,
                     fillColor: RumenoTheme.backgroundCream,
                     border: OutlineInputBorder(

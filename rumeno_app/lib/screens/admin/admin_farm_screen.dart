@@ -528,16 +528,17 @@ class _AnimalDetailSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            _detailCard(Icons.cake_rounded, Colors.purple, 'Age', animal.ageString),
+            _detailCard(const Icon(Icons.cake_rounded, color: Colors.purple, size: 22), Colors.purple, 'Age', animal.ageString),
             _detailCard(
-                animal.gender == Gender.male ? Icons.male_rounded : Icons.female_rounded,
+                Icon(animal.gender == Gender.male ? Icons.male_rounded : Icons.female_rounded,
+                    color: animal.gender == Gender.male ? Colors.blue : Colors.pink, size: 22),
                 animal.gender == Gender.male ? Colors.blue : Colors.pink,
                 'Gender', animal.gender.name.capitalize()),
-            _detailCard(Icons.favorite_rounded, _statusDetailColor(animal.status), 'Status', animal.statusLabel),
-            _detailCard(Icons.agriculture_rounded, Colors.teal, 'Purpose', animal.purpose.name.capitalize()),
-            _detailCard(Icons.monitor_weight_rounded, Colors.orange, 'Weight', '${animal.weightKg.toStringAsFixed(1)} kg'),
-            _detailCard(Icons.person_rounded, RumenoTheme.primaryGreen, 'Farmer', animal.farmerId),
-            if (animal.shedNumber != null) _detailCard(Icons.home_rounded, Colors.brown, 'Shed', animal.shedNumber!),
+            _detailCard(Icon(Icons.favorite_rounded, color: _statusDetailColor(animal.status), size: 22), _statusDetailColor(animal.status), 'Status', animal.statusLabel),
+            _detailCard(Image.asset('assets/images/farm1.png', width: 22, height: 22), Colors.teal, 'Purpose', animal.purpose.name.capitalize()),
+            _detailCard(const Icon(Icons.monitor_weight_rounded, color: Colors.orange, size: 22), Colors.orange, 'Weight', '${animal.weightKg.toStringAsFixed(1)} kg'),
+            _detailCard(Icon(Icons.person_rounded, color: RumenoTheme.primaryGreen, size: 22), RumenoTheme.primaryGreen, 'Farmer', animal.farmerId),
+            if (animal.shedNumber != null) _detailCard(const Icon(Icons.home_rounded, color: Colors.brown, size: 22), Colors.brown, 'Shed', animal.shedNumber!),
             const SizedBox(height: 20),
             Row(
               children: [
@@ -588,12 +589,12 @@ class _AnimalDetailSheet extends StatelessWidget {
     }
   }
 
-  Widget _detailCard(IconData icon, Color color, String label, String value) {
+  Widget _detailCard(Widget icon, Color color, String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
-          Container(width: 44, height: 44, decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)), child: Icon(icon, color: color, size: 22)),
+          Container(width: 44, height: 44, decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)), child: Center(child: icon)),
           const SizedBox(width: 14),
           Expanded(
             child: Column(

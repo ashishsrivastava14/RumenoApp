@@ -16,13 +16,13 @@ class AdminShell extends StatelessWidget {
     return 0;
   }
 
-  static const _destinations = [
-    _NavItem(Icons.dashboard_rounded, Icons.dashboard_outlined, '📊', 'Home', '/admin/dashboard'),
-    _NavItem(Icons.people_rounded, Icons.people_outline_rounded, '👨‍🌾', 'Farmers', '/admin/farmers'),
-    _NavItem(Icons.agriculture_rounded, Icons.agriculture_outlined, '🐄', 'Farm', '/admin/farm'),
-    _NavItem(Icons.storefront_rounded, Icons.storefront_outlined, '🛒', 'Shop', '/admin/shop'),
-    _NavItem(Icons.medical_services_rounded, Icons.medical_services_outlined, '🩺', 'Vets', '/admin/vets'),
-    _NavItem(Icons.more_horiz_rounded, Icons.more_horiz_rounded, '⚙️', 'More', '/admin/more'),
+  static final _destinations = [
+    _NavItem(const Icon(Icons.dashboard_rounded), const Icon(Icons.dashboard_outlined), '📊', 'Home', '/admin/dashboard'),
+    _NavItem(const Icon(Icons.people_rounded), const Icon(Icons.people_outline_rounded), '👨‍🌾', 'Farmers', '/admin/farmers'),
+    _NavItem(Image.asset('assets/images/farm1.png', width: 24, height: 24), Image.asset('assets/images/farm1.png', width: 24, height: 24), '🐄', 'Farm', '/admin/farm'),
+    _NavItem(const Icon(Icons.storefront_rounded), const Icon(Icons.storefront_outlined), '🛒', 'Shop', '/admin/shop'),
+    _NavItem(const Icon(Icons.medical_services_rounded), const Icon(Icons.medical_services_outlined), '🩺', 'Vets', '/admin/vets'),
+    _NavItem(const Icon(Icons.more_horiz_rounded), const Icon(Icons.more_horiz_rounded), '⚙️', 'More', '/admin/more'),
   ];
 
   @override
@@ -102,8 +102,8 @@ class AdminShell extends StatelessWidget {
       ),
       destinations: _destinations
           .map((d) => NavigationRailDestination(
-                icon: Icon(d.outlinedIcon),
-                selectedIcon: Icon(d.filledIcon),
+                icon: d.outlinedIcon,
+                selectedIcon: d.filledIcon,
                 label: Text(d.label),
               ))
           .toList(),
@@ -173,8 +173,8 @@ class AdminShell extends StatelessWidget {
 }
 
 class _NavItem {
-  final IconData filledIcon;
-  final IconData outlinedIcon;
+  final Widget filledIcon;
+  final Widget outlinedIcon;
   final String emoji;
   final String label;
   final String path;
