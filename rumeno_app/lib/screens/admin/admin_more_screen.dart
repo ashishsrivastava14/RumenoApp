@@ -184,15 +184,7 @@ class AdminMoreScreen extends StatelessWidget {
                         const SnackBar(content: Text('Coming soon')),
                       ),
                     ),
-                    _MenuTile(
-                      emoji: '🎧',
-                      color: const Color(0xFF01579B),
-                      label: 'Support Tickets',
-                      subtitle: 'User support & help',
-                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Coming soon')),
-                      ),
-                    ),
+                    // Support Tickets hidden for now
                   ]),
                   const SizedBox(height: 20),
 
