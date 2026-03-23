@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../../../config/theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../mock/mock_animals.dart';
 import '../../../mock/mock_health.dart';
 import '../../../models/models.dart';
 import '../../../widgets/common/marketplace_button.dart';
@@ -314,7 +315,7 @@ class _LabReportsScreenState extends State<LabReportsScreen>
   void _showAddLabReportDialog(BuildContext context) {
     String selTest = 'Complete Blood Count';
     DateTime? reportDate;
-    final animalIdCtrl = TextEditingController();
+    Animal? selectedAnimal;
     final labNameCtrl = TextEditingController();
     final vetNameCtrl = TextEditingController();
     final notesCtrl = TextEditingController();
@@ -494,8 +495,158 @@ class _LabReportsScreenState extends State<LabReportsScreen>
                   ),
                 ),
                 const SizedBox(height: 12),
-                _dialogField(animalIdCtrl, '🐄  Animal ID (e.g. C-001)',
-                    TextInputType.text),
+                GestureDetector(
+                  onTap: () async {
+                    final searchCtrl = TextEditingController();
+                    Animal? picked;
+                    await showDialog<Animal>(
+                      context: ctx,
+                      builder: (dCtx) => StatefulBuilder(
+                        builder: (dCtx, setDialogState) {
+                          final query = searchCtrl.text.toLowerCase();
+                          final filtered = mockAnimals
+                              .where((a) =>
+                                  a.status != AnimalStatus.deceased &&
+                                  (a.tagId.toLowerCase().contains(query) ||
+                                      a.breed.toLowerCase().contains(query) ||
+                                      a.species.name.toLowerCase().contains(query)))
+                              .toList();
+                          return AlertDialog(
+                            title: const Text('Select Animal'),
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                            content: SizedBox(
+                              width: double.maxFinite,
+                              height: 400,
+                              child: Column(
+                                children: [
+                                  TextField(
+                                    controller: searchCtrl,
+                                    autofocus: true,
+                                    decoration: InputDecoration(
+                                      hintText:
+                                          'Search by tag, breed or species…',
+                                      prefixIcon: const Icon(Icons.search),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 10),
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    onChanged: (_) =>
+                                        setDialogState(() {}),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Expanded(
+                                    child: filtered.isEmpty
+                                        ? const Center(
+                                            child: Text('No animals found'),
+                                          )
+                                        : ListView.separated(
+                                            itemCount: filtered.length,
+                                            separatorBuilder: (_, __) =>
+                                                const Divider(height: 1),
+                                            itemBuilder: (_, i) {
+                                              final a = filtered[i];
+                                              return ListTile(
+                                                dense: true,
+                                                leading: Text(
+                                                  _animalEmoji(a.species),
+                                                  style: const TextStyle(
+                                                      fontSize: 22),
+                                                ),
+                                                title: Text(
+                                                  a.tagId,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                                subtitle: Text(
+                                                    '${a.breed} · ${a.weightKg} kg'),
+                                                onTap: () {
+                                                  picked = a;
+                                                  Navigator.pop(dCtx);
+                                                },
+                                              );
+                                            },
+                                          ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(dCtx),
+                                child: const Text('Cancel'),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                    if (picked != null) {
+                      setModalState(() => selectedAnimal = picked);
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 14),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: selectedAnimal != null
+                            ? RumenoTheme.warmBrown
+                            : Colors.grey.shade300,
+                        width: selectedAnimal != null ? 1.5 : 1,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      color: selectedAnimal != null
+                          ? RumenoTheme.warmBrown.withOpacity(0.06)
+                          : Colors.grey.shade50,
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          selectedAnimal != null
+                              ? _animalEmoji(selectedAnimal!.species)
+                              : '🐄',
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: selectedAnimal != null
+                              ? Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      selectedAnimal!.tagId,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 15),
+                                    ),
+                                    Text(
+                                      '${selectedAnimal!.breed} · ${selectedAnimal!.weightKg} kg',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey.shade600),
+                                    ),
+                                  ],
+                                )
+                              : Text(
+                                  'Tap to select animal',
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize: 14),
+                                ),
+                        ),
+                        Icon(Icons.arrow_drop_down,
+                            color: Colors.grey.shade500),
+                      ],
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 12),
                 _dialogField(labNameCtrl, '🏥  Lab Name (optional)',
                     TextInputType.text),
@@ -657,10 +808,10 @@ class _LabReportsScreenState extends State<LabReportsScreen>
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      if (animalIdCtrl.text.trim().isEmpty) {
+                      if (selectedAnimal == null) {
                         ScaffoldMessenger.of(ctx).showSnackBar(
                           const SnackBar(
-                              content: Text('Please enter Animal ID'),
+                              content: Text('Please select an animal'),
                               backgroundColor: RumenoTheme.errorRed),
                         );
                         return;
@@ -678,7 +829,7 @@ class _LabReportsScreenState extends State<LabReportsScreen>
                       }
                       final record = LabReport(
                         id: 'LR_${DateTime.now().millisecondsSinceEpoch}',
-                        animalId: animalIdCtrl.text.trim(),
+                        animalId: selectedAnimal!.tagId,
                         testName: testName,
                         testDate: DateTime.now(),
                         labName: labNameCtrl.text.trim().isEmpty
@@ -724,6 +875,17 @@ class _LabReportsScreenState extends State<LabReportsScreen>
         ),
       ),
     );
+  }
+
+  String _animalEmoji(Species species) {
+    switch (species) {
+      case Species.cow: return '🐄';
+      case Species.buffalo: return '🐃';
+      case Species.goat: return '🐐';
+      case Species.sheep: return '🐑';
+      case Species.pig: return '🐷';
+      default: return '🐾';
+    }
   }
 
   Widget _dialogField(
