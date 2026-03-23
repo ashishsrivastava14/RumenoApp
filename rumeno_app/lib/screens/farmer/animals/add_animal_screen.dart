@@ -556,7 +556,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
           value: _weight,
           min: 10,
           max: 1000,
-          step: 5,
+          step: 1,
           onChanged: (v) => setState(() => _weight = v),
         ),
         const SizedBox(height: 20),
