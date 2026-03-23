@@ -37,6 +37,7 @@ class _VaccinationScreenState extends State<VaccinationScreen>
     String selVaccine = 'FMD';
     Animal? selectedAnimal;
     final vetNameCtrl = TextEditingController();
+    List<TextEditingController> otherMedCtrls = [TextEditingController()];
     DateTime selDate = DateTime.now();
     String dateMode = 'today'; // 'today', 'past', 'future'
 
@@ -46,6 +47,7 @@ class _VaccinationScreenState extends State<VaccinationScreen>
       {'v': 'HS', 'e': '🫀', 'd': 'Hemorrhagic Sep.'},
       {'v': 'PPR', 'e': '🐐', 'd': 'Sheep / Goat'},
       {'v': 'Brucella', 'e': '🔬', 'd': 'Brucellosis'},
+      {'v': 'Other', 'e': '💊', 'd': 'Other Vaccine'},
     ];
 
     showModalBottomSheet(
@@ -303,6 +305,72 @@ class _VaccinationScreenState extends State<VaccinationScreen>
                 _dialogField(vetNameCtrl,
                     '👨‍⚕️  Vet Name (optional)', TextInputType.text),
                 const SizedBox(height: 16),
+                // ── Other Medicines ───────────────────────────
+                if (selVaccine == 'Other') Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Other Vaccine',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            color: RumenoTheme.textDark)),
+                    GestureDetector(
+                      onTap: () => setModalState(() {
+                        otherMedCtrls.add(TextEditingController());
+                      }),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: RumenoTheme.primaryGreen,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.add,
+                            color: Colors.white, size: 20),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                ...otherMedCtrls.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final ctrl = entry.value;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _dialogField(
+                              ctrl,
+                              '💊  Vaccine name (optional)',
+                              TextInputType.text),
+                        ),
+                        if (otherMedCtrls.length > 1) ...
+                          [
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () => setModalState(() {
+                                otherMedCtrls.removeAt(index);
+                              }),
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: RumenoTheme.errorRed
+                                      .withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                      color: RumenoTheme.errorRed
+                                          .withValues(alpha: 0.3)),
+                                ),
+                                child: const Icon(Icons.remove,
+                                    color: RumenoTheme.errorRed, size: 18),
+                              ),
+                            ),
+                          ],
+                      ],
+                    ),
+                  );
+                }),
+                if (selVaccine == 'Other') const SizedBox(height: 16),
                 const Text('Vaccination Date',
                     style: TextStyle(
                         fontWeight: FontWeight.w600,
