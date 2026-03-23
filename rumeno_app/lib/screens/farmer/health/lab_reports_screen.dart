@@ -20,6 +20,282 @@ class _LabReportsScreenState extends State<LabReportsScreen>
   late TabController _tabController;
   late List<LabReport> _reports;
 
+  // ── Filters ──────────────────────────────────
+  final _searchCtrl = TextEditingController();
+  String _searchQuery = '';
+  String? _filterTest;      // test name filter
+  DateTime? _filterDateFrom;
+  DateTime? _filterDateTo;
+
+  List<LabReport> _applyFilters(List<LabReport> source) {
+    return source.where((r) {
+      if (_searchQuery.isNotEmpty) {
+        final q = _searchQuery.toLowerCase();
+        if (!r.testName.toLowerCase().contains(q) &&
+            !r.animalId.toLowerCase().contains(q) &&
+            !(r.labName?.toLowerCase().contains(q) ?? false) &&
+            !(r.vetName?.toLowerCase().contains(q) ?? false)) {
+          return false;
+        }
+      }
+      if (_filterTest != null && r.testName != _filterTest) return false;
+      if (_filterDateFrom != null &&
+          r.testDate.isBefore(_filterDateFrom!)) return false;
+      if (_filterDateTo != null &&
+          r.testDate.isAfter(
+              _filterDateTo!.add(const Duration(days: 1)))) return false;
+      return true;
+    }).toList();
+  }
+
+  bool get _hasActiveFilters =>
+      _searchQuery.isNotEmpty ||
+      _filterTest != null ||
+      _filterDateFrom != null ||
+      _filterDateTo != null;
+
+  void _clearFilters() {
+    setState(() {
+      _searchCtrl.clear();
+      _searchQuery = '';
+      _filterTest = null;
+      _filterDateFrom = null;
+      _filterDateTo = null;
+    });
+  }
+
+  void _showFilterSheet() {
+    String? tmpTest = _filterTest;
+    DateTime? tmpFrom = _filterDateFrom;
+    DateTime? tmpTo = _filterDateTo;
+
+    const testNames = [
+      'Complete Blood Count',
+      'Brucella Test',
+      'Milk Culture & Sensitivity',
+      'Fecal Egg Count',
+      'Liver Function Test',
+      'Tuberculin Test',
+      'Pregnancy Confirmation',
+      'Blood Smear',
+      'Urine Analysis',
+      'Other',
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) => Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: EdgeInsets.fromLTRB(
+              20, 12, 20, MediaQuery.of(ctx).viewInsets.bottom + 24),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Text('🔍',
+                        style: TextStyle(fontSize: 22)),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text('Filter Reports',
+                          style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold)),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        setSheet(() {
+                          tmpTest = null;
+                          tmpFrom = null;
+                          tmpTo = null;
+                        });
+                      },
+                      child: const Text('Clear All',
+                          style:
+                              TextStyle(color: RumenoTheme.warmBrown)),
+                    ),
+                  ],
+                ),
+                const Divider(),
+                const SizedBox(height: 8),
+                // ── Test Type ──────────────────────────
+                const Text('Test Type',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: RumenoTheme.textDark)),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: testNames.map((t) {
+                    final sel = tmpTest == t;
+                    return GestureDetector(
+                      onTap: () => setSheet(
+                          () => tmpTest = sel ? null : t),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 7),
+                        decoration: BoxDecoration(
+                          color: sel
+                              ? RumenoTheme.warmBrown
+                              : RumenoTheme.backgroundCream,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                              color: sel
+                                  ? RumenoTheme.warmBrown
+                                  : RumenoTheme.textLight),
+                        ),
+                        child: Text(t,
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: sel
+                                    ? Colors.white
+                                    : RumenoTheme.textDark)),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 20),
+                // ── Date Range ─────────────────────────
+                const Text('Date Range',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: RumenoTheme.textDark)),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () async {
+                    final range = await showDateRangePicker(
+                      context: ctx,
+                      initialDateRange: (tmpFrom != null && tmpTo != null)
+                          ? DateTimeRange(start: tmpFrom!, end: tmpTo!)
+                          : null,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime.now(),
+                      builder: (context, child) => Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: Theme.of(context)
+                              .colorScheme
+                              .copyWith(
+                                  primary: RumenoTheme.warmBrown,
+                                  onPrimary: Colors.white),
+                        ),
+                        child: child!,
+                      ),
+                    );
+                    if (range != null) {
+                      setSheet(() {
+                        tmpFrom = range.start;
+                        tmpTo = range.end;
+                      });
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: (tmpFrom != null || tmpTo != null)
+                          ? RumenoTheme.warmBrown.withValues(alpha: 0.08)
+                          : RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: (tmpFrom != null || tmpTo != null)
+                            ? RumenoTheme.warmBrown
+                            : RumenoTheme.textLight,
+                        width: (tmpFrom != null || tmpTo != null) ? 2 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Text('📅',
+                            style: TextStyle(fontSize: 18)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            (tmpFrom != null && tmpTo != null)
+                                ? '${tmpFrom!.day}/${tmpFrom!.month}/${tmpFrom!.year}  →  ${tmpTo!.day}/${tmpTo!.month}/${tmpTo!.year}'
+                                : tmpFrom != null
+                                    ? 'From ${tmpFrom!.day}/${tmpFrom!.month}/${tmpFrom!.year}'
+                                    : 'Select date range',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: (tmpFrom != null || tmpTo != null)
+                                  ? RumenoTheme.textDark
+                                  : Colors.grey.shade500,
+                              fontWeight: (tmpFrom != null || tmpTo != null)
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                        if (tmpFrom != null || tmpTo != null)
+                          GestureDetector(
+                            onTap: () => setSheet(() {
+                              tmpFrom = null;
+                              tmpTo = null;
+                            }),
+                            child: const Icon(Icons.close,
+                                size: 16,
+                                color: RumenoTheme.textGrey),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _filterTest = tmpTest;
+                        _filterDateFrom = tmpFrom;
+                        _filterDateTo = tmpTo;
+                      });
+                      Navigator.pop(ctx);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: RumenoTheme.warmBrown,
+                      foregroundColor: Colors.white,
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: const Text('Apply Filters',
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +306,7 @@ class _LabReportsScreenState extends State<LabReportsScreen>
   @override
   void dispose() {
     _tabController.dispose();
+    _searchCtrl.dispose();
     super.dispose();
   }
 
@@ -477,10 +754,12 @@ class _LabReportsScreenState extends State<LabReportsScreen>
   // ── Build ────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final pending =
+    final allPending =
         _reports.where((r) => r.status == LabReportStatus.pending).toList();
-    final completed =
+    final allCompleted =
         _reports.where((r) => r.status == LabReportStatus.completed).toList();
+    final pending = _applyFilters(allPending);
+    final completed = _applyFilters(allCompleted);
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
@@ -498,11 +777,140 @@ class _LabReportsScreenState extends State<LabReportsScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          _buildList(pending, 'pending'),
-          _buildList(completed, 'completed'),
+          // ── Search + Filter bar ──────────────
+          Container(
+            color: Colors.white,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchCtrl,
+                    onChanged: (v) =>
+                        setState(() => _searchQuery = v.trim()),
+                    decoration: InputDecoration(
+                      hintText: 'Search by test, animal, lab…',
+                      prefixIcon: const Icon(Icons.search,
+                          color: RumenoTheme.textGrey, size: 20),
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? GestureDetector(
+                              onTap: () => setState(() {
+                                _searchCtrl.clear();
+                                _searchQuery = '';
+                              }),
+                              child: const Icon(Icons.close,
+                                  size: 18,
+                                  color: RumenoTheme.textGrey),
+                            )
+                          : null,
+                      filled: true,
+                      fillColor: RumenoTheme.backgroundCream,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                              color: RumenoTheme.textLight)),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                              color: RumenoTheme.textLight)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                              color: RumenoTheme.warmBrown, width: 2)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: _showFilterSheet,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: _hasActiveFilters
+                          ? RumenoTheme.warmBrown
+                          : RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: _hasActiveFilters
+                              ? RumenoTheme.warmBrown
+                              : RumenoTheme.textLight),
+                    ),
+                    child: Icon(
+                      Icons.tune_rounded,
+                      color: _hasActiveFilters
+                          ? Colors.white
+                          : RumenoTheme.textGrey,
+                      size: 22,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // ── Active filter chips ──────────────
+          if (_hasActiveFilters)
+            Container(
+              color: Colors.white,
+              padding:
+                  const EdgeInsets.only(left: 12, right: 12, bottom: 8),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    if (_filterTest != null)
+                      _activeChip('🔬 $_filterTest',
+                          () => setState(() => _filterTest = null)),
+                    if (_filterDateFrom != null)
+                      _activeChip(
+                          '📅 From ${_filterDateFrom!.day}/${_filterDateFrom!.month}/${_filterDateFrom!.year}',
+                          () => setState(
+                              () => _filterDateFrom = null)),
+                    if (_filterDateTo != null)
+                      _activeChip(
+                          '📅 To ${_filterDateTo!.day}/${_filterDateTo!.month}/${_filterDateTo!.year}',
+                          () =>
+                              setState(() => _filterDateTo = null)),
+                    GestureDetector(
+                      onTap: _clearFilters,
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: RumenoTheme.errorRed
+                              .withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                              color: RumenoTheme.errorRed
+                                  .withValues(alpha: 0.4)),
+                        ),
+                        child: const Text('Clear all',
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: RumenoTheme.errorRed,
+                                fontWeight: FontWeight.w600)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          // ── Tab content ──────────────────────
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildList(pending, 'pending'),
+                _buildList(completed, 'completed'),
+              ],
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -516,14 +924,50 @@ class _LabReportsScreenState extends State<LabReportsScreen>
     );
   }
 
+  Widget _activeChip(String label, VoidCallback onRemove) {
+    return Container(
+      margin: const EdgeInsets.only(right: 6),
+      padding:
+          const EdgeInsets.only(left: 10, right: 4, top: 5, bottom: 5),
+      decoration: BoxDecoration(
+        color: RumenoTheme.warmBrown.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+            color: RumenoTheme.warmBrown.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label,
+              style: const TextStyle(
+                  fontSize: 12,
+                  color: RumenoTheme.warmBrown,
+                  fontWeight: FontWeight.w600)),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: onRemove,
+            child: const Icon(Icons.close,
+                size: 14, color: RumenoTheme.warmBrown),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildList(List<LabReport> reports, String type) {
     if (reports.isEmpty) {
       return _emptyState(
-        type == 'pending' ? '⏳' : '✅',
-        type == 'pending' ? 'No pending reports' : 'No completed reports yet',
-        type == 'pending'
-            ? 'Tap + to add a new lab test'
-            : 'Results will appear here once ready',
+        _hasActiveFilters ? '🔍' : (type == 'pending' ? '⏳' : '✅'),
+        _hasActiveFilters
+            ? 'No matching reports'
+            : (type == 'pending'
+                ? 'No pending reports'
+                : 'No completed reports yet'),
+        _hasActiveFilters
+            ? 'Try adjusting your filters'
+            : (type == 'pending'
+                ? 'Tap + to add a new lab test'
+                : 'Results will appear here once ready'),
       );
     }
     return ListView.builder(
