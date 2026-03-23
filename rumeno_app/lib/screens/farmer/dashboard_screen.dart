@@ -1012,7 +1012,7 @@ class _QuickActionsSection extends StatelessWidget {
               const SizedBox(width: 12),
               _QuickBtn(
                 icon: Icons.storefront_rounded,
-                label: '🛒 बेचें / Sell',
+                label: 'Sell',
                 gradient: const LinearGradient(
                     colors: [Color(0xFF2E7D32), Color(0xFF81C784)]),
                 onTap: () => context.push('/farmer/sale'),
