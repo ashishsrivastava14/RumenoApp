@@ -45,7 +45,6 @@ class _VaccinationScreenState extends State<VaccinationScreen>
       {'v': 'HS', 'e': '🫀', 'd': 'Hemorrhagic Sep.'},
       {'v': 'PPR', 'e': '🐐', 'd': 'Sheep / Goat'},
       {'v': 'Brucella', 'e': '🔬', 'd': 'Brucellosis'},
-      {'v': 'Deworming', 'e': '🪱', 'd': 'Parasites'},
     ];
 
     showModalBottomSheet(
