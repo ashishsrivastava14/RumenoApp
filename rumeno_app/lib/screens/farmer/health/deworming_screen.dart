@@ -42,7 +42,8 @@ class _DewormingScreenState extends State<DewormingScreen>
     final medicineSaltCtrl = TextEditingController();
     final List<Map<String, String>> medicines = [];
     DateTime selDate = DateTime.now();
-    bool isGivenToday = true;
+    // dateMode: 'today' | 'past' | 'future'
+    String dateMode = 'today';
 
     showModalBottomSheet(
       context: context,
@@ -199,7 +200,7 @@ class _DewormingScreenState extends State<DewormingScreen>
                 _stepHeader('4', 'Deworming Date'),
                 const SizedBox(height: 8),
                 const Text(
-                  'Choose when medicine is given',
+                  'Choose when medicine is / will be given',
                   style: TextStyle(fontSize: 12, color: RumenoTheme.textGrey),
                 ),
                 const SizedBox(height: 10),
@@ -207,40 +208,82 @@ class _DewormingScreenState extends State<DewormingScreen>
                   children: [
                     Expanded(
                       child: GestureDetector(
-                        onTap: () => setModalState(() => isGivenToday = true),
+                        onTap: () => setModalState(() {
+                          dateMode = 'today';
+                          selDate = DateTime.now();
+                        }),
                         child: _toggleTile(
                           '✅',
-                          'Given Today',
-                          isGivenToday,
+                          'Today',
+                          dateMode == 'today',
                           RumenoTheme.successGreen,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: GestureDetector(
                         onTap: () async {
+                          final now = DateTime.now();
+                          final yesterday = now.subtract(
+                            const Duration(days: 1),
+                          );
+                          final initial = dateMode == 'past' &&
+                                  selDate.isBefore(now)
+                              ? selDate
+                              : yesterday;
                           final d = await showDatePicker(
                             context: ctx,
-                            initialDate: selDate.isBefore(DateTime.now())
-                                ? DateTime.now()
-                                : selDate,
-                            firstDate: DateTime.now(),
+                            initialDate: initial,
+                            firstDate: DateTime(2000),
+                            lastDate: yesterday,
+                          );
+                          if (d != null) {
+                            setModalState(() {
+                              selDate = d;
+                              dateMode = 'past';
+                            });
+                          }
+                        },
+                        child: _toggleTile(
+                          '🕐',
+                          dateMode == 'past'
+                              ? '${selDate.day}/${selDate.month}/${selDate.year}'
+                              : 'Past Date',
+                          dateMode == 'past',
+                          RumenoTheme.warningYellow,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () async {
+                          final now = DateTime.now();
+                          final tomorrow = now.add(const Duration(days: 1));
+                          final initial = dateMode == 'future' &&
+                                  selDate.isAfter(now)
+                              ? selDate
+                              : tomorrow;
+                          final d = await showDatePicker(
+                            context: ctx,
+                            initialDate: initial,
+                            firstDate: tomorrow,
                             lastDate: DateTime(2030),
                           );
                           if (d != null) {
                             setModalState(() {
                               selDate = d;
-                              isGivenToday = false;
+                              dateMode = 'future';
                             });
                           }
                         },
                         child: _toggleTile(
                           '📅',
-                          isGivenToday
-                              ? 'Schedule Later'
-                              : '${selDate.day}/${selDate.month}/${selDate.year}',
-                          !isGivenToday,
+                          dateMode == 'future'
+                              ? '${selDate.day}/${selDate.month}/${selDate.year}'
+                              : 'Schedule',
+                          dateMode == 'future',
                           RumenoTheme.infoBlue,
                         ),
                       ),
@@ -304,8 +347,8 @@ class _DewormingScreenState extends State<DewormingScreen>
                       }
 
                       final now = DateTime.now();
-                      final actualDate = isGivenToday ? now : selDate;
-                      final isDone = !actualDate.isAfter(now);
+                      final actualDate = dateMode == 'today' ? now : selDate;
+                      final isDone = dateMode != 'future';
                       final medSummary = medicines
                           .map((med) {
                             final brand = med['brand'] ?? '';
