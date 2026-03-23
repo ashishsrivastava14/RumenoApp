@@ -1903,7 +1903,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Leave blank if the animal was born on your farm.',
+                  'Fill the below form if you are purchasing the animal.',
                   style: TextStyle(
                       color: RumenoTheme.accentOlive, fontSize: 13),
                 ),
@@ -1923,16 +1923,16 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
             'e.g. Local market, Farmer John, City…',
             Icons.location_on_outlined),
         const SizedBox(height: 20),
-        _sectionLabel('👤  Purchased By (Owner Name)'),
+        _sectionLabel('👤  Old Owner name'),
         const SizedBox(height: 8),
         _bigTextField(
             _ownerNameController, 'e.g. Ravi Kumar', Icons.person_outline),
         const SizedBox(height: 20),
-        _sectionLabel('📞  Owner Phone Number'),
+        _sectionLabel('📞  Old Owner Phone Number'),
         const SizedBox(height: 8),
         _buildPhoneField(),
         const SizedBox(height: 20),
-        _sectionLabel('🦷  Tooth Age (Dentition)'),
+        _sectionLabel('🦷  Age by Tooth'),
         const SizedBox(height: 8),
         _bigTextField(
             _toothAgeController,
