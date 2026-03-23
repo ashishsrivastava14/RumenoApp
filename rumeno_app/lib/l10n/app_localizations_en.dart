@@ -4734,4 +4734,243 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get account => 'Account';
+
+  @override
+  String get farmShopTitle => 'My Shop';
+
+  @override
+  String get farmShopEarningsBannerLabel => 'This Month Earnings';
+
+  @override
+  String get farmShopAnimalsSold => 'Animals\nSold';
+
+  @override
+  String get farmShopMilkSales => 'Milk\nSales';
+
+  @override
+  String get farmShopTotalRecords => 'Total\nRecords';
+
+  @override
+  String get farmShopWhatToSell => 'What to Sell?';
+
+  @override
+  String get farmShopSellAnimal => 'Sell Animal';
+
+  @override
+  String get farmShopSellMilk => 'Sell Milk';
+
+  @override
+  String get farmShopSellProduce => 'Sell Produce';
+
+  @override
+  String get farmShopSaleHistory => 'Sale History';
+
+  @override
+  String get farmShopRecentSales => 'Recent Sales';
+
+  @override
+  String get farmShopViewAll => 'All';
+
+  @override
+  String get farmShopQuickSell => 'Sell';
+
+  @override
+  String get farmShopAnimal => 'Animal';
+
+  @override
+  String get farmShopMilk => 'Milk';
+
+  @override
+  String get farmShopProduce => 'Produce';
+
+  @override
+  String get saleGoBack => 'Go Back';
+
+  @override
+  String get saleBuyerNameLabel => 'Buyer Name';
+
+  @override
+  String get salePhoneLabel => 'Phone (optional)';
+
+  @override
+  String get saleNotesLabel => 'Notes (optional)';
+
+  @override
+  String get salePriceLabel => 'Enter Price (₹)';
+
+  @override
+  String get saleNextButton => 'Next ➜';
+
+  @override
+  String get salePaymentMethodTitle => 'Payment Method';
+
+  @override
+  String get salePaymentCash => 'Cash';
+
+  @override
+  String get salePaymentBank => 'Bank';
+
+  @override
+  String get salePaymentCredit => 'Credit';
+
+  @override
+  String get saleErrorInvalidPrice => 'Please enter a valid price';
+
+  @override
+  String get saleErrorBuyerName => 'Please enter buyer\'s name';
+
+  @override
+  String get sellAnimalTitle => 'Sell Animal';
+
+  @override
+  String get sellAnimalStepPick => 'Pick Animal';
+
+  @override
+  String get sellAnimalStepPrice => 'Price';
+
+  @override
+  String get sellAnimalStepConfirm => 'Confirm';
+
+  @override
+  String get sellAnimalPickHeading => 'Which animal to sell?';
+
+  @override
+  String get sellAnimalErrorSelectFirst => 'Please select an animal first';
+
+  @override
+  String get sellAnimalNotesHint => 'Write any special notes...';
+
+  @override
+  String get sellAnimalSummaryTitle => 'Sale Summary';
+
+  @override
+  String get sellAnimalSummaryAnimal => 'Animal';
+
+  @override
+  String get sellAnimalSummaryPrice => 'Price';
+
+  @override
+  String get sellAnimalSummaryBuyer => 'Buyer';
+
+  @override
+  String get sellAnimalSummaryPhone => 'Phone';
+
+  @override
+  String get sellAnimalSummaryPayment => 'Payment';
+
+  @override
+  String get sellAnimalSummaryNotes => 'Notes';
+
+  @override
+  String get sellAnimalConfirmButton => 'Confirm Sale';
+
+  @override
+  String get sellAnimalSuccessTitle => 'Sale Recorded!';
+
+  @override
+  String get sellMilkTitle => 'Sell Milk';
+
+  @override
+  String get sellProduceTitle => 'Sell Produce';
+
+  @override
+  String get sellProduceWhatToSell => 'What to Sell?';
+
+  @override
+  String sellProduceHowMuch(String unit) {
+    return 'How Much? ($unit)';
+  }
+
+  @override
+  String get sellProduceTotalPrice => 'Total Price (₹)';
+
+  @override
+  String get sellProduceNotesHint => 'Any special note...';
+
+  @override
+  String get sellProduceRecordMilkSale => 'Record Milk Sale';
+
+  @override
+  String get sellProduceRecordSale => 'Record Sale';
+
+  @override
+  String get sellProduceSuccessTitle => 'Sale Recorded!';
+
+  @override
+  String get produceItemMilk => 'Milk';
+
+  @override
+  String get produceItemCurd => 'Curd';
+
+  @override
+  String get produceItemButter => 'Butter';
+
+  @override
+  String get produceItemGhee => 'Ghee';
+
+  @override
+  String get produceItemPaneer => 'Paneer';
+
+  @override
+  String get produceItemLassi => 'Lassi';
+
+  @override
+  String get produceItemFodder => 'Fodder';
+
+  @override
+  String get produceItemEggs => 'Eggs';
+
+  @override
+  String get produceItemManure => 'Manure';
+
+  @override
+  String get produceItemWool => 'Wool';
+
+  @override
+  String get produceItemVegetables => 'Vegetables';
+
+  @override
+  String get produceItemHerbs => 'Herbs';
+
+  @override
+  String get saleHistoryTitle => 'Sale History';
+
+  @override
+  String get saleHistorySearchHint => 'Search buyer or animal...';
+
+  @override
+  String get saleHistoryFilterAll => 'All';
+
+  @override
+  String get saleHistoryFilterAnimal => 'Animal';
+
+  @override
+  String get saleHistoryFilterMilk => 'Milk';
+
+  @override
+  String get saleHistoryFilterProduce => 'Produce';
+
+  @override
+  String get saleHistorySalesLabel => 'Sales';
+
+  @override
+  String get saleHistoryTotalLabel => 'Total';
+
+  @override
+  String get saleHistoryNoSales => 'No sales found';
+
+  @override
+  String get saleHistoryDeleteTitle => 'Delete?';
+
+  @override
+  String get saleHistoryDeleteConfirm => 'Delete';
+
+  @override
+  String get saleHistoryDeleteCancel => 'Cancel';
+
+  @override
+  String get saleHistorySwipeDeleteNo => 'No';
+
+  @override
+  String get saleHistorySwipeDeleteYes => 'Yes';
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_sales.dart';
 import '../../../models/models.dart';
 import '../../../widgets/common/marketplace_button.dart';
@@ -37,11 +38,12 @@ class _FarmShopScreenState extends State<FarmShopScreen> {
     final animalSales = _sales.where((s) => s.type == SaleType.animal).length;
     final milkSales = _sales.where((s) => s.type == SaleType.milk).length;
     final recentSales = _sales.take(5).toList();
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('🛒 मेरी दुकान / My Shop'),
+        title: Text('🛒 ${l10n.farmShopTitle}'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
@@ -72,7 +74,7 @@ class _FarmShopScreenState extends State<FarmShopScreen> {
                 Expanded(
                   child: _MiniStatCard(
                     emoji: '🐄',
-                    label: 'Animals\nSold',
+                    label: l10n.farmShopAnimalsSold,
                     value: '$animalSales',
                     color: const Color(0xFFE8F5E9),
                     valueColor: RumenoTheme.successGreen,
@@ -82,7 +84,7 @@ class _FarmShopScreenState extends State<FarmShopScreen> {
                 Expanded(
                   child: _MiniStatCard(
                     emoji: '🥛',
-                    label: 'Milk\nSales',
+                    label: l10n.farmShopMilkSales,
                     value: '$milkSales',
                     color: const Color(0xFFE3F2FD),
                     valueColor: RumenoTheme.infoBlue,
@@ -92,7 +94,7 @@ class _FarmShopScreenState extends State<FarmShopScreen> {
                 Expanded(
                   child: _MiniStatCard(
                     emoji: '📋',
-                    label: 'Total\nRecords',
+                    label: l10n.farmShopTotalRecords,
                     value: '${_sales.length}',
                     color: const Color(0xFFFFF8E1),
                     valueColor: RumenoTheme.warningYellow,
@@ -119,9 +121,9 @@ class _FarmShopScreenState extends State<FarmShopScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'क्या बेचना है? / What to Sell?',
-                    style: TextStyle(
+                  Text(
+                    l10n.farmShopWhatToSell,
+                    style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
                       color: RumenoTheme.textDark,
@@ -134,7 +136,7 @@ class _FarmShopScreenState extends State<FarmShopScreen> {
                       children: [
                         _BigActionTile(
                           emoji: '🐄',
-                          label: 'पशु बेचें\nSell Animal',
+                          label: l10n.farmShopSellAnimal,
                           color: const Color(0xFF43A047),
                           onTap: () async {
                             final result = await context.push('/farmer/sale/sell-animal');
@@ -144,7 +146,7 @@ class _FarmShopScreenState extends State<FarmShopScreen> {
                         const SizedBox(width: 12),
                         _BigActionTile(
                           emoji: '🥛',
-                          label: 'दूध बेचें\nSell Milk',
+                          label: l10n.farmShopSellMilk,
                           color: const Color(0xFF1E88E5),
                           onTap: () async {
                             final result = await context.push(
@@ -164,7 +166,7 @@ class _FarmShopScreenState extends State<FarmShopScreen> {
                       children: [
                         _BigActionTile(
                           emoji: '🌾',
-                          label: 'अनाज / घी बेचें\nSell Produce',
+                          label: l10n.farmShopSellProduce,
                           color: const Color(0xFFF57C00),
                           onTap: () async {
                             final result = await context.push(
@@ -177,7 +179,7 @@ class _FarmShopScreenState extends State<FarmShopScreen> {
                         const SizedBox(width: 12),
                         _BigActionTile(
                           emoji: '📋',
-                          label: 'बिक्री इतिहास\nSale History',
+                          label: l10n.farmShopSaleHistory,
                           color: const Color(0xFF6D4C41),
                           onTap: () => context.push('/farmer/sale/history'),
                         ),
@@ -194,9 +196,9 @@ class _FarmShopScreenState extends State<FarmShopScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    '🕐 हाल की बिक्री / Recent Sales',
-                    style: TextStyle(
+                  Text(
+                    '🕐 ${l10n.farmShopRecentSales}',
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: RumenoTheme.textDark,
@@ -204,7 +206,7 @@ class _FarmShopScreenState extends State<FarmShopScreen> {
                   ),
                   TextButton(
                     onPressed: () => context.push('/farmer/sale/history'),
-                    child: const Text('सभी देखें / All'),
+                    child: Text(l10n.farmShopViewAll),
                   ),
                 ],
               ),
@@ -219,9 +221,9 @@ class _FarmShopScreenState extends State<FarmShopScreen> {
         onPressed: () => _showQuickSellPicker(context),
         backgroundColor: RumenoTheme.primaryGreen,
         icon: const Text('💰', style: TextStyle(fontSize: 20)),
-        label: const Text(
-          'बेचें / Sell',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+        label: Text(
+          l10n.farmShopQuickSell,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
     );
@@ -283,13 +285,9 @@ class _EarningsBanner extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '💰 इस महीने की कमाई',
-            style: TextStyle(color: Colors.white70, fontSize: 14),
-          ),
-          const Text(
-            'This Month Earnings',
-            style: TextStyle(color: Colors.white60, fontSize: 12),
+          Text(
+            '💰 ${AppLocalizations.of(context).farmShopEarningsBannerLabel}',
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 8),
           Text(
@@ -564,30 +562,30 @@ class _QuickSellSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            '💰 क्या बेचना है? / What to Sell?',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Text(
+            '💰 ${AppLocalizations.of(context).farmShopWhatToSell}',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 24),
           Row(
             children: [
               _SheetTile(
                 emoji: '🐄',
-                label: 'पशु\nAnimal',
+                label: AppLocalizations.of(context).farmShopAnimal,
                 color: const Color(0xFF43A047),
                 onTap: onAnimal,
               ),
               const SizedBox(width: 12),
               _SheetTile(
                 emoji: '🥛',
-                label: 'दूध\nMilk',
+                label: AppLocalizations.of(context).farmShopMilk,
                 color: const Color(0xFF1E88E5),
                 onTap: onMilk,
               ),
               const SizedBox(width: 12),
               _SheetTile(
                 emoji: '🌾',
-                label: 'अनाज/घी\nProduce',
+                label: AppLocalizations.of(context).farmShopProduce,
                 color: const Color(0xFFF57C00),
                 onTap: onProduce,
               ),

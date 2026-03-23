@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_sales.dart';
 import '../../../models/models.dart';
 
@@ -24,23 +25,23 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
   PaymentMode _payment = PaymentMode.cash;
   bool _saving = false;
 
-  // Items: emoji, name, unit
-  static const _milkProducts = [
-    ('🥛', 'Milk / दूध', 'litre'),
-    ('🧴', 'Curd / दही', 'kg'),
-    ('🧈', 'Butter / मक्खन', 'kg'),
-    ('🫙', 'Ghee / घी', 'kg'),
-    ('🥛', 'Paneer / पनीर', 'kg'),
-    ('🥤', 'Lassi / लस्सी', 'litre'),
+  // Items: emoji, internal key, unit
+  static const _milkProductKeys = [
+    ('🥛', 'Milk', 'litre'),
+    ('🧴', 'Curd', 'kg'),
+    ('🧨', 'Butter', 'kg'),
+    ('🪹', 'Ghee', 'kg'),
+    ('🥛', 'Paneer', 'kg'),
+    ('🥤', 'Lassi', 'litre'),
   ];
 
-  static const _produceProducts = [
-    ('🌾', 'Fodder / चारा', 'kg'),
-    ('🥚', 'Eggs / अंडे', 'dozen'),
-    ('💩', 'Manure / खाद', 'kg'),
-    ('🐑', 'Wool / ऊन', 'kg'),
-    ('🌿', 'Vegetables / सब्जी', 'kg'),
-    ('🍃', 'Herbs / जड़ी-बूटी', 'kg'),
+  static const _produceProductKeys = [
+    ('🌾', 'Fodder', 'kg'),
+    ('🥚', 'Eggs', 'dozen'),
+    ('💩', 'Manure', 'kg'),
+    ('🐑', 'Wool', 'kg'),
+    ('🌿', 'Vegetables', 'kg'),
+    ('🍃', 'Herbs', 'kg'),
   ];
 
   @override
@@ -50,14 +51,31 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
   }
 
   String _getDefaultItem() {
-    if (widget.initialType == 'Milk') return 'Milk / दूध';
-    return 'Fodder / चारा';
+    return widget.initialType == 'Milk' ? 'Milk' : 'Fodder';
   }
 
-  List<(String, String, String)> get _items =>
-      widget.initialType == 'Milk' ? _milkProducts : _produceProducts;
+  List<(String, String, String)> get _itemKeys =>
+      widget.initialType == 'Milk' ? _milkProductKeys : _produceProductKeys;
 
-  String _unitOf(String name) => _items.firstWhere((i) => i.$2 == _produceType, orElse: () => ('', '', 'unit')).$3;
+  String _unitOf(String key) => _itemKeys.firstWhere((i) => i.$2 == _produceType, orElse: () => ('', '', 'unit')).$3;
+
+  String _displayNameOf(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'Milk': return l10n.produceItemMilk;
+      case 'Curd': return l10n.produceItemCurd;
+      case 'Butter': return l10n.produceItemButter;
+      case 'Ghee': return l10n.produceItemGhee;
+      case 'Paneer': return l10n.produceItemPaneer;
+      case 'Lassi': return l10n.produceItemLassi;
+      case 'Fodder': return l10n.produceItemFodder;
+      case 'Eggs': return l10n.produceItemEggs;
+      case 'Manure': return l10n.produceItemManure;
+      case 'Wool': return l10n.produceItemWool;
+      case 'Vegetables': return l10n.produceItemVegetables;
+      case 'Herbs': return l10n.produceItemHerbs;
+      default: return key;
+    }
+  }
 
   @override
   void dispose() {
@@ -72,10 +90,12 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
   @override
   Widget build(BuildContext context) {
     final isMilk = widget.initialType == 'Milk';
+    final l10n = AppLocalizations.of(context);
+    final gridItems = _itemKeys.map((k) => (k.$1, k.$2, _displayNameOf(k.$2, l10n))).toList();
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: Text(isMilk ? '🥛 दूध बेचें / Sell Milk' : '🌾 उत्पाद बेचें / Sell Produce'),
+        title: Text(isMilk ? '🥛 ${l10n.sellMilkTitle}' : '🌾 ${l10n.sellProduceTitle}'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.of(context).pop(false),
@@ -87,20 +107,20 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── What to sell ──
-            const Text(
-              'क्या बेचना है? / What to Sell?',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            Text(
+              l10n.sellProduceWhatToSell,
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             _ProductGrid(
-              items: _items,
+              items: gridItems,
               selected: _produceType,
-              onSelect: (name) => setState(() => _produceType = name),
+              onSelect: (key) => setState(() => _produceType = key),
             ),
             const SizedBox(height: 24),
 
             // ── Quantity ──
-            _FieldLabel(emoji: '⚖️', label: 'कितना? / How Much? (${_unitOf(_produceType)})'),
+            _FieldLabel(emoji: '⚖️', label: l10n.sellProduceHowMuch(_unitOf(_produceType))),
             const SizedBox(height: 8),
             TextField(
               controller: _quantityCtrl,
@@ -120,7 +140,7 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
             const SizedBox(height: 16),
 
             // ── Total price ──
-            const _FieldLabel(emoji: '💰', label: 'कुल कीमत / Total Price (₹)'),
+            _FieldLabel(emoji: '💰', label: l10n.sellProduceTotalPrice),
             const SizedBox(height: 8),
             TextField(
               controller: _priceCtrl,
@@ -141,13 +161,13 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
             const SizedBox(height: 20),
 
             // ── Buyer ──
-            const _FieldLabel(emoji: '👤', label: 'ग्राहक का नाम / Buyer Name'),
+            _FieldLabel(emoji: '👤', label: l10n.saleBuyerNameLabel),
             const SizedBox(height: 8),
-            _BigTextField(controller: _buyerCtrl, hint: 'जैसे: Meena Dairy'),
+            _BigTextField(controller: _buyerCtrl, hint: 'e.g., Meena Dairy'),
             const SizedBox(height: 14),
 
             // ── Phone ──
-            const _FieldLabel(emoji: '📱', label: 'फोन नंबर / Phone (optional)'),
+            _FieldLabel(emoji: '📱', label: l10n.salePhoneLabel),
             const SizedBox(height: 8),
             _BigTextField(
               controller: _phoneCtrl,
@@ -158,16 +178,16 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
             const SizedBox(height: 20),
 
             // ── Payment ──
-            const Text(
-              '💳 भुगतान / Payment Method',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              '💳 ${l10n.salePaymentMethodTitle}',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Row(
               children: [
                 _PaymentChip(
                   emoji: '💵',
-                  label: 'नकद\nCash',
+                  label: l10n.salePaymentCash,
                   mode: PaymentMode.cash,
                   selected: _payment,
                   onTap: (p) => setState(() => _payment = p),
@@ -183,7 +203,7 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
                 const SizedBox(width: 8),
                 _PaymentChip(
                   emoji: '🏦',
-                  label: 'बैंक\nBank',
+                  label: l10n.salePaymentBank,
                   mode: PaymentMode.bank,
                   selected: _payment,
                   onTap: (p) => setState(() => _payment = p),
@@ -191,7 +211,7 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
                 const SizedBox(width: 8),
                 _PaymentChip(
                   emoji: '💳',
-                  label: 'उधार\nCredit',
+                  label: l10n.salePaymentCredit,
                   mode: PaymentMode.credit,
                   selected: _payment,
                   onTap: (p) => setState(() => _payment = p),
@@ -201,13 +221,13 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
             const SizedBox(height: 16),
 
             // ── Notes ──
-            const _FieldLabel(emoji: '📝', label: 'नोट / Notes (optional)'),
+            _FieldLabel(emoji: '📝', label: l10n.saleNotesLabel),
             const SizedBox(height: 8),
             TextField(
               controller: _notesCtrl,
               maxLines: 2,
               decoration: InputDecoration(
-                hintText: 'कोई खास बात...',
+                hintText: l10n.sellProduceNotesHint,
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
@@ -228,9 +248,7 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
                 child: _saving
                     ? const CircularProgressIndicator(color: Colors.white)
                     : Text(
-                        isMilk
-                            ? '✅ दूध बिक्री दर्ज करें / Record Milk Sale'
-                            : '✅ बिक्री दर्ज करें / Record Sale',
+                        '✅ ${isMilk ? l10n.sellProduceRecordMilkSale : l10n.sellProduceRecordSale}',
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                       ),
@@ -245,11 +263,11 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
   void _save() async {
     final price = double.tryParse(_priceCtrl.text);
     if (price == null || price <= 0) {
-      _showError('कीमत डालें / Enter a valid price');
+      _showError(AppLocalizations.of(context).saleErrorInvalidPrice);
       return;
     }
     if (_buyerCtrl.text.trim().isEmpty) {
-      _showError('ग्राहक का नाम डालें / Enter buyer name');
+      _showError(AppLocalizations.of(context).saleErrorBuyerName);
       return;
     }
 
@@ -277,7 +295,7 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
 
     setState(() => _saving = false);
     if (!mounted) return;
-
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -288,10 +306,10 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
           children: [
             const Text('✅', style: TextStyle(fontSize: 64)),
             const SizedBox(height: 12),
-            const Text(
-              'बिक्री दर्ज हो गई!\nSale Recorded!',
+            Text(
+              l10n.sellProduceSuccessTitle,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
@@ -313,9 +331,9 @@ class _SellProduceScreenState extends State<SellProduceScreen> {
               Navigator.of(context).pop();
               Navigator.of(context).pop(true);
             },
-            child: const Text(
-              '🏠 वापस जाएँ / Go Back',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+            child: Text(
+              '🏠 ${l10n.saleGoBack}',
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
         ],
@@ -352,10 +370,10 @@ class _ProductGrid extends StatelessWidget {
       ),
       itemCount: items.length,
       itemBuilder: (_, i) {
-        final (emoji, name, unit) = items[i];
-        final isSelected = name == selected;
+        final (emoji, key, displayName) = items[i];
+        final isSelected = key == selected;
         return GestureDetector(
-          onTap: () => onSelect(name),
+          onTap: () => onSelect(key),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
             decoration: BoxDecoration(
@@ -372,7 +390,7 @@ class _ProductGrid extends StatelessWidget {
                 Text(emoji, style: const TextStyle(fontSize: 32)),
                 const SizedBox(height: 4),
                 Text(
-                  name,
+                  displayName,
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

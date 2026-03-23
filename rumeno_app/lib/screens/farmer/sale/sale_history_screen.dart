@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_sales.dart';
 import '../../../models/models.dart';
 
@@ -46,11 +47,12 @@ class _SaleHistoryScreenState extends State<SaleHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final sales = _filtered;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('📋 बिक्री इतिहास / Sale History'),
+        title: Text('📋 ${l10n.saleHistoryTitle}'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.of(context).pop(),
@@ -65,7 +67,7 @@ class _SaleHistoryScreenState extends State<SaleHistoryScreen> {
               controller: _searchCtrl,
               onChanged: (v) => setState(() => _search = v),
               decoration: InputDecoration(
-                hintText: '🔍 खोजें / Search buyer or animal...',
+                hintText: '🔍 ${l10n.saleHistorySearchHint}',
                 filled: true,
                 fillColor: Colors.white,
                 prefixIcon: const Icon(Icons.search_rounded),
@@ -95,14 +97,14 @@ class _SaleHistoryScreenState extends State<SaleHistoryScreen> {
                 children: [
                   _FilterChip(
                     emoji: '📋',
-                    label: 'सभी / All',
+                    label: l10n.saleHistoryFilterAll,
                     active: _filter == null,
                     onTap: () => setState(() => _filter = null),
                   ),
                   const SizedBox(width: 8),
                   _FilterChip(
                     emoji: '🐄',
-                    label: 'पशु / Animal',
+                    label: l10n.saleHistoryFilterAnimal,
                     active: _filter == SaleType.animal,
                     onTap: () => setState(
                       () => _filter = _filter == SaleType.animal ? null : SaleType.animal,
@@ -112,7 +114,7 @@ class _SaleHistoryScreenState extends State<SaleHistoryScreen> {
                   const SizedBox(width: 8),
                   _FilterChip(
                     emoji: '🥛',
-                    label: 'दूध / Milk',
+                    label: l10n.saleHistoryFilterMilk,
                     active: _filter == SaleType.milk,
                     onTap: () => setState(
                       () => _filter = _filter == SaleType.milk ? null : SaleType.milk,
@@ -122,7 +124,7 @@ class _SaleHistoryScreenState extends State<SaleHistoryScreen> {
                   const SizedBox(width: 8),
                   _FilterChip(
                     emoji: '🌾',
-                    label: 'उत्पाद / Produce',
+                    label: l10n.saleHistoryFilterProduce,
                     active: _filter == SaleType.produce,
                     onTap: () => setState(
                       () => _filter = _filter == SaleType.produce ? null : SaleType.produce,
@@ -147,11 +149,11 @@ class _SaleHistoryScreenState extends State<SaleHistoryScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${sales.length} बिक्री / Sales',
+                  '${sales.length} ${l10n.saleHistorySalesLabel}',
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 Text(
-                  'कुल: ₹${_totalFiltered.toStringAsFixed(0)}',
+                  '${l10n.saleHistoryTotalLabel}: ₹${_totalFiltered.toStringAsFixed(0)}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: RumenoTheme.primaryGreen,
@@ -182,18 +184,19 @@ class _SaleHistoryScreenState extends State<SaleHistoryScreen> {
   }
 
   void _confirmDelete(SaleRecord sale) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('🗑️ हटाएँ? / Delete?'),
+        title: Text('🗑️ ${l10n.saleHistoryDeleteTitle}'),
         content: Text(
           '${sale.typeEmoji} ${sale.animalTag ?? sale.produceType ?? sale.typeLabel}\n₹${sale.amount.toStringAsFixed(0)} — ${sale.buyerName}',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('रद्द / Cancel'),
+            child: Text(l10n.saleHistoryDeleteCancel),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: RumenoTheme.errorRed),
@@ -201,7 +204,7 @@ class _SaleHistoryScreenState extends State<SaleHistoryScreen> {
               Navigator.pop(context);
               setState(() => mockSales.remove(sale));
             },
-            child: const Text('हटाएँ / Delete', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.saleHistoryDeleteConfirm, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -308,21 +311,22 @@ class _SaleDetailCard extends StatelessWidget {
         ),
       ),
       confirmDismiss: (_) async {
+        final l10n = AppLocalizations.of(context);
         bool? confirm = false;
         await showDialog(
           context: context,
           builder: (_) => AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: const Text('हटाएँ? / Delete?'),
+            title: Text(l10n.saleHistoryDeleteTitle),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('नहीं / No'),
+                child: Text(l10n.saleHistorySwipeDeleteNo),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: RumenoTheme.errorRed),
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('हाँ / Yes', style: TextStyle(color: Colors.white)),
+                child: Text(l10n.saleHistorySwipeDeleteYes, style: const TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -495,10 +499,10 @@ class _EmptyState extends StatelessWidget {
         children: [
           Text(emoji, style: const TextStyle(fontSize: 64)),
           const SizedBox(height: 16),
-          const Text(
-            'कोई बिक्री नहीं मिली\nNo sales found',
+          Text(
+            AppLocalizations.of(context).saleHistoryNoSales,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18, color: RumenoTheme.textGrey),
+            style: const TextStyle(fontSize: 18, color: RumenoTheme.textGrey),
           ),
         ],
       ),

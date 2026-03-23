@@ -9177,6 +9177,480 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Account'**
   String get account;
+
+  /// No description provided for @farmShopTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Shop'**
+  String get farmShopTitle;
+
+  /// No description provided for @farmShopEarningsBannerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'This Month Earnings'**
+  String get farmShopEarningsBannerLabel;
+
+  /// No description provided for @farmShopAnimalsSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Animals\nSold'**
+  String get farmShopAnimalsSold;
+
+  /// No description provided for @farmShopMilkSales.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk\nSales'**
+  String get farmShopMilkSales;
+
+  /// No description provided for @farmShopTotalRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'Total\nRecords'**
+  String get farmShopTotalRecords;
+
+  /// No description provided for @farmShopWhatToSell.
+  ///
+  /// In en, this message translates to:
+  /// **'What to Sell?'**
+  String get farmShopWhatToSell;
+
+  /// No description provided for @farmShopSellAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell Animal'**
+  String get farmShopSellAnimal;
+
+  /// No description provided for @farmShopSellMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell Milk'**
+  String get farmShopSellMilk;
+
+  /// No description provided for @farmShopSellProduce.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell Produce'**
+  String get farmShopSellProduce;
+
+  /// No description provided for @farmShopSaleHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale History'**
+  String get farmShopSaleHistory;
+
+  /// No description provided for @farmShopRecentSales.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Sales'**
+  String get farmShopRecentSales;
+
+  /// No description provided for @farmShopViewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get farmShopViewAll;
+
+  /// No description provided for @farmShopQuickSell.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell'**
+  String get farmShopQuickSell;
+
+  /// No description provided for @farmShopAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal'**
+  String get farmShopAnimal;
+
+  /// No description provided for @farmShopMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk'**
+  String get farmShopMilk;
+
+  /// No description provided for @farmShopProduce.
+  ///
+  /// In en, this message translates to:
+  /// **'Produce'**
+  String get farmShopProduce;
+
+  /// No description provided for @saleGoBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Back'**
+  String get saleGoBack;
+
+  /// No description provided for @saleBuyerNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Buyer Name'**
+  String get saleBuyerNameLabel;
+
+  /// No description provided for @salePhoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone (optional)'**
+  String get salePhoneLabel;
+
+  /// No description provided for @saleNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes (optional)'**
+  String get saleNotesLabel;
+
+  /// No description provided for @salePriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Price (₹)'**
+  String get salePriceLabel;
+
+  /// No description provided for @saleNextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Next ➜'**
+  String get saleNextButton;
+
+  /// No description provided for @salePaymentMethodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Method'**
+  String get salePaymentMethodTitle;
+
+  /// No description provided for @salePaymentCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get salePaymentCash;
+
+  /// No description provided for @salePaymentBank.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank'**
+  String get salePaymentBank;
+
+  /// No description provided for @salePaymentCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit'**
+  String get salePaymentCredit;
+
+  /// No description provided for @saleErrorInvalidPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid price'**
+  String get saleErrorInvalidPrice;
+
+  /// No description provided for @saleErrorBuyerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter buyer\'s name'**
+  String get saleErrorBuyerName;
+
+  /// No description provided for @sellAnimalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell Animal'**
+  String get sellAnimalTitle;
+
+  /// No description provided for @sellAnimalStepPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick Animal'**
+  String get sellAnimalStepPick;
+
+  /// No description provided for @sellAnimalStepPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get sellAnimalStepPrice;
+
+  /// No description provided for @sellAnimalStepConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get sellAnimalStepConfirm;
+
+  /// No description provided for @sellAnimalPickHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Which animal to sell?'**
+  String get sellAnimalPickHeading;
+
+  /// No description provided for @sellAnimalErrorSelectFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select an animal first'**
+  String get sellAnimalErrorSelectFirst;
+
+  /// No description provided for @sellAnimalNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write any special notes...'**
+  String get sellAnimalNotesHint;
+
+  /// No description provided for @sellAnimalSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale Summary'**
+  String get sellAnimalSummaryTitle;
+
+  /// No description provided for @sellAnimalSummaryAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal'**
+  String get sellAnimalSummaryAnimal;
+
+  /// No description provided for @sellAnimalSummaryPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get sellAnimalSummaryPrice;
+
+  /// No description provided for @sellAnimalSummaryBuyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Buyer'**
+  String get sellAnimalSummaryBuyer;
+
+  /// No description provided for @sellAnimalSummaryPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get sellAnimalSummaryPhone;
+
+  /// No description provided for @sellAnimalSummaryPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get sellAnimalSummaryPayment;
+
+  /// No description provided for @sellAnimalSummaryNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get sellAnimalSummaryNotes;
+
+  /// No description provided for @sellAnimalConfirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Sale'**
+  String get sellAnimalConfirmButton;
+
+  /// No description provided for @sellAnimalSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale Recorded!'**
+  String get sellAnimalSuccessTitle;
+
+  /// No description provided for @sellMilkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell Milk'**
+  String get sellMilkTitle;
+
+  /// No description provided for @sellProduceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell Produce'**
+  String get sellProduceTitle;
+
+  /// No description provided for @sellProduceWhatToSell.
+  ///
+  /// In en, this message translates to:
+  /// **'What to Sell?'**
+  String get sellProduceWhatToSell;
+
+  /// No description provided for @sellProduceHowMuch.
+  ///
+  /// In en, this message translates to:
+  /// **'How Much? ({unit})'**
+  String sellProduceHowMuch(String unit);
+
+  /// No description provided for @sellProduceTotalPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Price (₹)'**
+  String get sellProduceTotalPrice;
+
+  /// No description provided for @sellProduceNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Any special note...'**
+  String get sellProduceNotesHint;
+
+  /// No description provided for @sellProduceRecordMilkSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Record Milk Sale'**
+  String get sellProduceRecordMilkSale;
+
+  /// No description provided for @sellProduceRecordSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Record Sale'**
+  String get sellProduceRecordSale;
+
+  /// No description provided for @sellProduceSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale Recorded!'**
+  String get sellProduceSuccessTitle;
+
+  /// No description provided for @produceItemMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk'**
+  String get produceItemMilk;
+
+  /// No description provided for @produceItemCurd.
+  ///
+  /// In en, this message translates to:
+  /// **'Curd'**
+  String get produceItemCurd;
+
+  /// No description provided for @produceItemButter.
+  ///
+  /// In en, this message translates to:
+  /// **'Butter'**
+  String get produceItemButter;
+
+  /// No description provided for @produceItemGhee.
+  ///
+  /// In en, this message translates to:
+  /// **'Ghee'**
+  String get produceItemGhee;
+
+  /// No description provided for @produceItemPaneer.
+  ///
+  /// In en, this message translates to:
+  /// **'Paneer'**
+  String get produceItemPaneer;
+
+  /// No description provided for @produceItemLassi.
+  ///
+  /// In en, this message translates to:
+  /// **'Lassi'**
+  String get produceItemLassi;
+
+  /// No description provided for @produceItemFodder.
+  ///
+  /// In en, this message translates to:
+  /// **'Fodder'**
+  String get produceItemFodder;
+
+  /// No description provided for @produceItemEggs.
+  ///
+  /// In en, this message translates to:
+  /// **'Eggs'**
+  String get produceItemEggs;
+
+  /// No description provided for @produceItemManure.
+  ///
+  /// In en, this message translates to:
+  /// **'Manure'**
+  String get produceItemManure;
+
+  /// No description provided for @produceItemWool.
+  ///
+  /// In en, this message translates to:
+  /// **'Wool'**
+  String get produceItemWool;
+
+  /// No description provided for @produceItemVegetables.
+  ///
+  /// In en, this message translates to:
+  /// **'Vegetables'**
+  String get produceItemVegetables;
+
+  /// No description provided for @produceItemHerbs.
+  ///
+  /// In en, this message translates to:
+  /// **'Herbs'**
+  String get produceItemHerbs;
+
+  /// No description provided for @saleHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale History'**
+  String get saleHistoryTitle;
+
+  /// No description provided for @saleHistorySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search buyer or animal...'**
+  String get saleHistorySearchHint;
+
+  /// No description provided for @saleHistoryFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get saleHistoryFilterAll;
+
+  /// No description provided for @saleHistoryFilterAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal'**
+  String get saleHistoryFilterAnimal;
+
+  /// No description provided for @saleHistoryFilterMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk'**
+  String get saleHistoryFilterMilk;
+
+  /// No description provided for @saleHistoryFilterProduce.
+  ///
+  /// In en, this message translates to:
+  /// **'Produce'**
+  String get saleHistoryFilterProduce;
+
+  /// No description provided for @saleHistorySalesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales'**
+  String get saleHistorySalesLabel;
+
+  /// No description provided for @saleHistoryTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get saleHistoryTotalLabel;
+
+  /// No description provided for @saleHistoryNoSales.
+  ///
+  /// In en, this message translates to:
+  /// **'No sales found'**
+  String get saleHistoryNoSales;
+
+  /// No description provided for @saleHistoryDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete?'**
+  String get saleHistoryDeleteTitle;
+
+  /// No description provided for @saleHistoryDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get saleHistoryDeleteConfirm;
+
+  /// No description provided for @saleHistoryDeleteCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get saleHistoryDeleteCancel;
+
+  /// No description provided for @saleHistorySwipeDeleteNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get saleHistorySwipeDeleteNo;
+
+  /// No description provided for @saleHistorySwipeDeleteYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get saleHistorySwipeDeleteYes;
 }
 
 class _AppLocalizationsDelegate

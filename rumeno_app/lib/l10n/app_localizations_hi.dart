@@ -4738,4 +4738,243 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get account => 'Account';
+
+  @override
+  String get farmShopTitle => 'मेरी दुकान';
+
+  @override
+  String get farmShopEarningsBannerLabel => 'इस महीने की कमाई';
+
+  @override
+  String get farmShopAnimalsSold => 'पशु\nबेचे';
+
+  @override
+  String get farmShopMilkSales => 'दूध\nबिक्री';
+
+  @override
+  String get farmShopTotalRecords => 'कुल\nरिकॉर्ड';
+
+  @override
+  String get farmShopWhatToSell => 'क्या बेचना है?';
+
+  @override
+  String get farmShopSellAnimal => 'पशु बेचें';
+
+  @override
+  String get farmShopSellMilk => 'दूध बेचें';
+
+  @override
+  String get farmShopSellProduce => 'अनाज / घी बेचें';
+
+  @override
+  String get farmShopSaleHistory => 'बिक्री इतिहास';
+
+  @override
+  String get farmShopRecentSales => 'हाल की बिक्री';
+
+  @override
+  String get farmShopViewAll => 'सभी देखें';
+
+  @override
+  String get farmShopQuickSell => 'बेचें';
+
+  @override
+  String get farmShopAnimal => 'पशु';
+
+  @override
+  String get farmShopMilk => 'दूध';
+
+  @override
+  String get farmShopProduce => 'अनाज/घी';
+
+  @override
+  String get saleGoBack => 'वापस जाएँ';
+
+  @override
+  String get saleBuyerNameLabel => 'ग्राहक का नाम';
+
+  @override
+  String get salePhoneLabel => 'फोन नंबर (वैकल्पिक)';
+
+  @override
+  String get saleNotesLabel => 'नोट (वैकल्पिक)';
+
+  @override
+  String get salePriceLabel => 'कीमत डालें (₹)';
+
+  @override
+  String get saleNextButton => 'आगे ➜';
+
+  @override
+  String get salePaymentMethodTitle => 'भुगतान का तरीका';
+
+  @override
+  String get salePaymentCash => 'नकद';
+
+  @override
+  String get salePaymentBank => 'बैंक';
+
+  @override
+  String get salePaymentCredit => 'उधार';
+
+  @override
+  String get saleErrorInvalidPrice => 'कृपया सही कीमत डालें';
+
+  @override
+  String get saleErrorBuyerName => 'ग्राहक का नाम डालें';
+
+  @override
+  String get sellAnimalTitle => 'पशु बेचें';
+
+  @override
+  String get sellAnimalStepPick => 'पशु चुनें';
+
+  @override
+  String get sellAnimalStepPrice => 'कीमत';
+
+  @override
+  String get sellAnimalStepConfirm => 'पक्का करें';
+
+  @override
+  String get sellAnimalPickHeading => 'कौन सा पशु बेचना है?';
+
+  @override
+  String get sellAnimalErrorSelectFirst => 'पहले पशु चुनें';
+
+  @override
+  String get sellAnimalNotesHint => 'कोई खास बात लिखें...';
+
+  @override
+  String get sellAnimalSummaryTitle => 'बिक्री विवरण';
+
+  @override
+  String get sellAnimalSummaryAnimal => 'पशु';
+
+  @override
+  String get sellAnimalSummaryPrice => 'कीमत';
+
+  @override
+  String get sellAnimalSummaryBuyer => 'ग्राहक';
+
+  @override
+  String get sellAnimalSummaryPhone => 'फोन';
+
+  @override
+  String get sellAnimalSummaryPayment => 'भुगतान';
+
+  @override
+  String get sellAnimalSummaryNotes => 'नोट';
+
+  @override
+  String get sellAnimalConfirmButton => 'बिक्री दर्ज करें';
+
+  @override
+  String get sellAnimalSuccessTitle => 'बिक्री सफल!';
+
+  @override
+  String get sellMilkTitle => 'दूध बेचें';
+
+  @override
+  String get sellProduceTitle => 'उत्पाद बेचें';
+
+  @override
+  String get sellProduceWhatToSell => 'क्या बेचना है?';
+
+  @override
+  String sellProduceHowMuch(String unit) {
+    return 'कितना? ($unit)';
+  }
+
+  @override
+  String get sellProduceTotalPrice => 'कुल कीमत (₹)';
+
+  @override
+  String get sellProduceNotesHint => 'कोई खास बात...';
+
+  @override
+  String get sellProduceRecordMilkSale => 'दूध बिक्री दर्ज करें';
+
+  @override
+  String get sellProduceRecordSale => 'बिक्री दर्ज करें';
+
+  @override
+  String get sellProduceSuccessTitle => 'बिक्री दर्ज हो गई!';
+
+  @override
+  String get produceItemMilk => 'दूध';
+
+  @override
+  String get produceItemCurd => 'दही';
+
+  @override
+  String get produceItemButter => 'मक्खन';
+
+  @override
+  String get produceItemGhee => 'घी';
+
+  @override
+  String get produceItemPaneer => 'पनीर';
+
+  @override
+  String get produceItemLassi => 'लस्सी';
+
+  @override
+  String get produceItemFodder => 'चारा';
+
+  @override
+  String get produceItemEggs => 'अंडे';
+
+  @override
+  String get produceItemManure => 'खाद';
+
+  @override
+  String get produceItemWool => 'ऊन';
+
+  @override
+  String get produceItemVegetables => 'सब्जी';
+
+  @override
+  String get produceItemHerbs => 'जड़ी-बूटी';
+
+  @override
+  String get saleHistoryTitle => 'बिक्री इतिहास';
+
+  @override
+  String get saleHistorySearchHint => 'खोजें (खरीदार / पशु)...';
+
+  @override
+  String get saleHistoryFilterAll => 'सभी';
+
+  @override
+  String get saleHistoryFilterAnimal => 'पशु';
+
+  @override
+  String get saleHistoryFilterMilk => 'दूध';
+
+  @override
+  String get saleHistoryFilterProduce => 'उत्पाद';
+
+  @override
+  String get saleHistorySalesLabel => 'बिक्री';
+
+  @override
+  String get saleHistoryTotalLabel => 'कुल';
+
+  @override
+  String get saleHistoryNoSales => 'कोई बिक्री नहीं मिली';
+
+  @override
+  String get saleHistoryDeleteTitle => 'हटाएँ?';
+
+  @override
+  String get saleHistoryDeleteConfirm => 'हटाएँ';
+
+  @override
+  String get saleHistoryDeleteCancel => 'रद्द';
+
+  @override
+  String get saleHistorySwipeDeleteNo => 'नहीं';
+
+  @override
+  String get saleHistorySwipeDeleteYes => 'हाँ';
 }

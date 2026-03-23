@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../config/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../mock/mock_sales.dart';
 import '../../../models/models.dart';
@@ -43,7 +44,7 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
-        title: const Text('🐄 पशु बेचें / Sell Animal'),
+        title: Text('🐄 ${AppLocalizations.of(context).sellAnimalTitle}'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
@@ -103,18 +104,19 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
   }
 
   void _goNext() {
+    final l10n = AppLocalizations.of(context);
     if (_step == 0 && _selected == null) {
-      _showError('पहले पशु चुनें\nPlease select an animal first');
+      _showError(l10n.sellAnimalErrorSelectFirst);
       return;
     }
     if (_step == 1) {
       final price = double.tryParse(_priceCtrl.text);
       if (price == null || price <= 0) {
-        _showError('कीमत डालें\nPlease enter a valid price');
+        _showError(l10n.saleErrorInvalidPrice);
         return;
       }
       if (_buyerCtrl.text.trim().isEmpty) {
-        _showError('ग्राहक का नाम डालें\nPlease enter buyer\'s name');
+        _showError(l10n.saleErrorBuyerName);
         return;
       }
     }
@@ -157,6 +159,7 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
   }
 
   void _showSuccessDialog() {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -167,10 +170,10 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
           children: [
             const Text('✅', style: TextStyle(fontSize: 64)),
             const SizedBox(height: 12),
-            const Text(
-              'बिक्री सफल!\nSale Recorded!',
+            Text(
+              l10n.sellAnimalSuccessTitle,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
@@ -192,9 +195,9 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
               Navigator.of(context).pop(); // close dialog
               Navigator.of(context).pop(true); // return true to parent
             },
-            child: const Text(
-              '🏠 वापस जाएँ / Go Back',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+            child: Text(
+              '🏠 ${l10n.saleGoBack}',
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
         ],
@@ -211,7 +214,12 @@ class _StepIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const steps = ['🐄 पशु चुनें', '💰 कीमत', '✅ पक्का करें'];
+    final l10n = AppLocalizations.of(context);
+    final steps = [
+      '🐄 ${l10n.sellAnimalStepPick}',
+      '💰 ${l10n.sellAnimalStepPrice}',
+      '✅ ${l10n.sellAnimalStepConfirm}',
+    ];
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
@@ -311,12 +319,13 @@ class _StepPickAnimal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'कौन सा पशु बेचना है?\nWhich animal to sell?',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Text(
+          l10n.sellAnimalPickHeading,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
         ...animals.map((a) {
@@ -407,7 +416,7 @@ class _StepPickAnimal extends StatelessWidget {
           );
         }),
         const SizedBox(height: 24),
-        _NextButton(label: 'आगे / Next ➜', onTap: onNext, enabled: selected != null),
+        _NextButton(label: l10n.saleNextButton, onTap: onNext, enabled: selected != null),
       ],
     );
   }
@@ -439,6 +448,7 @@ class _StepPriceBuyer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -471,7 +481,7 @@ class _StepPriceBuyer extends StatelessWidget {
         const SizedBox(height: 24),
 
         // Price
-        const _FieldLabel(emoji: '💰', label: 'कीमत डालें / Enter Price (₹)'),
+        _FieldLabel(emoji: '💰', label: l10n.salePriceLabel),
         const SizedBox(height: 8),
         TextField(
           controller: priceCtrl,
@@ -492,13 +502,13 @@ class _StepPriceBuyer extends StatelessWidget {
         const SizedBox(height: 20),
 
         // Buyer name
-        const _FieldLabel(emoji: '👤', label: 'ग्राहक का नाम / Buyer Name'),
+        _FieldLabel(emoji: '👤', label: l10n.saleBuyerNameLabel),
         const SizedBox(height: 8),
         _BigTextField(controller: buyerCtrl, hint: 'जैसे: Ramesh Patel'),
         const SizedBox(height: 16),
 
         // Phone
-        const _FieldLabel(emoji: '📱', label: 'फोन नंबर / Phone (optional)'),
+        _FieldLabel(emoji: '📱', label: l10n.salePhoneLabel),
         const SizedBox(height: 8),
         _BigTextField(
           controller: phoneCtrl,
@@ -509,13 +519,13 @@ class _StepPriceBuyer extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Notes
-        const _FieldLabel(emoji: '📝', label: 'नोट / Notes (optional)'),
+        _FieldLabel(emoji: '📝', label: l10n.saleNotesLabel),
         const SizedBox(height: 8),
         TextField(
           controller: notesCtrl,
           maxLines: 2,
           decoration: InputDecoration(
-            hintText: 'कोई खास बात लिखें...',
+            hintText: l10n.sellAnimalNotesHint,
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
@@ -523,7 +533,7 @@ class _StepPriceBuyer extends StatelessWidget {
         ),
         const SizedBox(height: 24),
 
-        _NextButton(label: 'आगे / Next ➜', onTap: onNext, enabled: true),
+        _NextButton(label: l10n.saleNextButton, onTap: onNext, enabled: true),
       ],
     );
   }
@@ -557,12 +567,13 @@ class _StepPaymentConfirm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'भुगतान का तरीका\nPayment Method',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Text(
+          l10n.salePaymentMethodTitle,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
 
@@ -571,7 +582,7 @@ class _StepPaymentConfirm extends StatelessWidget {
           children: [
             _PaymentOption(
               emoji: '💵',
-              label: 'नकद\nCash',
+              label: l10n.salePaymentCash,
               mode: PaymentMode.cash,
               selected: payment,
               onTap: onPaymentChange,
@@ -591,7 +602,7 @@ class _StepPaymentConfirm extends StatelessWidget {
           children: [
             _PaymentOption(
               emoji: '🏦',
-              label: 'बैंक\nBank',
+              label: l10n.salePaymentBank,
               mode: PaymentMode.bank,
               selected: payment,
               onTap: onPaymentChange,
@@ -599,7 +610,7 @@ class _StepPaymentConfirm extends StatelessWidget {
             const SizedBox(width: 10),
             _PaymentOption(
               emoji: '💳',
-              label: 'उधार\nCredit',
+              label: l10n.salePaymentCredit,
               mode: PaymentMode.credit,
               selected: payment,
               onTap: onPaymentChange,
@@ -619,20 +630,20 @@ class _StepPaymentConfirm extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '📋 बिक्री विवरण / Sale Summary',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              Text(
+                '📋 ${l10n.sellAnimalSummaryTitle}',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const Divider(height: 20),
-              _SummaryRow(label: '🐄 पशु', value: '${animal.tagId} (${animal.speciesName})'),
-              _SummaryRow(label: '💰 कीमत', value: '₹${price.toStringAsFixed(0)}'),
-              _SummaryRow(label: '👤 ग्राहक', value: buyerName),
-              if (buyerPhone.isNotEmpty) _SummaryRow(label: '📱 फोन', value: buyerPhone),
+              _SummaryRow(label: '🐄 ${l10n.sellAnimalSummaryAnimal}', value: '${animal.tagId} (${animal.speciesName})'),
+              _SummaryRow(label: '💰 ${l10n.sellAnimalSummaryPrice}', value: '₹${price.toStringAsFixed(0)}'),
+              _SummaryRow(label: '👤 ${l10n.sellAnimalSummaryBuyer}', value: buyerName),
+              if (buyerPhone.isNotEmpty) _SummaryRow(label: '📱 ${l10n.sellAnimalSummaryPhone}', value: buyerPhone),
               _SummaryRow(
-                label: '💳 भुगतान',
-                value: _paymentLabel(payment),
+                label: '💳 ${l10n.sellAnimalSummaryPayment}',
+                value: _paymentLabel(payment, l10n),
               ),
-              if (notes.isNotEmpty) _SummaryRow(label: '📝 नोट', value: notes),
+              if (notes.isNotEmpty) _SummaryRow(label: '📝 ${l10n.sellAnimalSummaryNotes}', value: notes),
             ],
           ),
         ),
@@ -650,9 +661,9 @@ class _StepPaymentConfirm extends StatelessWidget {
             onPressed: saving ? null : onConfirm,
             child: saving
                 ? const CircularProgressIndicator(color: Colors.white)
-                : const Text(
-                    '✅ बिक्री दर्ज करें / Confirm Sale',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white),
+                : Text(
+                    '✅ ${l10n.sellAnimalConfirmButton}',
+                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
           ),
         ),
@@ -660,16 +671,16 @@ class _StepPaymentConfirm extends StatelessWidget {
     );
   }
 
-  String _paymentLabel(PaymentMode m) {
+  String _paymentLabel(PaymentMode m, AppLocalizations l10n) {
     switch (m) {
       case PaymentMode.cash:
-        return '💵 नकद (Cash)';
+        return '💵 ${l10n.salePaymentCash}';
       case PaymentMode.upi:
         return '📲 UPI';
       case PaymentMode.bank:
-        return '🏦 बैंक (Bank)';
+        return '🏦 ${l10n.salePaymentBank}';
       case PaymentMode.credit:
-        return '💳 उधार (Credit)';
+        return '💳 ${l10n.salePaymentCredit}';
     }
   }
 }
