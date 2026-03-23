@@ -1064,6 +1064,12 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
           entries: fatherEntries,
           selected: _fatherId,
           onChanged: (v) => setState(() => _fatherId = v),
+          previousFarmEntry: const _ParentEntry(
+            animalId: 'BF-112',
+            location: 'Green Valley Farm',
+            ownerName: 'Ahmad Raza',
+          ),
+          parentLabel: 'Father',
           onAddNew: () => _showAddParentDialog(
             title: 'Add Father',
             onSave: (entry) {
@@ -1081,6 +1087,12 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
           entries: motherEntries,
           selected: _motherId,
           onChanged: (v) => setState(() => _motherId = v),
+          previousFarmEntry: const _ParentEntry(
+            animalId: 'CM-204',
+            location: 'Green Valley Farm',
+            ownerName: 'Ahmad Raza',
+          ),
+          parentLabel: 'Mother',
           onAddNew: () => _showAddParentDialog(
             title: 'Add Mother',
             onSave: (entry) {
@@ -1416,11 +1428,39 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
     );
   }
 
+  void _showPreviousFarmParentInfo(String label) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: const [
+            Icon(Icons.info_outline, color: RumenoTheme.infoBlue),
+            SizedBox(width: 8),
+            Text('Previous Farm Info', style: TextStyle(fontSize: 16)),
+          ],
+        ),
+        content: Text(
+          '$label detail of previous farm if available',
+          style: const TextStyle(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _parentSelector({
     required List<_ParentEntry> entries,
     required String? selected,
     required Function(String?) onChanged,
     required VoidCallback onAddNew,
+    _ParentEntry? previousFarmEntry,
+    String parentLabel = 'Parent',
   }) {
     return Column(
       children: [
@@ -1467,6 +1507,23 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
                     ),
                   ),
                 ),
+                if (previousFarmEntry != null)
+                  GestureDetector(
+                    onTap: () {
+                      _showPreviousFarmParentInfo(parentLabel);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: Tooltip(
+                        message: '$parentLabel info from previous farm',
+                        child: const Icon(
+                          Icons.info_outline,
+                          size: 20,
+                          color: RumenoTheme.infoBlue,
+                        ),
+                      ),
+                    ),
+                  ),
                 const Icon(Icons.arrow_forward_ios_rounded,
                     size: 16, color: RumenoTheme.primaryGreen),
               ],
