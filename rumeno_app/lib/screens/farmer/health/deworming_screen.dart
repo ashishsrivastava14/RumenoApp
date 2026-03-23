@@ -34,7 +34,7 @@ class _DewormingScreenState extends State<DewormingScreen>
 
   // ── Add Deworming Dialog ─────────────────────
   void _showAddDewormingDialog(BuildContext context) {
-    final animalIdCtrl = TextEditingController();
+    Animal? selectedAnimal;
     final vetNameCtrl = TextEditingController();
     final doseCtrl = TextEditingController();
     final bodyWeightCtrl = TextEditingController();
@@ -90,12 +90,176 @@ class _DewormingScreenState extends State<DewormingScreen>
                   ],
                 ),
                 const SizedBox(height: 20),
-                _stepHeader('1', 'Animal ID / Tag Number'),
+                _stepHeader('1', 'Select Animal'),
                 const SizedBox(height: 8),
-                _dialogField(
-                  animalIdCtrl,
-                  '🐄  Example: 1 or C-001',
-                  TextInputType.text,
+                GestureDetector(
+                  onTap: () async {
+                    final searchCtrl = TextEditingController();
+                    Animal? picked;
+                    await showDialog<Animal>(
+                      context: ctx,
+                      builder: (dCtx) => StatefulBuilder(
+                        builder: (dCtx, setDialogState) {
+                          final query = searchCtrl.text.toLowerCase();
+                          final filtered = mockAnimals.where((a) {
+                            return a.tagId.toLowerCase().contains(query) ||
+                                a.breed.toLowerCase().contains(query) ||
+                                a.species.name.toLowerCase().contains(query);
+                          }).toList();
+                          return AlertDialog(
+                            title: const Text('Select Animal'),
+                            contentPadding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                            content: SizedBox(
+                              width: double.maxFinite,
+                              height: 400,
+                              child: Column(
+                                children: [
+                                  TextField(
+                                    controller: searchCtrl,
+                                    autofocus: true,
+                                    decoration: InputDecoration(
+                                      hintText: 'Search by tag, breed or species…',
+                                      prefixIcon: const Icon(Icons.search),
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 10),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    onChanged: (_) => setDialogState(() {}),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Expanded(
+                                    child: filtered.isEmpty
+                                        ? const Center(
+                                            child: Text('No animals found'),
+                                          )
+                                        : ListView.separated(
+                                            itemCount: filtered.length,
+                                            separatorBuilder: (_, __) =>
+                                                const Divider(height: 1),
+                                            itemBuilder: (_, i) {
+                                              final a = filtered[i];
+                                              final speciesEmoji = {
+                                                Species.cow: '🐄',
+                                                Species.buffalo: '🐃',
+                                                Species.goat: '🐐',
+                                                Species.sheep: '🐑',
+                                                Species.pig: '🐷',
+                                                Species.horse: '🐴',
+                                              }[a.species] ?? '🐾';
+                                              return ListTile(
+                                                dense: true,
+                                                leading: Text(
+                                                  speciesEmoji,
+                                                  style: const TextStyle(
+                                                    fontSize: 22),
+                                                ),
+                                                title: Text(
+                                                  a.tagId,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w600),
+                                                ),
+                                                subtitle: Text(
+                                                  '${a.breed} · ${a.weightKg} kg',
+                                                ),
+                                                onTap: () {
+                                                  picked = a;
+                                                  Navigator.pop(dCtx);
+                                                },
+                                              );
+                                            },
+                                          ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(dCtx),
+                                child: const Text('Cancel'),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                    if (picked != null) {
+                      setModalState(() {
+                        selectedAnimal = picked;
+                        bodyWeightCtrl.text =
+                            picked!.weightKg.toStringAsFixed(1);
+                      });
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 14),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: selectedAnimal != null
+                            ? RumenoTheme.accentOlive
+                            : Colors.grey.shade300,
+                        width: selectedAnimal != null ? 1.5 : 1,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: selectedAnimal != null
+                          ? RumenoTheme.accentOlive.withOpacity(0.06)
+                          : Colors.grey.shade50,
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          selectedAnimal != null
+                              ? {
+                                  Species.cow: '🐄',
+                                  Species.buffalo: '🐃',
+                                  Species.goat: '🐐',
+                                  Species.sheep: '🐑',
+                                  Species.pig: '🐷',
+                                  Species.horse: '🐴',
+                                }[selectedAnimal!.species] ?? '🐾'
+                              : '🐄',
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: selectedAnimal != null
+                              ? Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      selectedAnimal!.tagId,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${selectedAnimal!.breed} · ${selectedAnimal!.weightKg} kg',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Text(
+                                  'Tap to select animal',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade500,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                        ),
+                        Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.grey.shade500,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 14),
                 _stepHeader('2', 'Add Medicine Name'),
@@ -295,11 +459,10 @@ class _DewormingScreenState extends State<DewormingScreen>
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      final animalInput = animalIdCtrl.text.trim();
-                      if (animalInput.isEmpty) {
+                      if (selectedAnimal == null) {
                         ScaffoldMessenger.of(ctx).showSnackBar(
                           const SnackBar(
-                            content: Text('Please enter Animal ID'),
+                            content: Text('Please select an animal'),
                             backgroundColor: RumenoTheme.errorRed,
                           ),
                         );
@@ -331,20 +494,7 @@ class _DewormingScreenState extends State<DewormingScreen>
                         return;
                       }
 
-                      final animal =
-                          getAnimalById(animalInput) ??
-                          getAnimalByTag(animalInput);
-                      if (animal == null) {
-                        ScaffoldMessenger.of(ctx).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Animal not found. Enter valid ID or tag',
-                            ),
-                            backgroundColor: RumenoTheme.errorRed,
-                          ),
-                        );
-                        return;
-                      }
+                      final animal = selectedAnimal!;
 
                       final now = DateTime.now();
                       final actualDate = dateMode == 'today' ? now : selDate;
