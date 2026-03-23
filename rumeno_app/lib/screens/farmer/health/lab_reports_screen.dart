@@ -36,6 +36,7 @@ class _LabReportsScreenState extends State<LabReportsScreen>
   // ── Add Lab Report Dialog ────────────────────
   void _showAddLabReportDialog(BuildContext context) {
     String selTest = 'Complete Blood Count';
+    DateTime? reportDate;
     final animalIdCtrl = TextEditingController();
     final labNameCtrl = TextEditingController();
     final vetNameCtrl = TextEditingController();
@@ -172,6 +173,50 @@ class _LabReportsScreenState extends State<LabReportsScreen>
                   ),
                   const SizedBox(height: 12),
                 ],
+                // Date of Report
+                GestureDetector(
+                  onTap: () async {
+                    final d = await showDatePicker(
+                      context: ctx,
+                      initialDate: reportDate ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime.now(),
+                    );
+                    if (d != null) setModalState(() => reportDate = d);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: reportDate != null
+                            ? RumenoTheme.warmBrown
+                            : RumenoTheme.textLight,
+                        width: reportDate != null ? 2 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Text('📅', style: TextStyle(fontSize: 18)),
+                        const SizedBox(width: 10),
+                        Text(
+                          reportDate != null
+                              ? '${reportDate!.day}/${reportDate!.month}/${reportDate!.year}'
+                              : 'Date of Report (optional)',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: reportDate != null
+                                ? RumenoTheme.textDark
+                                : Colors.grey.shade500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
                 _dialogField(animalIdCtrl, '🐄  Animal ID (e.g. C-001)',
                     TextInputType.text),
                 const SizedBox(height: 12),
