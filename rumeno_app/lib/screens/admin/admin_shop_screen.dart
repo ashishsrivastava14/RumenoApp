@@ -4,6 +4,7 @@ import '../../config/theme.dart';
 import '../../mock/mock_ecommerce.dart';
 import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
+import 'admin_categories_screen.dart';
 
 class AdminShopScreen extends StatefulWidget {
   const AdminShopScreen({super.key});
@@ -397,6 +398,36 @@ class _ProductsTabState extends State<_ProductsTab> {
                 ),
               ),
             ],
+          ),
+        ),
+        // ── Manage Categories button ──
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+          child: InkWell(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AdminCategoriesScreen()),
+            ),
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1565C0).withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFF1565C0).withValues(alpha: 0.2)),
+              ),
+              child: Row(
+                children: [
+                  const Text('📂', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: Text('Manage Categories',
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1565C0))),
+                  ),
+                  const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Color(0xFF1565C0)),
+                ],
+              ),
+            ),
           ),
         ),
         // ── Category filter chips ──

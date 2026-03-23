@@ -643,6 +643,48 @@ enum ProductCategory { animalFeed, tonic, supplements, veterinaryMedicines, farm
 
 enum ProductAnimal { cattle, goat, sheep, poultry, pig, horse }
 
+class ShopCategory {
+  final String id;
+  final String name;
+  final String emoji;
+  final int colorValue;
+  final String? description;
+  final bool isActive;
+  final int sortOrder;
+  final DateTime createdAt;
+
+  const ShopCategory({
+    required this.id,
+    required this.name,
+    required this.emoji,
+    required this.colorValue,
+    this.description,
+    this.isActive = true,
+    this.sortOrder = 0,
+    required this.createdAt,
+  });
+
+  ShopCategory copyWith({
+    String? name,
+    String? emoji,
+    int? colorValue,
+    String? description,
+    bool? isActive,
+    int? sortOrder,
+  }) {
+    return ShopCategory(
+      id: id,
+      name: name ?? this.name,
+      emoji: emoji ?? this.emoji,
+      colorValue: colorValue ?? this.colorValue,
+      description: description ?? this.description,
+      isActive: isActive ?? this.isActive,
+      sortOrder: sortOrder ?? this.sortOrder,
+      createdAt: createdAt,
+    );
+  }
+}
+
 enum OrderStatus { pending, confirmed, packed, shipped, delivered, cancelled, returned }
 
 enum VendorStatus { pending, approved, rejected, suspended }

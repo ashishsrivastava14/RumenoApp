@@ -26,6 +26,9 @@ class EcommerceProvider extends ChangeNotifier {
   // Vendors
   List<Vendor> _vendors = [];
 
+  // Shop Categories
+  List<ShopCategory> _shopCategories = [];
+
   EcommerceProvider() {
     _loadMockData();
   }
@@ -35,6 +38,18 @@ class EcommerceProvider extends ChangeNotifier {
     _orders = List.from(mockOrders);
     _addresses = List.from(mockAddresses);
     _vendors = List.from(mockVendors);
+    _shopCategories = _defaultShopCategories();
+  }
+
+  List<ShopCategory> _defaultShopCategories() {
+    final now = DateTime.now();
+    return [
+      ShopCategory(id: 'cat_1', name: 'Animal Feed', emoji: '🌾', colorValue: 0xFF4CAF50, description: 'Cattle feed, fodder, silage', sortOrder: 0, createdAt: now),
+      ShopCategory(id: 'cat_2', name: 'Tonic', emoji: '💊', colorValue: 0xFF9C27B0, description: 'Health tonics for animals', sortOrder: 1, createdAt: now),
+      ShopCategory(id: 'cat_3', name: 'Supplements', emoji: '🧴', colorValue: 0xFF009688, description: 'Mineral mixtures, vitamins', sortOrder: 2, createdAt: now),
+      ShopCategory(id: 'cat_4', name: 'Veterinary Medicines', emoji: '💉', colorValue: 0xFFE53935, description: 'Dewormers, antibiotics', sortOrder: 3, createdAt: now),
+      ShopCategory(id: 'cat_5', name: 'Farm Equipment', emoji: '🔧', colorValue: 0xFFFF9800, description: 'Milking machines, tools', sortOrder: 4, createdAt: now),
+    ];
   }
 
   // ─── Product Getters & Methods ───
@@ -408,6 +423,60 @@ class EcommerceProvider extends ChangeNotifier {
       _wishlistProductIds.remove(productId);
     } else {
       _wishlistProductIds.add(productId);
+    }
+    notifyListeners();
+  }
+
+  // ─── Shop Categories ───
+
+  List<ShopCategory> get shopCategories =>
+      _shopCategories.where((c) => c.isActive).toList()
+        ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+  List<ShopCategory> get allShopCategories =>
+      List.from(_shopCategories)
+        ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+  void addShopCategory(ShopCategory category) {
+    _shopCategories.add(category);
+    notifyListeners();
+  }
+
+  void updateShopCategory(String id, {
+    String? name,
+    String? emoji,
+    int? colorValue,
+    String? description,
+    bool? isActive,
+    int? sortOrder,
+  }) {
+    final idx = _shopCategories.indexWhere((c) => c.id == id);
+    if (idx == -1) return;
+    _shopCategories[idx] = _shopCategories[idx].copyWith(
+      name: name,
+      emoji: emoji,
+      colorValue: colorValue,
+      description: description,
+      isActive: isActive,
+      sortOrder: sortOrder,
+    );
+    notifyListeners();
+  }
+
+  void deleteShopCategory(String id) {
+    _shopCategories.removeWhere((c) => c.id == id);
+    notifyListeners();
+  }
+
+  void reorderShopCategories(int oldIndex, int newIndex) {
+    final sorted = allShopCategories;
+    final item = sorted.removeAt(oldIndex);
+    sorted.insert(newIndex, item);
+    for (int i = 0; i < sorted.length; i++) {
+      final idx = _shopCategories.indexWhere((c) => c.id == sorted[i].id);
+      if (idx != -1) {
+        _shopCategories[idx] = _shopCategories[idx].copyWith(sortOrder: i);
+      }
     }
     notifyListeners();
   }
