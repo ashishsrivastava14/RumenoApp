@@ -37,7 +37,7 @@ class _VaccinationScreenState extends State<VaccinationScreen>
     final animalIdCtrl = TextEditingController();
     final vetNameCtrl = TextEditingController();
     DateTime selDate = DateTime.now();
-    bool isGivenToday = true;
+    String dateMode = 'today'; // 'today', 'past', 'future'
 
     const vaccineItems = [
       {'v': 'FMD', 'e': '🐄', 'd': 'Foot & Mouth'},
@@ -161,38 +161,71 @@ class _VaccinationScreenState extends State<VaccinationScreen>
                   children: [
                     Expanded(
                       child: GestureDetector(
-                        onTap: () =>
-                            setModalState(() => isGivenToday = true),
-                        child: _toggleTile('✅', 'Given Today',
-                            isGivenToday, RumenoTheme.successGreen),
+                        onTap: () => setModalState(() => dateMode = 'today'),
+                        child: _toggleTile('✅', 'Today',
+                            dateMode == 'today', RumenoTheme.successGreen),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: GestureDetector(
                         onTap: () async {
+                          final now = DateTime.now();
+                          final yesterday = now.subtract(const Duration(days: 1));
+                          final initial = (dateMode == 'past' && selDate.isBefore(now))
+                              ? selDate
+                              : yesterday;
                           final d = await showDatePicker(
                             context: ctx,
-                            initialDate: selDate.isBefore(DateTime.now())
-                                ? DateTime.now()
-                                : selDate,
-                            firstDate: DateTime.now(),
+                            initialDate: initial,
+                            firstDate: DateTime(2000),
+                            lastDate: yesterday,
+                          );
+                          if (d != null) {
+                            setModalState(() {
+                              selDate = d;
+                              dateMode = 'past';
+                            });
+                          }
+                        },
+                        child: _toggleTile(
+                          '🕐',
+                          dateMode == 'past'
+                              ? '${selDate.day}/${selDate.month}/${selDate.year}'
+                              : 'Past Date',
+                          dateMode == 'past',
+                          RumenoTheme.warningYellow,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () async {
+                          final now = DateTime.now();
+                          final tomorrow = now.add(const Duration(days: 1));
+                          final initial = (dateMode == 'future' && selDate.isAfter(now))
+                              ? selDate
+                              : tomorrow;
+                          final d = await showDatePicker(
+                            context: ctx,
+                            initialDate: initial,
+                            firstDate: tomorrow,
                             lastDate: DateTime(2030),
                           );
                           if (d != null) {
-                            setModalState(
-                                () {
+                            setModalState(() {
                               selDate = d;
-                              isGivenToday = false;
+                              dateMode = 'future';
                             });
                           }
                         },
                         child: _toggleTile(
                           '📅',
-                          isGivenToday
-                              ? 'Schedule Later'
-                              : '${selDate.day}/${selDate.month}/${selDate.year}',
-                          !isGivenToday,
+                          dateMode == 'future'
+                              ? '${selDate.day}/${selDate.month}/${selDate.year}'
+                              : 'Schedule',
+                          dateMode == 'future',
                           RumenoTheme.infoBlue,
                         ),
                       ),
@@ -214,8 +247,8 @@ class _VaccinationScreenState extends State<VaccinationScreen>
                       }
                       final now = DateTime.now();
                       final actualDate =
-                          isGivenToday ? now : selDate;
-                      final isDone = !actualDate.isAfter(now);
+                          dateMode == 'today' ? now : selDate;
+                      final isDone = dateMode != 'future';
                       final record = VaccinationRecord(
                         id: 'VAC_${now.millisecondsSinceEpoch}',
                         animalId: animalIdCtrl.text.trim(),
