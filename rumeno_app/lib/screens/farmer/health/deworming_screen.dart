@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../../config/theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../mock/mock_health.dart';
 import '../../../models/models.dart';
+import '../../../providers/group_provider.dart';
 import '../../../widgets/common/marketplace_button.dart';
 
 class DewormingScreen extends StatefulWidget {
@@ -18,6 +20,28 @@ class _DewormingScreenState extends State<DewormingScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late List<DewormingRecord> _records;
+
+  // ── Group / Category Filters ──
+  Species? _selectedCategory;
+  String? _selectedGroupId;
+
+  List<DewormingRecord> get _filteredRecords {
+    var list = _records;
+    if (_selectedGroupId != null) {
+      final provider = context.read<GroupProvider>();
+      final group = provider.getGroupById(_selectedGroupId!);
+      if (group != null) {
+        list = list.where((r) => group.animalIds.contains(r.animalId)).toList();
+      }
+    } else if (_selectedCategory != null) {
+      final animalIds = mockAnimals
+          .where((a) => a.species == _selectedCategory)
+          .map((a) => a.id)
+          .toSet();
+      list = list.where((r) => animalIds.contains(r.animalId)).toList();
+    }
+    return list;
+  }
 
   @override
   void initState() {
@@ -705,16 +729,18 @@ class _DewormingScreenState extends State<DewormingScreen>
   // ── Build ────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final upcoming = _records
+    final filtered = _filteredRecords;
+    final upcoming = filtered
         .where((r) => r.status != DewormingStatus.done)
         .toList();
-    final done = _records
+    final done = filtered
         .where((r) => r.status == DewormingStatus.done)
         .toList();
-    final overdue = _records
+    final overdue = filtered
         .where((r) => r.status == DewormingStatus.overdue)
         .toList();
-    final due = _records.where((r) => r.status == DewormingStatus.due).toList();
+    final due = filtered.where((r) => r.status == DewormingStatus.due).toList();
+    final groupProvider = context.watch<GroupProvider>();
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
@@ -733,12 +759,21 @@ class _DewormingScreenState extends State<DewormingScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          _buildScheduleTab(upcoming),
-          _buildHistoryTab(done),
-          _buildRemindersTab(overdue, due),
+          // ── Category & Group Filter Bar ──
+          _buildFilterBar(groupProvider),
+          // ── Tabs ──
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildScheduleTab(upcoming),
+                _buildHistoryTab(done),
+                _buildRemindersTab(overdue, due),
+              ],
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -843,6 +878,175 @@ class _DewormingScreenState extends State<DewormingScreen>
       ],
     ),
   );
+
+  // ── Filter Bar ──────────────────────────────
+  Widget _buildFilterBar(GroupProvider groupProvider) {
+    final groups = _selectedCategory != null
+        ? groupProvider.getGroupsBySpecies(_selectedCategory!)
+        : groupProvider.groups;
+
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Category chips
+          SizedBox(
+            height: 40,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                _categoryChip(null, '🐾', 'All'),
+                ...Species.values.map(
+                  (s) => _categoryChip(
+                      s,
+                      _animalEmoji(s),
+                      s.name[0].toUpperCase() + s.name.substring(1)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Group dropdown
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: RumenoTheme.backgroundCream,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _selectedGroupId != null
+                          ? RumenoTheme.accentOlive
+                          : RumenoTheme.textLight,
+                    ),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String?>(
+                      value: _selectedGroupId,
+                      hint: const Text('📂 Filter by Group',
+                          style: TextStyle(
+                              fontSize: 14, color: RumenoTheme.textGrey)),
+                      isExpanded: true,
+                      icon: const Icon(Icons.arrow_drop_down,
+                          color: RumenoTheme.textGrey),
+                      items: [
+                        const DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text('All Animals',
+                              style: TextStyle(fontSize: 14)),
+                        ),
+                        ...groups.map((g) => DropdownMenuItem<String?>(
+                              value: g.id,
+                              child: Text(
+                                '${g.name} (${g.animalIds.length})',
+                                style: const TextStyle(fontSize: 14),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            )),
+                      ],
+                      onChanged: (val) =>
+                          setState(() => _selectedGroupId = val),
+                    ),
+                  ),
+                ),
+              ),
+              if (_selectedGroupId != null) ...[
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => setState(() => _selectedGroupId = null),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: RumenoTheme.errorRed.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.close,
+                        size: 18, color: RumenoTheme.errorRed),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          // Show animals in selected group
+          if (_selectedGroupId != null) ...[
+            const SizedBox(height: 8),
+            _buildGroupAnimalsPreview(groupProvider),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _categoryChip(Species? species, String emoji, String label) {
+    final selected = _selectedCategory == species;
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: FilterChip(
+        selected: selected,
+        label: Text('$emoji $label', style: const TextStyle(fontSize: 12)),
+        onSelected: (_) => setState(() {
+          _selectedCategory = selected ? null : species;
+          _selectedGroupId = null;
+        }),
+        selectedColor: RumenoTheme.accentOlive.withValues(alpha: 0.2),
+        checkmarkColor: RumenoTheme.accentOlive,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
+        labelStyle: TextStyle(
+          fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+          color: selected ? RumenoTheme.accentOlive : RumenoTheme.textDark,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGroupAnimalsPreview(GroupProvider provider) {
+    final animals = provider.getAnimalsInGroup(_selectedGroupId!);
+    if (animals.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 4),
+        child: Text('No animals in this group',
+            style: TextStyle(fontSize: 12, color: RumenoTheme.textGrey)),
+      );
+    }
+    return Wrap(
+      spacing: 6,
+      runSpacing: 4,
+      children: animals.map((a) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: RumenoTheme.accentOlive.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+                color: RumenoTheme.accentOlive.withValues(alpha: 0.3)),
+          ),
+          child: Text(
+            '${_animalEmoji(a.species)} ${a.tagId}',
+            style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: RumenoTheme.accentOlive),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  String _animalEmoji(Species species) {
+    switch (species) {
+      case Species.cow: return '🐄';
+      case Species.buffalo: return '🐃';
+      case Species.goat: return '🐐';
+      case Species.sheep: return '🐑';
+      case Species.pig: return '🐷';
+      default: return '🐾';
+    }
+  }
 }
 
 class _DewormingCard extends StatelessWidget {

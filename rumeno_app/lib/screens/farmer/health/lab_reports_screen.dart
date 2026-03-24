@@ -2,11 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../../config/theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../mock/mock_health.dart';
 import '../../../models/models.dart';
+import '../../../providers/group_provider.dart';
 import '../../../widgets/common/marketplace_button.dart';
 
 class LabReportsScreen extends StatefulWidget {
@@ -27,6 +29,10 @@ class _LabReportsScreenState extends State<LabReportsScreen>
   String? _filterTest;      // test name filter
   DateTime? _filterDateFrom;
   DateTime? _filterDateTo;
+
+  // ── Group / Category Filters ──
+  Species? _selectedCategory;
+  String? _selectedGroupId;
 
   List<LabReport> _applyFilters(List<LabReport> source) {
     return source.where((r) {
@@ -57,7 +63,9 @@ class _LabReportsScreenState extends State<LabReportsScreen>
       _searchQuery.isNotEmpty ||
       _filterTest != null ||
       _filterDateFrom != null ||
-      _filterDateTo != null;
+      _filterDateTo != null ||
+      _selectedGroupId != null ||
+      _selectedCategory != null;
 
   void _clearFilters() {
     setState(() {
@@ -66,6 +74,8 @@ class _LabReportsScreenState extends State<LabReportsScreen>
       _filterTest = null;
       _filterDateFrom = null;
       _filterDateTo = null;
+      _selectedCategory = null;
+      _selectedGroupId = null;
     });
   }
 
@@ -918,12 +928,192 @@ class _LabReportsScreenState extends State<LabReportsScreen>
   }
 
   // ── Build ────────────────────────────────────
+
+  // ── Group Filter Bar ──────────────────────────
+  Widget _buildGroupFilterBar(GroupProvider groupProvider) {
+    final groups = _selectedCategory != null
+        ? groupProvider.getGroupsBySpecies(_selectedCategory!)
+        : groupProvider.groups;
+
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Category chips
+          SizedBox(
+            height: 40,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                _categoryChip(null, '🐾', 'All'),
+                ...Species.values.map(
+                  (s) => _categoryChip(
+                      s,
+                      _animalEmoji(s),
+                      s.name[0].toUpperCase() + s.name.substring(1)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Group dropdown
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: RumenoTheme.backgroundCream,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _selectedGroupId != null
+                          ? RumenoTheme.warmBrown
+                          : RumenoTheme.textLight,
+                    ),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String?>(
+                      value: _selectedGroupId,
+                      hint: const Text('📂 Filter by Group',
+                          style: TextStyle(
+                              fontSize: 14, color: RumenoTheme.textGrey)),
+                      isExpanded: true,
+                      icon: const Icon(Icons.arrow_drop_down,
+                          color: RumenoTheme.textGrey),
+                      items: [
+                        const DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text('All Animals',
+                              style: TextStyle(fontSize: 14)),
+                        ),
+                        ...groups.map((g) => DropdownMenuItem<String?>(
+                              value: g.id,
+                              child: Text(
+                                '${g.name} (${g.animalIds.length})',
+                                style: const TextStyle(fontSize: 14),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            )),
+                      ],
+                      onChanged: (val) =>
+                          setState(() => _selectedGroupId = val),
+                    ),
+                  ),
+                ),
+              ),
+              if (_selectedGroupId != null) ...[
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => setState(() => _selectedGroupId = null),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: RumenoTheme.errorRed.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.close,
+                        size: 18, color: RumenoTheme.errorRed),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          // Show animals in selected group
+          if (_selectedGroupId != null) ...[
+            const SizedBox(height: 8),
+            _buildGroupAnimalsPreview(groupProvider),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _categoryChip(Species? species, String emoji, String label) {
+    final selected = _selectedCategory == species;
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: FilterChip(
+        selected: selected,
+        label: Text('$emoji $label', style: const TextStyle(fontSize: 12)),
+        onSelected: (_) => setState(() {
+          _selectedCategory = selected ? null : species;
+          _selectedGroupId = null;
+        }),
+        selectedColor: RumenoTheme.warmBrown.withValues(alpha: 0.2),
+        checkmarkColor: RumenoTheme.warmBrown,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
+        labelStyle: TextStyle(
+          fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+          color: selected ? RumenoTheme.warmBrown : RumenoTheme.textDark,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGroupAnimalsPreview(GroupProvider provider) {
+    final animals = provider.getAnimalsInGroup(_selectedGroupId!);
+    if (animals.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 4),
+        child: Text('No animals in this group',
+            style: TextStyle(fontSize: 12, color: RumenoTheme.textGrey)),
+      );
+    }
+    return Wrap(
+      spacing: 6,
+      runSpacing: 4,
+      children: animals.map((a) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: RumenoTheme.warmBrown.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+                color: RumenoTheme.warmBrown.withValues(alpha: 0.3)),
+          ),
+          child: Text(
+            '${_animalEmoji(a.species)} ${a.tagId}',
+            style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: RumenoTheme.warmBrown),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final groupProvider = context.watch<GroupProvider>();
+
+    // Pre-filter by group/category
+    var baseReports = _reports;
+    if (_selectedGroupId != null) {
+      final group = groupProvider.getGroupById(_selectedGroupId!);
+      if (group != null) {
+        final tagIds = mockAnimals
+            .where((a) => group.animalIds.contains(a.id))
+            .map((a) => a.tagId)
+            .toSet();
+        baseReports = baseReports.where((r) => tagIds.contains(r.animalId)).toList();
+      }
+    } else if (_selectedCategory != null) {
+      final tagIds = mockAnimals
+          .where((a) => a.species == _selectedCategory)
+          .map((a) => a.tagId)
+          .toSet();
+      baseReports = baseReports.where((r) => tagIds.contains(r.animalId)).toList();
+    }
+
     final allPending =
-        _reports.where((r) => r.status == LabReportStatus.pending).toList();
+        baseReports.where((r) => r.status == LabReportStatus.pending).toList();
     final allCompleted =
-        _reports.where((r) => r.status == LabReportStatus.completed).toList();
+        baseReports.where((r) => r.status == LabReportStatus.completed).toList();
     final pending = _applyFilters(allPending);
     final completed = _applyFilters(allCompleted);
 
@@ -945,6 +1135,8 @@ class _LabReportsScreenState extends State<LabReportsScreen>
       ),
       body: Column(
         children: [
+          // ── Category & Group Filter Bar ──
+          _buildGroupFilterBar(groupProvider),
           // ── Search + Filter bar ──────────────
           Container(
             color: Colors.white,
