@@ -22,6 +22,7 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
   final _priceCtrl = TextEditingController();
   final _buyerCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
+  final _addressCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
   PaymentMode _payment = PaymentMode.cash;
   bool _saving = false;
@@ -35,6 +36,7 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
     _priceCtrl.dispose();
     _buyerCtrl.dispose();
     _phoneCtrl.dispose();
+    _addressCtrl.dispose();
     _notesCtrl.dispose();
     super.dispose();
   }
@@ -80,6 +82,7 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
                             priceCtrl: _priceCtrl,
                             buyerCtrl: _buyerCtrl,
                             phoneCtrl: _phoneCtrl,
+                            addressCtrl: _addressCtrl,
                             notesCtrl: _notesCtrl,
                             onNext: _goNext,
                           )
@@ -89,6 +92,7 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
                             price: double.tryParse(_priceCtrl.text) ?? 0,
                             buyerName: _buyerCtrl.text,
                             buyerPhone: _phoneCtrl.text,
+                            buyerAddress: _addressCtrl.text,
                             notes: _notesCtrl.text,
                             payment: _payment,
                             onPaymentChange: (p) => setState(() => _payment = p),
@@ -144,6 +148,7 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
       paymentMode: _payment,
       buyerName: _buyerCtrl.text.trim(),
       buyerPhone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
+      buyerAddress: _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
       animalId: _selected!.id,
       animalTag: _selected!.tagId,
       animalSpecies: _selected!.speciesName,
@@ -433,6 +438,7 @@ class _StepPriceBuyer extends StatelessWidget {
   final TextEditingController priceCtrl;
   final TextEditingController buyerCtrl;
   final TextEditingController phoneCtrl;
+  final TextEditingController addressCtrl;
   final TextEditingController notesCtrl;
   final VoidCallback onNext;
 
@@ -442,6 +448,7 @@ class _StepPriceBuyer extends StatelessWidget {
     required this.priceCtrl,
     required this.buyerCtrl,
     required this.phoneCtrl,
+    required this.addressCtrl,
     required this.notesCtrl,
     required this.onNext,
   });
@@ -518,6 +525,15 @@ class _StepPriceBuyer extends StatelessWidget {
         ),
         const SizedBox(height: 16),
 
+        // Address
+        _FieldLabel(emoji: '📍', label: 'Buyer Address (optional)'),
+        const SizedBox(height: 8),
+        _BigTextField(
+          controller: addressCtrl,
+          hint: 'Village / Town / City',
+        ),
+        const SizedBox(height: 16),
+
         // Notes
         _FieldLabel(emoji: '📝', label: l10n.saleNotesLabel),
         const SizedBox(height: 8),
@@ -546,6 +562,7 @@ class _StepPaymentConfirm extends StatelessWidget {
   final double price;
   final String buyerName;
   final String buyerPhone;
+  final String buyerAddress;
   final String notes;
   final PaymentMode payment;
   final ValueChanged<PaymentMode> onPaymentChange;
@@ -558,6 +575,7 @@ class _StepPaymentConfirm extends StatelessWidget {
     required this.price,
     required this.buyerName,
     required this.buyerPhone,
+    required this.buyerAddress,
     required this.notes,
     required this.payment,
     required this.onPaymentChange,
@@ -639,6 +657,7 @@ class _StepPaymentConfirm extends StatelessWidget {
               _SummaryRow(label: '💰 ${l10n.sellAnimalSummaryPrice}', value: '₹${price.toStringAsFixed(0)}'),
               _SummaryRow(label: '👤 ${l10n.sellAnimalSummaryBuyer}', value: buyerName),
               if (buyerPhone.isNotEmpty) _SummaryRow(label: '📱 ${l10n.sellAnimalSummaryPhone}', value: buyerPhone),
+              if (buyerAddress.isNotEmpty) _SummaryRow(label: '📍 Address', value: buyerAddress),
               _SummaryRow(
                 label: '💳 ${l10n.sellAnimalSummaryPayment}',
                 value: _paymentLabel(payment, l10n),

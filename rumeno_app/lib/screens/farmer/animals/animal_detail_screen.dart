@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../config/theme.dart';
@@ -166,6 +167,8 @@ class _OverviewTabState extends State<_OverviewTab> {
   late DateTime? _saleDate;
   late double? _salePrice;
   late String? _buyerName;
+  late String? _buyerPhone;
+  late String? _buyerAddress;
 
   @override
   void initState() {
@@ -176,6 +179,8 @@ class _OverviewTabState extends State<_OverviewTab> {
     _saleDate = widget.animal.saleDate;
     _salePrice = widget.animal.salePrice;
     _buyerName = widget.animal.buyerName;
+    _buyerPhone = widget.animal.buyerPhone;
+    _buyerAddress = widget.animal.buyerAddress;
   }
 
   // ── Mortality reasons — big emoji presets for illiterate users ──
@@ -482,6 +487,8 @@ class _OverviewTabState extends State<_OverviewTab> {
     double? price;
     final priceController = TextEditingController();
     String buyerName = '';
+    String buyerPhone = '';
+    String buyerAddress = '';
 
     showModalBottomSheet(
       context: context,
@@ -623,6 +630,51 @@ class _OverviewTabState extends State<_OverviewTab> {
                   ),
                   onChanged: (val) => buyerName = val.trim(),
                 ),
+                const SizedBox(height: 18),
+
+                // Buyer phone (optional)
+                const Text('📱  Buyer Phone (optional)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                const SizedBox(height: 10),
+                TextField(
+                  style: const TextStyle(fontSize: 17),
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: InputDecoration(
+                    hintText: '9876543210',
+                    hintStyle: TextStyle(fontSize: 15, color: Colors.grey.shade400),
+                    prefixIcon: const Padding(padding: EdgeInsets.only(left: 12, right: 8), child: Text('📱', style: TextStyle(fontSize: 22))),
+                    prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+                    filled: true,
+                    fillColor: RumenoTheme.backgroundCream,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: RumenoTheme.primaryGreen.withValues(alpha: 0.6))),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: RumenoTheme.primaryGreen.withValues(alpha: 0.6))),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: RumenoTheme.primaryGreen, width: 2)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  ),
+                  onChanged: (val) => buyerPhone = val.trim(),
+                ),
+                const SizedBox(height: 18),
+
+                // Buyer address (optional)
+                const Text('📍  Buyer Address (optional)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                const SizedBox(height: 10),
+                TextField(
+                  style: const TextStyle(fontSize: 17),
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: InputDecoration(
+                    hintText: 'Village / Town / City',
+                    hintStyle: TextStyle(fontSize: 15, color: Colors.grey.shade400),
+                    prefixIcon: const Padding(padding: EdgeInsets.only(left: 12, right: 8), child: Text('📍', style: TextStyle(fontSize: 22))),
+                    prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+                    filled: true,
+                    fillColor: RumenoTheme.backgroundCream,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: RumenoTheme.primaryGreen.withValues(alpha: 0.6))),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: RumenoTheme.primaryGreen.withValues(alpha: 0.6))),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: RumenoTheme.primaryGreen, width: 2)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  ),
+                  onChanged: (val) => buyerAddress = val.trim(),
+                ),
                 const SizedBox(height: 28),
 
                 // Save
@@ -640,6 +692,8 @@ class _OverviewTabState extends State<_OverviewTab> {
                         _saleDate = sellDate;
                         _salePrice = price;
                         _buyerName = buyerName.isNotEmpty ? buyerName : null;
+                        _buyerPhone = buyerPhone.isNotEmpty ? buyerPhone : null;
+                        _buyerAddress = buyerAddress.isNotEmpty ? buyerAddress : null;
                       });
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Row(children: [const Icon(Icons.check_circle, color: Colors.white), const SizedBox(width: 8), Text('${widget.animal.tagId} marked as sold')]),
@@ -806,6 +860,40 @@ class _OverviewTabState extends State<_OverviewTab> {
                       const Text('Buyer', style: TextStyle(fontSize: 13, color: RumenoTheme.textGrey)),
                       const Spacer(),
                       Text(_buyerName!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ]),
+                  ),
+                ],
+                if (_buyerPhone != null) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(children: [
+                      const Text('📱', style: TextStyle(fontSize: 22)),
+                      const SizedBox(width: 10),
+                      const Text('Phone', style: TextStyle(fontSize: 13, color: RumenoTheme.textGrey)),
+                      const Spacer(),
+                      Text(_buyerPhone!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ]),
+                  ),
+                ],
+                if (_buyerAddress != null) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(children: [
+                      const Text('📍', style: TextStyle(fontSize: 22)),
+                      const SizedBox(width: 10),
+                      const Text('Address', style: TextStyle(fontSize: 13, color: RumenoTheme.textGrey)),
+                      const Spacer(),
+                      Flexible(child: Text(_buyerAddress!, textAlign: TextAlign.end, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
                     ]),
                   ),
                 ],

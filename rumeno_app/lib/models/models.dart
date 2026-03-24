@@ -63,6 +63,8 @@ class Animal {
   final DateTime? saleDate;
   final double? salePrice;
   final String? buyerName;
+  final String? buyerPhone;
+  final String? buyerAddress;
 
   const Animal({
     required this.id,
@@ -89,6 +91,8 @@ class Animal {
     this.saleDate,
     this.salePrice,
     this.buyerName,
+    this.buyerPhone,
+    this.buyerAddress,
   });
 
   int get ageInMonths {
@@ -578,6 +582,7 @@ class SaleRecord {
   final PaymentMode paymentMode;
   final String buyerName;
   final String? buyerPhone;
+  final String? buyerAddress;
 
   // Animal-specific
   final String? animalId;
@@ -600,6 +605,7 @@ class SaleRecord {
     required this.paymentMode,
     required this.buyerName,
     this.buyerPhone,
+    this.buyerAddress,
     this.animalId,
     this.animalTag,
     this.animalSpecies,
