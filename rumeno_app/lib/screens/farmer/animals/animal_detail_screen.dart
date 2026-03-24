@@ -476,18 +476,6 @@ class _OverviewTabState extends State<_OverviewTab> {
     );
   }
 
-  // ── Sell Animal quick-preset prices for illiterate users ──
-  static const _quickPrices = [
-    {'emoji': '💵', 'label': '₹5,000', 'value': 5000.0},
-    {'emoji': '💵', 'label': '₹10,000', 'value': 10000.0},
-    {'emoji': '💰', 'label': '₹15,000', 'value': 15000.0},
-    {'emoji': '💰', 'label': '₹20,000', 'value': 20000.0},
-    {'emoji': '💰', 'label': '₹30,000', 'value': 30000.0},
-    {'emoji': '💰', 'label': '₹40,000', 'value': 40000.0},
-    {'emoji': '🤑', 'label': '₹50,000', 'value': 50000.0},
-    {'emoji': '🤑', 'label': '₹75,000', 'value': 75000.0},
-    {'emoji': '🤑', 'label': '₹1,00,000', 'value': 100000.0},
-  ];
 
   void _showSellAnimalSheet() {
     DateTime sellDate = DateTime.now();
@@ -589,39 +577,9 @@ class _OverviewTabState extends State<_OverviewTab> {
                 ),
                 const SizedBox(height: 22),
 
-                // Price — quick presets (big emoji tiles)
+                // Price
                 const Text('💰  Selling Price', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                 const SizedBox(height: 10),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: _quickPrices.map((p) {
-                    final sel = price == p['value'];
-                    return GestureDetector(
-                      onTap: () => setModalState(() {
-                        price = p['value'] as double;
-                        priceController.text = (p['value'] as double).toStringAsFixed(0);
-                      }),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: sel ? RumenoTheme.primaryGreen.withValues(alpha: 0.12) : RumenoTheme.backgroundCream,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textLight, width: sel ? 2.5 : 1),
-                        ),
-                        child: Row(mainAxisSize: MainAxisSize.min, children: [
-                          Text(p['emoji'] as String, style: const TextStyle(fontSize: 22)),
-                          const SizedBox(width: 6),
-                          Text(p['label'] as String, style: TextStyle(fontSize: 15, fontWeight: sel ? FontWeight.bold : FontWeight.w500, color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textDark)),
-                        ]),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 14),
-
-                // Custom price input
                 TextField(
                   controller: priceController,
                   keyboardType: TextInputType.number,
@@ -629,7 +587,7 @@ class _OverviewTabState extends State<_OverviewTab> {
                   decoration: InputDecoration(
                     prefixText: '₹ ',
                     prefixStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: RumenoTheme.primaryGreen),
-                    hintText: 'Or type price here',
+                    hintText: 'Enter selling price',
                     hintStyle: TextStyle(fontSize: 16, color: Colors.grey.shade400),
                     filled: true,
                     fillColor: RumenoTheme.backgroundCream,
