@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../../../config/theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_animals.dart';
+import '../../../mock/mock_groups.dart';
 import '../../../mock/mock_sales.dart';
 import '../../../models/models.dart';
 
@@ -19,6 +20,13 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
   int _step = 0; // 0 = pick, 1 = price+buyer, 2 = payment+confirm
 
   Animal? _selected;
+  bool _groupMode = false;
+  AnimalGroup? _selectedGroup;
+  Set<String> _groupSelectedIds = {};
+
+  List<Animal> get _groupSelectedAnimals =>
+      _availableAnimals.where((a) => _groupSelectedIds.contains(a.id)).toList();
+
   final _priceCtrl = TextEditingController();
   final _buyerCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
@@ -73,12 +81,42 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
                         animals: _availableAnimals,
                         selected: _selected,
                         onSelect: (a) => setState(() => _selected = a),
+                        groupMode: _groupMode,
+                        onGroupModeChange: (v) => setState(() {
+                          _groupMode = v;
+                          _selected = null;
+                          _selectedGroup = null;
+                          _groupSelectedIds = {};
+                        }),
+                        groups: mockGroups,
+                        selectedGroup: _selectedGroup,
+                        onGroupSelect: (g) => setState(() {
+                          _selectedGroup = g;
+                          _groupSelectedIds = g == null
+                              ? {}
+                              : _availableAnimals
+                                  .where((a) => g.animalIds.contains(a.id))
+                                  .map((a) => a.id)
+                                  .toSet();
+                        }),
+                        groupSelectedIds: _groupSelectedIds,
+                        onToggleGroupAnimal: (id) => setState(() {
+                          final updated = Set<String>.from(_groupSelectedIds);
+                          if (updated.contains(id)) {
+                            updated.remove(id);
+                          } else {
+                            updated.add(id);
+                          }
+                          _groupSelectedIds = updated;
+                        }),
                         onNext: _goNext,
                       )
                     : _step == 1
                         ? _StepPriceBuyer(
                             key: const ValueKey('step1'),
-                            animal: _selected!,
+                            animal: _groupMode ? null : _selected,
+                            groupAnimals: _groupMode ? _groupSelectedAnimals : null,
+                            groupName: _groupMode ? _selectedGroup?.name : null,
                             priceCtrl: _priceCtrl,
                             buyerCtrl: _buyerCtrl,
                             phoneCtrl: _phoneCtrl,
@@ -88,7 +126,9 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
                           )
                         : _StepPaymentConfirm(
                             key: const ValueKey('step2'),
-                            animal: _selected!,
+                            animal: _groupMode ? null : _selected,
+                            groupAnimals: _groupMode ? _groupSelectedAnimals : null,
+                            groupName: _groupMode ? _selectedGroup?.name : null,
                             price: double.tryParse(_priceCtrl.text) ?? 0,
                             buyerName: _buyerCtrl.text,
                             buyerPhone: _phoneCtrl.text,
@@ -109,9 +149,20 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
 
   void _goNext() {
     final l10n = AppLocalizations.of(context);
-    if (_step == 0 && _selected == null) {
-      _showError(l10n.sellAnimalErrorSelectFirst);
-      return;
+    if (_step == 0) {
+      if (_groupMode) {
+        if (_selectedGroup == null) {
+          _showError('Please select a group first');
+          return;
+        }
+        if (_groupSelectedIds.isEmpty) {
+          _showError('No available animals in selected group');
+          return;
+        }
+      } else if (_selected == null) {
+        _showError(l10n.sellAnimalErrorSelectFirst);
+        return;
+      }
     }
     if (_step == 1) {
       final price = double.tryParse(_priceCtrl.text);
@@ -140,22 +191,43 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
     setState(() => _saving = true);
     await Future.delayed(const Duration(milliseconds: 800)); // simulate save
 
-    final sale = SaleRecord(
-      id: 'SALE_${DateTime.now().millisecondsSinceEpoch}',
-      type: SaleType.animal,
-      date: DateTime.now(),
-      amount: double.tryParse(_priceCtrl.text) ?? 0,
-      paymentMode: _payment,
-      buyerName: _buyerCtrl.text.trim(),
-      buyerPhone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
-      buyerAddress: _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
-      animalId: _selected!.id,
-      animalTag: _selected!.tagId,
-      animalSpecies: _selected!.speciesName,
-      notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
-      farmerId: 'F001',
-    );
-    mockSales.insert(0, sale);
+    if (_groupMode) {
+      final animals = _groupSelectedAnimals;
+      for (int i = 0; i < animals.length; i++) {
+        final a = animals[i];
+        mockSales.insert(0, SaleRecord(
+          id: 'SALE_${DateTime.now().millisecondsSinceEpoch}_$i',
+          type: SaleType.animal,
+          date: DateTime.now(),
+          amount: double.tryParse(_priceCtrl.text) ?? 0,
+          paymentMode: _payment,
+          buyerName: _buyerCtrl.text.trim(),
+          buyerPhone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
+          buyerAddress: _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
+          animalId: a.id,
+          animalTag: a.tagId,
+          animalSpecies: a.speciesName,
+          notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+          farmerId: 'F001',
+        ));
+      }
+    } else {
+      mockSales.insert(0, SaleRecord(
+        id: 'SALE_${DateTime.now().millisecondsSinceEpoch}',
+        type: SaleType.animal,
+        date: DateTime.now(),
+        amount: double.tryParse(_priceCtrl.text) ?? 0,
+        paymentMode: _payment,
+        buyerName: _buyerCtrl.text.trim(),
+        buyerPhone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
+        buyerAddress: _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
+        animalId: _selected!.id,
+        animalTag: _selected!.tagId,
+        animalSpecies: _selected!.speciesName,
+        notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+        farmerId: 'F001',
+      ));
+    }
 
     setState(() => _saving = false);
     if (!mounted) return;
@@ -182,7 +254,9 @@ class _SellAnimalScreenState extends State<SellAnimalScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              '${_selected!.tagId} — ₹${_priceCtrl.text}',
+              _groupMode
+                  ? '${_groupSelectedAnimals.length} animals sold — ₹${_priceCtrl.text} each'
+                  : '${_selected!.tagId} — ₹${_priceCtrl.text}',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 16, color: RumenoTheme.textGrey),
             ),
@@ -295,6 +369,13 @@ class _StepPickAnimal extends StatelessWidget {
   final List<Animal> animals;
   final Animal? selected;
   final ValueChanged<Animal> onSelect;
+  final bool groupMode;
+  final ValueChanged<bool> onGroupModeChange;
+  final List<AnimalGroup> groups;
+  final AnimalGroup? selectedGroup;
+  final ValueChanged<AnimalGroup?> onGroupSelect;
+  final Set<String> groupSelectedIds;
+  final ValueChanged<String> onToggleGroupAnimal;
   final VoidCallback onNext;
 
   const _StepPickAnimal({
@@ -302,6 +383,13 @@ class _StepPickAnimal extends StatelessWidget {
     required this.animals,
     required this.selected,
     required this.onSelect,
+    required this.groupMode,
+    required this.onGroupModeChange,
+    required this.groups,
+    required this.selectedGroup,
+    required this.onGroupSelect,
+    required this.groupSelectedIds,
+    required this.onToggleGroupAnimal,
     required this.onNext,
   });
 
@@ -325,103 +413,324 @@ class _StepPickAnimal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final groupAnimals = selectedGroup == null
+        ? <Animal>[]
+        : animals.where((a) => selectedGroup!.animalIds.contains(a.id)).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.sellAnimalPickHeading,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 16),
-        ...animals.map((a) {
-          final isSelected = selected?.id == a.id;
-          return GestureDetector(
-            onTap: () => onSelect(a),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: isSelected ? RumenoTheme.primaryGreen.withValues(alpha: 0.1) : Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: isSelected ? RumenoTheme.primaryGreen : Colors.grey[200]!,
-                  width: isSelected ? 2.5 : 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 56,
-                    height: 56,
+        // ── Mode Toggle ──
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.grey[200]!),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => onGroupModeChange(false),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? RumenoTheme.primaryGreen.withValues(alpha: 0.15)
-                          : Colors.grey[100],
-                      borderRadius: BorderRadius.circular(12),
+                      color: !groupMode ? RumenoTheme.primaryGreen : Colors.transparent,
+                      borderRadius: BorderRadius.circular(13),
                     ),
-                    child: Center(
-                      child: Text(
-                        _speciesEmoji(a.species),
-                        style: const TextStyle(fontSize: 30),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              a.tagId,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 17,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.green[50],
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                a.genderLabel,
-                                style: const TextStyle(fontSize: 11, color: RumenoTheme.textGrey),
-                              ),
-                            ),
-                          ],
-                        ),
+                        const Text('🐄', style: TextStyle(fontSize: 18)),
+                        const SizedBox(width: 6),
                         Text(
-                          '${a.speciesName} • ${a.breed}',
-                          style: const TextStyle(fontSize: 13, color: RumenoTheme.textGrey),
-                        ),
-                        Text(
-                          '⚖️ ${a.weightKg.toStringAsFixed(0)} kg  •  🎂 ${a.ageString}',
-                          style: const TextStyle(fontSize: 12, color: RumenoTheme.textGrey),
+                          'Individual',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: !groupMode ? Colors.white : RumenoTheme.textGrey,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  if (isSelected)
-                    const Icon(Icons.check_circle_rounded, color: RumenoTheme.primaryGreen, size: 28),
-                ],
+                ),
               ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => onGroupModeChange(true),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: groupMode ? RumenoTheme.primaryGreen : Colors.transparent,
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('🐑', style: TextStyle(fontSize: 18)),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Group',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: groupMode ? Colors.white : RumenoTheme.textGrey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        if (!groupMode) ...[
+          // ── Individual Animal List ──
+          Text(
+            l10n.sellAnimalPickHeading,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          ...animals.map((a) {
+            final isSelected = selected?.id == a.id;
+            return GestureDetector(
+              onTap: () => onSelect(a),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: isSelected ? RumenoTheme.primaryGreen.withValues(alpha: 0.1) : Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isSelected ? RumenoTheme.primaryGreen : Colors.grey[200]!,
+                    width: isSelected ? 2.5 : 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? RumenoTheme.primaryGreen.withValues(alpha: 0.15)
+                            : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          _speciesEmoji(a.species),
+                          style: const TextStyle(fontSize: 30),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                a.tagId,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.green[50],
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  a.genderLabel,
+                                  style: const TextStyle(fontSize: 11, color: RumenoTheme.textGrey),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            '${a.speciesName} • ${a.breed}',
+                            style: const TextStyle(fontSize: 13, color: RumenoTheme.textGrey),
+                          ),
+                          Text(
+                            '⚖️ ${a.weightKg.toStringAsFixed(0)} kg  •  🎂 ${a.ageString}',
+                            style: const TextStyle(fontSize: 12, color: RumenoTheme.textGrey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (isSelected)
+                      const Icon(Icons.check_circle_rounded, color: RumenoTheme.primaryGreen, size: 28),
+                  ],
+                ),
+              ),
+            );
+          }),
+          const SizedBox(height: 24),
+          _NextButton(label: l10n.saleNextButton, onTap: onNext, enabled: selected != null),
+        ] else ...[
+          // ── Group Selector ──
+          const Text(
+            '🐑  Select Group',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 12),
+          ...groups.map((g) {
+            final isSel = selectedGroup?.id == g.id;
+            final availableCount = animals.where((a) => g.animalIds.contains(a.id)).length;
+            return GestureDetector(
+              onTap: () => onGroupSelect(isSel ? null : g),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: isSel ? RumenoTheme.primaryGreen.withValues(alpha: 0.1) : Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isSel ? RumenoTheme.primaryGreen : Colors.grey[200]!,
+                    width: isSel ? 2.5 : 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Text('🐑', style: TextStyle(fontSize: 28)),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            g.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          Text(
+                            availableCount == 0
+                                ? 'No available animals'
+                                : '$availableCount animal${availableCount > 1 ? 's' : ''} available',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: availableCount == 0 ? RumenoTheme.errorRed : RumenoTheme.textGrey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (isSel)
+                      const Icon(Icons.check_circle_rounded, color: RumenoTheme.primaryGreen, size: 26),
+                  ],
+                ),
+              ),
+            );
+          }),
+
+          // ── Animals in group (with checkboxes) ──
+          if (selectedGroup != null && groupAnimals.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                const Text(
+                  '🐄  Animals in Group',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                const Spacer(),
+                Text(
+                  '${groupSelectedIds.length} selected',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: RumenoTheme.primaryGreen,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          );
-        }),
-        const SizedBox(height: 24),
-        _NextButton(label: l10n.saleNextButton, onTap: onNext, enabled: selected != null),
+            const SizedBox(height: 10),
+            ...groupAnimals.map((a) {
+              final isChecked = groupSelectedIds.contains(a.id);
+              return GestureDetector(
+                onTap: () => onToggleGroupAnimal(a.id),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 120),
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isChecked
+                        ? RumenoTheme.primaryGreen.withValues(alpha: 0.08)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isChecked ? RumenoTheme.primaryGreen : Colors.grey[200]!,
+                      width: isChecked ? 2 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: isChecked
+                              ? RumenoTheme.primaryGreen.withValues(alpha: 0.15)
+                              : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text(
+                            _speciesEmoji(a.species),
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              a.tagId,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                            Text(
+                              '${a.speciesName} • ${a.breed}  •  ${a.weightKg.toStringAsFixed(0)} kg',
+                              style: const TextStyle(fontSize: 12, color: RumenoTheme.textGrey),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Checkbox(
+                        value: isChecked,
+                        onChanged: (_) => onToggleGroupAnimal(a.id),
+                        activeColor: RumenoTheme.primaryGreen,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ],
+          const SizedBox(height: 24),
+          _NextButton(
+            label: l10n.saleNextButton,
+            onTap: onNext,
+            enabled: selectedGroup != null && groupSelectedIds.isNotEmpty,
+          ),
+        ],
       ],
     );
   }
@@ -434,7 +743,9 @@ extension on Animal {
 // ─── Step 1: Price & Buyer ────────────────────────────────────────────────────
 
 class _StepPriceBuyer extends StatelessWidget {
-  final Animal animal;
+  final Animal? animal;
+  final List<Animal>? groupAnimals;
+  final String? groupName;
   final TextEditingController priceCtrl;
   final TextEditingController buyerCtrl;
   final TextEditingController phoneCtrl;
@@ -444,7 +755,9 @@ class _StepPriceBuyer extends StatelessWidget {
 
   const _StepPriceBuyer({
     super.key,
-    required this.animal,
+    this.animal,
+    this.groupAnimals,
+    this.groupName,
     required this.priceCtrl,
     required this.buyerCtrl,
     required this.phoneCtrl,
@@ -459,7 +772,7 @@ class _StepPriceBuyer extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Animal summary
+        // Animal / group summary
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
@@ -469,17 +782,24 @@ class _StepPriceBuyer extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const Text('🐄', style: TextStyle(fontSize: 36)),
+              Text(
+                groupAnimals != null ? '🐑' : '🐄',
+                style: const TextStyle(fontSize: 36),
+              ),
               const SizedBox(width: 14),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    animal.tagId,
+                    groupAnimals != null ? (groupName ?? 'Group') : (animal?.tagId ?? ''),
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
-                  Text('${animal.speciesName} • ${animal.breed}',
-                      style: const TextStyle(color: RumenoTheme.textGrey)),
+                  Text(
+                    groupAnimals != null
+                        ? '${groupAnimals!.length} animal${groupAnimals!.length > 1 ? 's' : ''}'
+                        : '${animal?.speciesName} • ${animal?.breed}',
+                    style: const TextStyle(color: RumenoTheme.textGrey),
+                  ),
                 ],
               ),
             ],
@@ -558,7 +878,9 @@ class _StepPriceBuyer extends StatelessWidget {
 // ─── Step 2: Payment & Confirm ────────────────────────────────────────────────
 
 class _StepPaymentConfirm extends StatelessWidget {
-  final Animal animal;
+  final Animal? animal;
+  final List<Animal>? groupAnimals;
+  final String? groupName;
   final double price;
   final String buyerName;
   final String buyerPhone;
@@ -571,7 +893,9 @@ class _StepPaymentConfirm extends StatelessWidget {
 
   const _StepPaymentConfirm({
     super.key,
-    required this.animal,
+    this.animal,
+    this.groupAnimals,
+    this.groupName,
     required this.price,
     required this.buyerName,
     required this.buyerPhone,
@@ -653,8 +977,11 @@ class _StepPaymentConfirm extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const Divider(height: 20),
-              _SummaryRow(label: '🐄 ${l10n.sellAnimalSummaryAnimal}', value: '${animal.tagId} (${animal.speciesName})'),
-              _SummaryRow(label: '💰 ${l10n.sellAnimalSummaryPrice}', value: '₹${price.toStringAsFixed(0)}'),
+              if (groupAnimals != null)
+                _SummaryRow(label: '🐑 Group', value: '${groupName ?? 'Group'} (${groupAnimals!.length} animals)')
+              else
+                _SummaryRow(label: '🐄 ${l10n.sellAnimalSummaryAnimal}', value: '${animal?.tagId} (${animal?.speciesName})'),
+              _SummaryRow(label: '💰 ${l10n.sellAnimalSummaryPrice}', value: '₹${price.toStringAsFixed(0)}${groupAnimals != null ? ' each' : ''}'),
               _SummaryRow(label: '👤 ${l10n.sellAnimalSummaryBuyer}', value: buyerName),
               if (buyerPhone.isNotEmpty) _SummaryRow(label: '📱 ${l10n.sellAnimalSummaryPhone}', value: buyerPhone),
               if (buyerAddress.isNotEmpty) _SummaryRow(label: '📍 Address', value: buyerAddress),
