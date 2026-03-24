@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../config/theme.dart';
+import '../../../mock/mock_animals.dart';
 import '../../../models/models.dart';
 import '../../../providers/group_provider.dart';
 import '../../../widgets/common/marketplace_button.dart';
@@ -260,137 +261,263 @@ class _GroupListScreenState extends State<GroupListScreen> {
   void _showCreateGroupDialog(BuildContext context, GroupProvider provider) {
     final nameCtrl = TextEditingController();
     Species? species;
+    final selectedAnimalIds = <String>{};
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModalState) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: EdgeInsets.fromLTRB(
-              20, 12, 20, MediaQuery.of(ctx).viewInsets.bottom + 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(2)),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Row(
-                children: [
-                  Text('📂', style: TextStyle(fontSize: 26)),
-                  SizedBox(width: 10),
-                  Text('Create New Group',
-                      style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: nameCtrl,
-                decoration: InputDecoration(
-                  hintText: 'Group name (e.g., "Dairy Cows")',
-                  filled: true,
-                  fillColor: RumenoTheme.backgroundCream,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: RumenoTheme.textLight)),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: RumenoTheme.textLight)),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                          color: RumenoTheme.primaryGreen, width: 2)),
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 14),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text('Category (optional)',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: RumenoTheme.textDark)),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _speciesChoiceChip(null, '🐾 Mixed', species == null,
-                      () => setModalState(() => species = null)),
-                  ...Species.values.map((s) => _speciesChoiceChip(
-                      s,
-                      '${_speciesEmoji(s)} ${s.name[0].toUpperCase()}${s.name.substring(1)}',
-                      species == s,
-                      () => setModalState(() => species = s))),
-                ],
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    final name = nameCtrl.text.trim();
-                    if (name.isEmpty) {
-                      ScaffoldMessenger.of(ctx).showSnackBar(
-                        const SnackBar(
-                            content: Text('Please enter a group name'),
-                            backgroundColor: RumenoTheme.errorRed),
-                      );
-                      return;
-                    }
-                    final group = AnimalGroup(
-                      id: 'GRP_${DateTime.now().millisecondsSinceEpoch}',
-                      name: name,
-                      species: species,
-                      animalIds: [],
-                      farmerId: 'F001',
-                      createdAt: DateTime.now(),
-                    );
-                    provider.addGroup(group);
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Row(children: [
-                          const Icon(Icons.check_circle_rounded,
-                              color: Colors.white),
-                          const SizedBox(width: 8),
-                          Text('Group "$name" created!'),
-                        ]),
-                        backgroundColor: RumenoTheme.successGreen,
+        builder: (ctx, setModalState) {
+          // Filter animals by selected species, exclude deceased
+          final availableAnimals = species != null
+              ? mockAnimals
+                  .where((a) =>
+                      a.species == species &&
+                      a.status != AnimalStatus.deceased)
+                  .toList()
+              : mockAnimals
+                  .where((a) => a.status != AnimalStatus.deceased)
+                  .toList();
+
+          return Container(
+            height: MediaQuery.of(ctx).size.height * 0.85,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              children: [
+                // ── Header ──
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(2)),
+                        ),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.add_circle_outline),
-                  label: const Text('Create Group',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: RumenoTheme.primaryGreen,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
+                      const SizedBox(height: 16),
+                      const Row(
+                        children: [
+                          Text('📂', style: TextStyle(fontSize: 26)),
+                          SizedBox(width: 10),
+                          Text('Create New Group',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      // ── Group Name ──
+                      TextField(
+                        controller: nameCtrl,
+                        decoration: InputDecoration(
+                          hintText: 'Group name (e.g., "Dairy Cows")',
+                          filled: true,
+                          fillColor: RumenoTheme.backgroundCream,
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                  color: RumenoTheme.textLight)),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                  color: RumenoTheme.textLight)),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                  color: RumenoTheme.primaryGreen, width: 2)),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 14),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // ── Category Selection ──
+                      const Text('Category (optional)',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: RumenoTheme.textDark)),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _speciesChoiceChip(
+                              null, '🐾 Mixed', species == null, () {
+                            setModalState(() {
+                              species = null;
+                              selectedAnimalIds.clear();
+                            });
+                          }),
+                          ...Species.values.map((s) => _speciesChoiceChip(
+                              s,
+                              '${_speciesEmoji(s)} ${s.name[0].toUpperCase()}${s.name.substring(1)}',
+                              species == s, () {
+                            setModalState(() {
+                              species = s;
+                              // Remove animals that don't match new species
+                              selectedAnimalIds.removeWhere((id) {
+                                final animal = mockAnimals
+                                    .where((a) => a.id == id)
+                                    .firstOrNull;
+                                return animal == null ||
+                                    animal.species != s;
+                              });
+                            });
+                          })),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // ── Animals Selection Header ──
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '🐾  Select Animals (${selectedAnimalIds.length})',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: RumenoTheme.textDark),
+                          ),
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () => setModalState(() {
+                                  selectedAnimalIds.addAll(
+                                      availableAnimals.map((a) => a.id));
+                                }),
+                                child: const Text('Select All',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: RumenoTheme.primaryGreen,
+                                        fontWeight: FontWeight.w600)),
+                              ),
+                              const SizedBox(width: 12),
+                              GestureDetector(
+                                onTap: () => setModalState(
+                                    () => selectedAnimalIds.clear()),
+                                child: const Text('Deselect All',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: RumenoTheme.textGrey,
+                                        fontWeight: FontWeight.w600)),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
+                const Divider(height: 1),
+                // ── Animal List ──
+                Expanded(
+                  child: availableAnimals.isEmpty
+                      ? const Center(
+                          child: Text('No animals available',
+                              style: TextStyle(color: RumenoTheme.textGrey)),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: availableAnimals.length,
+                          itemBuilder: (_, i) {
+                            final animal = availableAnimals[i];
+                            final isSelected =
+                                selectedAnimalIds.contains(animal.id);
+                            return CheckboxListTile(
+                              value: isSelected,
+                              onChanged: (val) {
+                                setModalState(() {
+                                  if (val == true) {
+                                    selectedAnimalIds.add(animal.id);
+                                  } else {
+                                    selectedAnimalIds.remove(animal.id);
+                                  }
+                                });
+                              },
+                              secondary: Text(
+                                _speciesEmoji(animal.species),
+                                style: const TextStyle(fontSize: 22),
+                              ),
+                              title: Text(animal.tagId,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600)),
+                              subtitle: Text(
+                                  '${animal.breed} · ${animal.weightKg} kg · ${animal.statusLabel}'),
+                              activeColor: RumenoTheme.primaryGreen,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                            );
+                          },
+                        ),
+                ),
+                // ── Create Button ──
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        final name = nameCtrl.text.trim();
+                        if (name.isEmpty) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            const SnackBar(
+                                content: Text('Please enter a group name'),
+                                backgroundColor: RumenoTheme.errorRed),
+                          );
+                          return;
+                        }
+                        final group = AnimalGroup(
+                          id: 'GRP_${DateTime.now().millisecondsSinceEpoch}',
+                          name: name,
+                          species: species,
+                          animalIds: selectedAnimalIds.toList(),
+                          farmerId: 'F001',
+                          createdAt: DateTime.now(),
+                        );
+                        provider.addGroup(group);
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(children: [
+                              const Icon(Icons.check_circle_rounded,
+                                  color: Colors.white),
+                              const SizedBox(width: 8),
+                              Text('Group "$name" created with ${selectedAnimalIds.length} animals!'),
+                            ]),
+                            backgroundColor: RumenoTheme.successGreen,
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.add_circle_outline),
+                      label: Text(
+                          selectedAnimalIds.isEmpty
+                              ? 'Create Group'
+                              : 'Create Group (${selectedAnimalIds.length} animals)',
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: RumenoTheme.primaryGreen,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
