@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../config/theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../models/models.dart';
+import '../../../providers/group_provider.dart';
 import '../../../widgets/common/marketplace_button.dart';
 
 class DataExportScreen extends StatefulWidget {
@@ -24,6 +26,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
   // ─── Farm Data Export ───
   final Set<String> _selectedCategories = {};
   bool _includeMedicalHistory = true;
+  String? _selectedGroupId;
 
   // Category-specific filters
   final Set<Species> _speciesFilter = {};
@@ -244,6 +247,12 @@ class _DataExportScreenState extends State<DataExportScreen> {
       _buildDateRangePicker(),
       const SizedBox(height: 24),
 
+      // ── Group Filter ──
+      _buildSectionTitle('📂', 'Group'),
+      const SizedBox(height: 8),
+      _buildGroupFilter(),
+      const SizedBox(height: 24),
+
       // ── Select Data Categories ──
       _buildCategoryHeader(),
       const SizedBox(height: 10),
@@ -373,6 +382,75 @@ class _DataExportScreenState extends State<DataExportScreen> {
                   color: RumenoTheme.primaryGreen, size: 22),
           ],
         ),
+      ),
+    );
+  }
+
+  // ─── Group Filter ───
+  Widget _buildGroupFilter() {
+    final groupProvider = context.watch<GroupProvider>();
+    final groups = groupProvider.groups;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: _selectedGroupId != null
+            ? RumenoTheme.primaryGreen.withValues(alpha: 0.08)
+            : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: _selectedGroupId != null
+              ? RumenoTheme.primaryGreen
+              : Colors.grey.shade300,
+          width: _selectedGroupId != null ? 2 : 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String?>(
+                value: _selectedGroupId,
+                hint: const Text(
+                  '📂 Filter by Group',
+                  style: TextStyle(fontSize: 14, color: RumenoTheme.textGrey),
+                ),
+                isExpanded: true,
+                icon: const Icon(Icons.arrow_drop_down,
+                    color: RumenoTheme.textGrey),
+                items: [
+                  const DropdownMenuItem<String?>(
+                    value: null,
+                    child: Text('All Animals',
+                        style: TextStyle(fontSize: 14)),
+                  ),
+                  ...groups.map((g) => DropdownMenuItem<String?>(
+                        value: g.id,
+                        child: Text(
+                          '${g.name} (${g.animalIds.length})',
+                          style: const TextStyle(fontSize: 14),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      )),
+                ],
+                onChanged: (val) => setState(() => _selectedGroupId = val),
+              ),
+            ),
+          ),
+          if (_selectedGroupId != null)
+            GestureDetector(
+              onTap: () => setState(() => _selectedGroupId = null),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: RumenoTheme.errorRed.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.close,
+                    size: 18, color: RumenoTheme.errorRed),
+              ),
+            ),
+        ],
       ),
     );
   }
