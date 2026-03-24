@@ -2568,24 +2568,37 @@ class _AnimalFeedCalculatorScreenState
             GestureDetector(
               onTap: () {
                 context.read<EcommerceProvider>().addToCart(product);
-                ScaffoldMessenger.of(context).showSnackBar(
+                final messenger = ScaffoldMessenger.of(context);
+                messenger.hideCurrentSnackBar();
+                messenger.showSnackBar(
                   SnackBar(
-                    content: Row(
-                      children: [
-                        const Text('🛒', style: TextStyle(fontSize: 18)),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text('${product.name} added to cart!'),
-                        ),
-                      ],
+                    content: GestureDetector(
+                      onTap: () {
+                        messenger.hideCurrentSnackBar();
+                        context.push('/shop/cart');
+                      },
+                      child: Row(
+                        children: [
+                          const Text('🛒', style: TextStyle(fontSize: 18)),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text('${product.name} added to cart!'),
+                          ),
+                          const Text(
+                            'View Cart →',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                    duration: const Duration(seconds: 3),
                     behavior: SnackBarBehavior.floating,
                     backgroundColor: RumenoTheme.primaryGreen,
-                    action: SnackBarAction(
-                      label: 'View Cart',
-                      textColor: Colors.white,
-                      onPressed: () => context.push('/shop/cart'),
-                    ),
+                    showCloseIcon: true,
+                    closeIconColor: Colors.white,
                   ),
                 );
               },
