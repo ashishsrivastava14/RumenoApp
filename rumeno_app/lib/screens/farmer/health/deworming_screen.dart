@@ -69,6 +69,13 @@ class _DewormingScreenState extends State<DewormingScreen>
     // dateMode: 'today' | 'past' | 'future'
     String dateMode = 'today';
 
+    // Group-based state
+    final groupProvider = context.read<GroupProvider>();
+    String applyMode = 'single'; // 'single' or 'group'
+    String? selectedGroupIdInDialog;
+    Set<String> selectedAnimalIdsInGroup = {};
+    bool applyToEntireGroup = true;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -114,6 +121,190 @@ class _DewormingScreenState extends State<DewormingScreen>
                   ],
                 ),
                 const SizedBox(height: 20),
+                // ── Single / Group Mode Toggle ──
+                const Text('Apply To',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setModalState(() {
+                          applyMode = 'single';
+                          selectedGroupIdInDialog = null;
+                          selectedAnimalIdsInGroup.clear();
+                        }),
+                        child: _toggleTile('🐄', 'Single Animal',
+                            applyMode == 'single',
+                            RumenoTheme.accentOlive),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setModalState(() {
+                          applyMode = 'group';
+                          selectedAnimal = null;
+                        }),
+                        child: _toggleTile('👥', 'Group',
+                            applyMode == 'group',
+                            RumenoTheme.infoBlue),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // ── Group-based selection ──
+                if (applyMode == 'group') ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: selectedGroupIdInDialog != null
+                            ? RumenoTheme.accentOlive
+                            : RumenoTheme.textLight,
+                      ),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String?>(
+                        value: selectedGroupIdInDialog,
+                        hint: const Text('📂 Select Group'),
+                        isExpanded: true,
+                        items: groupProvider.groups
+                            .map((g) => DropdownMenuItem<String?>(
+                                  value: g.id,
+                                  child: Text(
+                                    '${g.name} (${g.animalIds.length} animals)',
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          setModalState(() {
+                            selectedGroupIdInDialog = val;
+                            applyToEntireGroup = true;
+                            if (val != null) {
+                              final group = groupProvider.getGroupById(val);
+                              selectedAnimalIdsInGroup =
+                                  Set<String>.from(group?.animalIds ?? []);
+                            } else {
+                              selectedAnimalIdsInGroup.clear();
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  if (selectedGroupIdInDialog != null) ...[
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setModalState(() {
+                              applyToEntireGroup = true;
+                              final group = groupProvider
+                                  .getGroupById(selectedGroupIdInDialog!);
+                              selectedAnimalIdsInGroup =
+                                  Set<String>.from(group?.animalIds ?? []);
+                            }),
+                            child: _toggleTile('✅', 'Entire Group',
+                                applyToEntireGroup,
+                                RumenoTheme.successGreen),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setModalState(
+                                () => applyToEntireGroup = false),
+                            child: _toggleTile('☑️', 'Select Animals',
+                                !applyToEntireGroup,
+                                RumenoTheme.warningYellow),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Builder(builder: (bCtx) {
+                      final groupAnimals = groupProvider
+                          .getAnimalsInGroup(selectedGroupIdInDialog!);
+                      return Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: groupAnimals.map((a) {
+                          final isSelected =
+                              selectedAnimalIdsInGroup.contains(a.id);
+                          return GestureDetector(
+                            onTap: applyToEntireGroup
+                                ? null
+                                : () => setModalState(() {
+                                      if (isSelected) {
+                                        selectedAnimalIdsInGroup.remove(a.id);
+                                      } else {
+                                        selectedAnimalIdsInGroup.add(a.id);
+                                      }
+                                    }),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? RumenoTheme.accentOlive.withValues(alpha: 0.15)
+                                    : Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? RumenoTheme.accentOlive
+                                      : RumenoTheme.textLight,
+                                  width: isSelected ? 1.5 : 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (isSelected)
+                                    const Icon(Icons.check_circle,
+                                        size: 14, color: RumenoTheme.accentOlive),
+                                  if (isSelected) const SizedBox(width: 4),
+                                  Text(
+                                    '${_animalEmoji(a.species)} ${a.tagId}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                      color: isSelected
+                                          ? RumenoTheme.accentOlive
+                                          : RumenoTheme.textDark,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    }),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${selectedAnimalIdsInGroup.length} animal(s) selected',
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: RumenoTheme.accentOlive,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                ],
+                // ── Single animal picker (only in single mode) ──
+                if (applyMode == 'single') ...[
                 _stepHeader('1', 'Select Animal'),
                 const SizedBox(height: 8),
                 GestureDetector(
@@ -285,8 +476,9 @@ class _DewormingScreenState extends State<DewormingScreen>
                     ),
                   ),
                 ),
+                ],
                 const SizedBox(height: 14),
-                _stepHeader('2', 'Add Medicine Name'),
+                _stepHeader(applyMode == 'single' ? '2' : '1', 'Add Medicine Name'),
                 const SizedBox(height: 8),
                 _dialogField(
                   medicineBrandCtrl,
@@ -357,7 +549,7 @@ class _DewormingScreenState extends State<DewormingScreen>
                   ),
                 ],
                 const SizedBox(height: 14),
-                _stepHeader('3', 'Dose and Body Weight'),
+                _stepHeader(applyMode == 'single' ? '3' : '2', 'Dose and Body Weight'),
                 const SizedBox(height: 8),
                 _dialogField(
                   doseCtrl,
@@ -385,7 +577,7 @@ class _DewormingScreenState extends State<DewormingScreen>
                   TextInputType.text,
                 ),
                 const SizedBox(height: 16),
-                _stepHeader('4', 'Deworming Date'),
+                _stepHeader(applyMode == 'single' ? '4' : '3', 'Deworming Date'),
                 const SizedBox(height: 8),
                 const Text(
                   'Choose when medicine is / will be given',
@@ -483,10 +675,19 @@ class _DewormingScreenState extends State<DewormingScreen>
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      if (selectedAnimal == null) {
+                      if (applyMode == 'single' && selectedAnimal == null) {
                         ScaffoldMessenger.of(ctx).showSnackBar(
                           const SnackBar(
                             content: Text('Please select an animal'),
+                            backgroundColor: RumenoTheme.errorRed,
+                          ),
+                        );
+                        return;
+                      }
+                      if (applyMode == 'group' && selectedAnimalIdsInGroup.isEmpty) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please select a group and animals'),
                             backgroundColor: RumenoTheme.errorRed,
                           ),
                         );
@@ -506,7 +707,7 @@ class _DewormingScreenState extends State<DewormingScreen>
                       final bodyWeight = double.tryParse(
                         bodyWeightCtrl.text.trim(),
                       );
-                      if (bodyWeight == null || bodyWeight <= 0) {
+                      if (applyMode == 'single' && (bodyWeight == null || bodyWeight <= 0)) {
                         ScaffoldMessenger.of(ctx).showSnackBar(
                           const SnackBar(
                             content: Text(
@@ -517,8 +718,6 @@ class _DewormingScreenState extends State<DewormingScreen>
                         );
                         return;
                       }
-
-                      final animal = selectedAnimal!;
 
                       final now = DateTime.now();
                       final actualDate = dateMode == 'today' ? now : selDate;
@@ -534,50 +733,89 @@ class _DewormingScreenState extends State<DewormingScreen>
                           })
                           .join(', ');
 
-                      final record = DewormingRecord(
-                        id: 'DW_${now.millisecondsSinceEpoch}',
-                        animalId: animal.id,
-                        medicineName: medSummary,
-                        dose: doseCtrl.text.trim().isEmpty
-                            ? null
-                            : doseCtrl.text.trim(),
-                        dueDate: actualDate,
-                        dateAdministered: isDone ? actualDate : null,
-                        nextDueDate: isDone
-                            ? actualDate.add(const Duration(days: 90))
-                            : null,
-                        vetName: vetNameCtrl.text.trim().isEmpty
-                            ? null
-                            : vetNameCtrl.text.trim(),
-                        status: isDone
-                            ? DewormingStatus.done
-                            : DewormingStatus.due,
-                      );
-                      _updateAnimalWeight(animal.id, bodyWeight);
-                      Navigator.pop(ctx);
-                      setState(() => _records.add(record));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Row(
-                            children: [
-                              const Icon(
-                                Icons.check_circle,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Deworming saved. Weight updated to ${bodyWeight.toStringAsFixed(1)} kg',
-                              ),
-                            ],
+                      if (applyMode == 'group') {
+                        final records = <DewormingRecord>[];
+                        for (final animalId in selectedAnimalIdsInGroup) {
+                          records.add(DewormingRecord(
+                            id: 'DW_${now.millisecondsSinceEpoch}_$animalId',
+                            animalId: animalId,
+                            medicineName: medSummary,
+                            dose: doseCtrl.text.trim().isEmpty
+                                ? null
+                                : doseCtrl.text.trim(),
+                            dueDate: actualDate,
+                            dateAdministered: isDone ? actualDate : null,
+                            nextDueDate: isDone
+                                ? actualDate.add(const Duration(days: 90))
+                                : null,
+                            vetName: vetNameCtrl.text.trim().isEmpty
+                                ? null
+                                : vetNameCtrl.text.trim(),
+                            status: isDone
+                                ? DewormingStatus.done
+                                : DewormingStatus.due,
+                          ));
+                        }
+                        Navigator.pop(ctx);
+                        setState(() => _records.addAll(records));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                const Icon(Icons.check_circle, color: Colors.white),
+                                const SizedBox(width: 8),
+                                Text('Deworming added for ${records.length} animals! 🪱'),
+                              ],
+                            ),
+                            backgroundColor: RumenoTheme.successGreen,
                           ),
-                          backgroundColor: RumenoTheme.successGreen,
-                        ),
-                      );
+                        );
+                      } else {
+                        final animal = selectedAnimal!;
+                        final record = DewormingRecord(
+                          id: 'DW_${now.millisecondsSinceEpoch}',
+                          animalId: animal.id,
+                          medicineName: medSummary,
+                          dose: doseCtrl.text.trim().isEmpty
+                              ? null
+                              : doseCtrl.text.trim(),
+                          dueDate: actualDate,
+                          dateAdministered: isDone ? actualDate : null,
+                          nextDueDate: isDone
+                              ? actualDate.add(const Duration(days: 90))
+                              : null,
+                          vetName: vetNameCtrl.text.trim().isEmpty
+                              ? null
+                              : vetNameCtrl.text.trim(),
+                          status: isDone
+                              ? DewormingStatus.done
+                              : DewormingStatus.due,
+                        );
+                        _updateAnimalWeight(animal.id, bodyWeight!);
+                        Navigator.pop(ctx);
+                        setState(() => _records.add(record));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                const Icon(Icons.check_circle, color: Colors.white),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Deworming saved. Weight updated to ${bodyWeight.toStringAsFixed(1)} kg',
+                                ),
+                              ],
+                            ),
+                            backgroundColor: RumenoTheme.successGreen,
+                          ),
+                        );
+                      }
                     },
                     icon: const Icon(Icons.save),
-                    label: const Text(
-                      'Save Record',
-                      style: TextStyle(
+                    label: Text(
+                      applyMode == 'group'
+                          ? 'Save for ${selectedAnimalIdsInGroup.length} animals'
+                          : 'Save Record',
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),

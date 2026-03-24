@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../config/theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../mock/mock_health.dart';
 import '../../../models/models.dart';
+import '../../../providers/group_provider.dart';
 import '../../../widgets/cards/vaccination_card.dart';
 import '../../../widgets/cards/health_record_card.dart';
 import '../../../widgets/common/marketplace_button.dart';
@@ -313,6 +315,12 @@ class HealthDashboardScreen extends StatelessWidget {
     DateTime? cuttingDate;
     DateTime? nextScheduleDate;
 
+    // ── Group mode state ──
+    String applyMode = 'single';
+    String? selectedGroupIdInDialog;
+    List<String> selectedAnimalIdsInGroup = [];
+    bool applyToEntireGroup = true;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -369,7 +377,152 @@ class HealthDashboardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // ─── Select Animal ───
+                // ─── Apply To toggle ───
+                Builder(builder: (_) {
+                  final groupProvider = Provider.of<GroupProvider>(context, listen: false);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Apply To',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                              color: RumenoTheme.textDark)),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _toggleTile(
+                              icon: Icons.pets,
+                              label: 'Single Animal',
+                              selected: applyMode == 'single',
+                              onTap: () => setModalState(() {
+                                applyMode = 'single';
+                                selectedGroupIdInDialog = null;
+                                selectedAnimalIdsInGroup = [];
+                              }),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _toggleTile(
+                              icon: Icons.groups,
+                              label: 'Group',
+                              selected: applyMode == 'group',
+                              onTap: () => setModalState(() {
+                                applyMode = 'group';
+                                selectedAnimal = null;
+                              }),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (applyMode == 'group') ...[
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<String>(
+                          value: selectedGroupIdInDialog,
+                          decoration: InputDecoration(
+                            labelText: 'Select Group',
+                            filled: true,
+                            fillColor: RumenoTheme.backgroundCream,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 14),
+                          ),
+                          items: groupProvider.groups
+                              .map((g) => DropdownMenuItem(
+                                  value: g.id,
+                                  child: Text('${g.name} (${g.animalIds.length})')))
+                              .toList(),
+                          onChanged: (val) {
+                            if (val == null) return;
+                            setModalState(() {
+                              selectedGroupIdInDialog = val;
+                              final group = groupProvider.getGroupById(val);
+                              if (group != null) {
+                                selectedAnimalIdsInGroup =
+                                    List.from(group.animalIds);
+                                applyToEntireGroup = true;
+                              }
+                            });
+                          },
+                        ),
+                        if (selectedGroupIdInDialog != null) ...[
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _toggleTile(
+                                  icon: Icons.select_all,
+                                  label: 'Entire Group',
+                                  selected: applyToEntireGroup,
+                                  onTap: () => setModalState(() {
+                                    applyToEntireGroup = true;
+                                    final group = groupProvider
+                                        .getGroupById(selectedGroupIdInDialog!);
+                                    if (group != null) {
+                                      selectedAnimalIdsInGroup =
+                                          List.from(group.animalIds);
+                                    }
+                                  }),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _toggleTile(
+                                  icon: Icons.checklist,
+                                  label: 'Select Animals',
+                                  selected: !applyToEntireGroup,
+                                  onTap: () => setModalState(
+                                      () => applyToEntireGroup = false),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (!applyToEntireGroup) ...[
+                            const SizedBox(height: 10),
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 6,
+                              children: groupProvider
+                                  .getAnimalsInGroup(selectedGroupIdInDialog!)
+                                  .map((a) {
+                                final selected =
+                                    selectedAnimalIdsInGroup.contains(a.id);
+                                return FilterChip(
+                                  label: Text(
+                                      '${_animalEmoji(a.species)} ${a.tagId}'),
+                                  selected: selected,
+                                  selectedColor:
+                                      RumenoTheme.warmBrown.withOpacity(0.2),
+                                  checkmarkColor: RumenoTheme.warmBrown,
+                                  onSelected: (sel) => setModalState(() {
+                                    if (sel) {
+                                      selectedAnimalIdsInGroup.add(a.id);
+                                    } else {
+                                      selectedAnimalIdsInGroup.remove(a.id);
+                                    }
+                                  }),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                          const SizedBox(height: 4),
+                          Text(
+                            '${selectedAnimalIdsInGroup.length} animal(s) selected',
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.grey.shade600),
+                          ),
+                        ],
+                      ],
+                      const SizedBox(height: 16),
+                    ],
+                  );
+                }),
+
+                // ─── Select Animal (single mode only) ───
+                if (applyMode == 'single') ...[
                 _hoofLabel('🐾', 'Select Animal'),
                 const SizedBox(height: 8),
                 GestureDetector(
@@ -525,6 +678,7 @@ class HealthDashboardScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
+                ],
 
                 // ─── Date (when it was done) ───
                 _hoofLabel('📅', 'When was it done?'),
@@ -651,10 +805,18 @@ class HealthDashboardScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      if (selectedAnimal == null) {
+                      if (applyMode == 'single' && selectedAnimal == null) {
                         ScaffoldMessenger.of(ctx).showSnackBar(
                           const SnackBar(
                               content: Text('Please select an animal'),
+                              backgroundColor: RumenoTheme.errorRed),
+                        );
+                        return;
+                      }
+                      if (applyMode == 'group' && selectedAnimalIdsInGroup.isEmpty) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                              content: Text('Please select a group and animals'),
                               backgroundColor: RumenoTheme.errorRed),
                         );
                         return;
@@ -669,19 +831,27 @@ class HealthDashboardScreen extends StatelessWidget {
                         return;
                       }
                       Navigator.pop(ctx);
+                      final count = applyMode == 'group'
+                          ? selectedAnimalIdsInGroup.length
+                          : 1;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
+                        SnackBar(
                           content: Row(children: [
-                            Icon(Icons.check_circle, color: Colors.white),
-                            SizedBox(width: 8),
-                            Text('Hoof cutting record saved! ✅'),
+                            const Icon(Icons.check_circle, color: Colors.white),
+                            const SizedBox(width: 8),
+                            Text(applyMode == 'group'
+                                ? 'Hoof cutting saved for $count animals! \u2705'
+                                : 'Hoof cutting record saved! \u2705'),
                           ]),
                           backgroundColor: RumenoTheme.successGreen,
                         ),
                       );
                     },
                     icon: const Text('✅', style: TextStyle(fontSize: 20)),
-                    label: Text(AppLocalizations.of(ctx).commonSaveRecord,
+                    label: Text(
+                        applyMode == 'group'
+                            ? 'Save for ${selectedAnimalIdsInGroup.length} animals'
+                            : AppLocalizations.of(ctx).commonSaveRecord,
                         style: const TextStyle(
                             fontSize: 17, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
@@ -696,6 +866,47 @@ class HealthDashboardScreen extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _toggleTile({
+    required IconData icon,
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: selected
+              ? RumenoTheme.warmBrown.withOpacity(0.10)
+              : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected ? RumenoTheme.warmBrown : Colors.grey.shade300,
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon,
+                size: 20,
+                color: selected ? RumenoTheme.warmBrown : Colors.grey),
+            const SizedBox(width: 6),
+            Text(label,
+                style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: selected
+                        ? RumenoTheme.warmBrown
+                        : Colors.grey.shade600)),
+          ],
         ),
       ),
     );

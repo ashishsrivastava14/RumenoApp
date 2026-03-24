@@ -65,6 +65,13 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     final otherSymptomsCtrl = TextEditingController();
     final selectedSymptoms = <String>{};
 
+    // Group-based state
+    final groupProvider = context.read<GroupProvider>();
+    String applyMode = 'single'; // 'single' or 'group'
+    String? selectedGroupIdInDialog;
+    Set<String> selectedAnimalIdsInGroup = {};
+    bool applyToEntireGroup = true;
+
     const symptomItems = [
       {'e': '🌡️', 's': 'Fever'},
       {'e': '💧', 's': 'Diarrhea'},
@@ -116,6 +123,190 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
+                // ── Single / Group Mode Toggle ──
+                const Text('Apply To',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: RumenoTheme.textDark)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setModalState(() {
+                          applyMode = 'single';
+                          selectedGroupIdInDialog = null;
+                          selectedAnimalIdsInGroup.clear();
+                        }),
+                        child: _toggleTile('🐄', 'Single Animal',
+                            applyMode == 'single',
+                            RumenoTheme.errorRed),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setModalState(() {
+                          applyMode = 'group';
+                          selectedAnimal = null;
+                        }),
+                        child: _toggleTile('👥', 'Group',
+                            applyMode == 'group',
+                            RumenoTheme.infoBlue),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // ── Group-based selection ──
+                if (applyMode == 'group') ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: RumenoTheme.backgroundCream,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: selectedGroupIdInDialog != null
+                            ? RumenoTheme.errorRed
+                            : RumenoTheme.textLight,
+                      ),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String?>(
+                        value: selectedGroupIdInDialog,
+                        hint: const Text('📂 Select Group'),
+                        isExpanded: true,
+                        items: groupProvider.groups
+                            .map((g) => DropdownMenuItem<String?>(
+                                  value: g.id,
+                                  child: Text(
+                                    '${g.name} (${g.animalIds.length} animals)',
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          setModalState(() {
+                            selectedGroupIdInDialog = val;
+                            applyToEntireGroup = true;
+                            if (val != null) {
+                              final group = groupProvider.getGroupById(val);
+                              selectedAnimalIdsInGroup =
+                                  Set<String>.from(group?.animalIds ?? []);
+                            } else {
+                              selectedAnimalIdsInGroup.clear();
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  if (selectedGroupIdInDialog != null) ...[
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setModalState(() {
+                              applyToEntireGroup = true;
+                              final group = groupProvider
+                                  .getGroupById(selectedGroupIdInDialog!);
+                              selectedAnimalIdsInGroup =
+                                  Set<String>.from(group?.animalIds ?? []);
+                            }),
+                            child: _toggleTile('✅', 'Entire Group',
+                                applyToEntireGroup,
+                                RumenoTheme.successGreen),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setModalState(
+                                () => applyToEntireGroup = false),
+                            child: _toggleTile('☑️', 'Select Animals',
+                                !applyToEntireGroup,
+                                RumenoTheme.warningYellow),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Builder(builder: (bCtx) {
+                      final groupAnimals = groupProvider
+                          .getAnimalsInGroup(selectedGroupIdInDialog!);
+                      return Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: groupAnimals.map((a) {
+                          final isSelected =
+                              selectedAnimalIdsInGroup.contains(a.id);
+                          return GestureDetector(
+                            onTap: applyToEntireGroup
+                                ? null
+                                : () => setModalState(() {
+                                      if (isSelected) {
+                                        selectedAnimalIdsInGroup.remove(a.id);
+                                      } else {
+                                        selectedAnimalIdsInGroup.add(a.id);
+                                      }
+                                    }),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? RumenoTheme.errorRed.withValues(alpha: 0.15)
+                                    : Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? RumenoTheme.errorRed
+                                      : RumenoTheme.textLight,
+                                  width: isSelected ? 1.5 : 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (isSelected)
+                                    const Icon(Icons.check_circle,
+                                        size: 14, color: RumenoTheme.errorRed),
+                                  if (isSelected) const SizedBox(width: 4),
+                                  Text(
+                                    '${_animalEmoji(a.species)} ${a.tagId}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                      color: isSelected
+                                          ? RumenoTheme.errorRed
+                                          : RumenoTheme.textDark,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    }),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${selectedAnimalIdsInGroup.length} animal(s) selected',
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: RumenoTheme.errorRed,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                ],
+                // ── Single animal picker (only in single mode) ──
+                if (applyMode == 'single')
                 GestureDetector(
                   onTap: () async {
                     final searchCtrl = TextEditingController();
@@ -388,10 +579,18 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      if (selectedAnimal == null) {
+                      if (applyMode == 'single' && selectedAnimal == null) {
                         ScaffoldMessenger.of(ctx).showSnackBar(
                           const SnackBar(
                               content: Text('Please select an animal'),
+                              backgroundColor: RumenoTheme.errorRed),
+                        );
+                        return;
+                      }
+                      if (applyMode == 'group' && selectedAnimalIdsInGroup.isEmpty) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                              content: Text('Please select a group and animals'),
                               backgroundColor: RumenoTheme.errorRed),
                         );
                         return;
@@ -406,42 +605,81 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                       }
                       final withdrawal =
                           int.tryParse(withdrawalCtrl.text.trim());
-                      final record = TreatmentRecord(
-                        id: 'TR_${DateTime.now().millisecondsSinceEpoch}',
-                        animalId: selectedAnimal!.tagId,
-                        symptoms: () {
-                          final extra = otherSymptomsCtrl.text.trim();
-                          final all = <String>{...selectedSymptoms};
-                          if (extra.isNotEmpty) all.add(extra);
-                          return all.isEmpty ? ['General illness'] : all.toList();
-                        }(),
-                        diagnosis: diagnosisCtrl.text.trim(),
-                        treatment: treatmentCtrl.text.trim().isEmpty
-                            ? 'Treatment pending'
-                            : treatmentCtrl.text.trim(),
-                        startDate: DateTime.now(),
-                        vetName: vetCtrl.text.trim().isEmpty
-                            ? 'Pending vet assignment'
-                            : vetCtrl.text.trim(),
-                        status: TreatmentStatus.active,
-                        withdrawalDays: withdrawal,
-                      );
-                      Navigator.pop(ctx);
-                      setState(() => _treatments.insert(0, record));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Row(children: [
-                            Icon(Icons.check_circle, color: Colors.white),
-                            SizedBox(width: 8),
-                            Text('Treatment record added!'),
-                          ]),
-                          backgroundColor: RumenoTheme.successGreen,
-                        ),
-                      );
+                      final symptoms = () {
+                        final extra = otherSymptomsCtrl.text.trim();
+                        final all = <String>{...selectedSymptoms};
+                        if (extra.isNotEmpty) all.add(extra);
+                        return all.isEmpty ? ['General illness'] : all.toList();
+                      }();
+
+                      if (applyMode == 'group') {
+                        final records = <TreatmentRecord>[];
+                        for (final animalId in selectedAnimalIdsInGroup) {
+                          final animal = mockAnimals.where((a) => a.id == animalId).firstOrNull;
+                          records.add(TreatmentRecord(
+                            id: 'TR_${DateTime.now().millisecondsSinceEpoch}_$animalId',
+                            animalId: animal?.tagId ?? animalId,
+                            symptoms: symptoms,
+                            diagnosis: diagnosisCtrl.text.trim(),
+                            treatment: treatmentCtrl.text.trim().isEmpty
+                                ? 'Treatment pending'
+                                : treatmentCtrl.text.trim(),
+                            startDate: DateTime.now(),
+                            vetName: vetCtrl.text.trim().isEmpty
+                                ? 'Pending vet assignment'
+                                : vetCtrl.text.trim(),
+                            status: TreatmentStatus.active,
+                            withdrawalDays: withdrawal,
+                          ));
+                        }
+                        Navigator.pop(ctx);
+                        setState(() => _treatments.insertAll(0, records));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(children: [
+                              const Icon(Icons.check_circle, color: Colors.white),
+                              const SizedBox(width: 8),
+                              Text('Treatment added for ${records.length} animals! 🩺'),
+                            ]),
+                            backgroundColor: RumenoTheme.successGreen,
+                          ),
+                        );
+                      } else {
+                        final record = TreatmentRecord(
+                          id: 'TR_${DateTime.now().millisecondsSinceEpoch}',
+                          animalId: selectedAnimal!.tagId,
+                          symptoms: symptoms,
+                          diagnosis: diagnosisCtrl.text.trim(),
+                          treatment: treatmentCtrl.text.trim().isEmpty
+                              ? 'Treatment pending'
+                              : treatmentCtrl.text.trim(),
+                          startDate: DateTime.now(),
+                          vetName: vetCtrl.text.trim().isEmpty
+                              ? 'Pending vet assignment'
+                              : vetCtrl.text.trim(),
+                          status: TreatmentStatus.active,
+                          withdrawalDays: withdrawal,
+                        );
+                        Navigator.pop(ctx);
+                        setState(() => _treatments.insert(0, record));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Row(children: [
+                              Icon(Icons.check_circle, color: Colors.white),
+                              SizedBox(width: 8),
+                              Text('Treatment record added!'),
+                            ]),
+                            backgroundColor: RumenoTheme.successGreen,
+                          ),
+                        );
+                      }
                     },
                     icon: const Icon(Icons.save),
-                    label: const Text('Save Treatment',
-                        style: TextStyle(
+                    label: Text(
+                        applyMode == 'group'
+                            ? 'Save for ${selectedAnimalIdsInGroup.length} animals'
+                            : 'Save Treatment',
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: RumenoTheme.errorRed,
@@ -469,6 +707,39 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       case Species.pig: return '🐷';
       default: return '🐾';
     }
+  }
+
+  Widget _toggleTile(
+      String emoji, String label, bool selected, Color color) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+      decoration: BoxDecoration(
+        color: selected
+            ? color.withValues(alpha: 0.12)
+            : RumenoTheme.backgroundCream,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+            color: selected ? color : RumenoTheme.textLight,
+            width: selected ? 2 : 1),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(label,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                  color: selected ? color : RumenoTheme.textGrey,
+                ),
+                overflow: TextOverflow.ellipsis),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _dialogField(
