@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../../config/theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_finance.dart';
@@ -364,6 +365,7 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
   final _transportGoodsNameController = TextEditingController();
   final _vendorController = TextEditingController();
   final _notesController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -521,6 +523,72 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
       _medicineGstController.clear();
     });
     return true;
+  }
+
+  Widget _buildDatePicker() {
+    final now = DateTime.now();
+    final isToday = _selectedDate.year == now.year &&
+        _selectedDate.month == now.month &&
+        _selectedDate.day == now.day;
+    final formatted = DateFormat('dd MMM yyyy').format(_selectedDate);
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.blue.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.blue.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.calendar_today_rounded, color: Colors.blue, size: 22),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Date',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.blue.shade700,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  isToday ? 'Today — $formatted' : formatted,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: _selectedDate,
+                firstDate: DateTime(2020),
+                lastDate: DateTime.now(),
+                helpText: 'Select expense date',
+              );
+              if (picked != null) {
+                setState(() => _selectedDate = picked);
+              }
+            },
+            child: Text(
+              isToday ? 'Change' : 'Change',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   String _categoryLabel(ExpenseCategory c) {
@@ -752,7 +820,8 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
           'How much did you pay?',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 14),
+        _buildDatePicker(),
         // Big amount display
         Container(
           width: double.infinity,
@@ -846,7 +915,8 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
           'Add feed bill',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 10),
+        _buildDatePicker(),
         Text(
           'Fill 4 boxes from bill',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -1120,7 +1190,8 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
           'Add medicine expense',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 10),
+        _buildDatePicker(),
         Text(
           'Choose easy way to fill',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -1435,7 +1506,8 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
           'Add equipment expense',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 10),
+        _buildDatePicker(),
         Text(
           'Choose easy way to fill',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -1743,7 +1815,8 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
           'Add labour expense',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 10),
+        _buildDatePicker(),
         Text(
           'Select labour type',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -1866,7 +1939,8 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
           'Add transport expense',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 10),
+        _buildDatePicker(),
         Text(
           'Fill trip details',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -2270,6 +2344,21 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
               Row(
                 children: [
                   const Icon(
+                    Icons.calendar_today_rounded,
+                    size: 20,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Date: ${DateFormat('dd MMM yyyy').format(_selectedDate)}',
+                    style: TextStyle(fontSize: 14, color: RumenoTheme.textGrey),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(
                     Icons.payment_rounded,
                     size: 20,
                     color: Colors.grey,
@@ -2503,7 +2592,7 @@ class _AddExpenseWizardState extends State<_AddExpenseWizard> {
                     id: 'EXP_${DateTime.now().millisecondsSinceEpoch}',
                     category: _category ?? ExpenseCategory.other,
                     amount: double.tryParse(_amount) ?? 0,
-                    date: DateTime.now(),
+                    date: _selectedDate,
                     vendorName: _vendorController.text.trim().isEmpty
                         ? null
                         : _vendorController.text.trim(),
