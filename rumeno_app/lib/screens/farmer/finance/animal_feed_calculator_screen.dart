@@ -22,6 +22,10 @@ class _AnimalType {
   final double targetProtein;
   final double targetFiber;
   final double targetEnergy;
+  final double targetCarbohydrate;
+  final double targetFat;
+  final double targetMoisture;
+  final double targetAsh;
   final String tip;
 
   const _AnimalType({
@@ -38,6 +42,10 @@ class _AnimalType {
     required this.targetProtein,
     required this.targetFiber,
     required this.targetEnergy,
+    required this.targetCarbohydrate,
+    required this.targetFat,
+    required this.targetMoisture,
+    required this.targetAsh,
     required this.tip,
   });
 }
@@ -57,6 +65,10 @@ const _animalTypes = [
     targetProtein: 16,
     targetFiber: 18,
     targetEnergy: 65,
+    targetCarbohydrate: 55,
+    targetFat: 3.5,
+    targetMoisture: 15,
+    targetAsh: 8,
     tip:
         'Give 1 kg extra concentrate for every 2.5 litres of milk above 5 litres.',
   ),
@@ -74,6 +86,10 @@ const _animalTypes = [
     targetProtein: 14,
     targetFiber: 20,
     targetEnergy: 60,
+    targetCarbohydrate: 50,
+    targetFat: 4.0,
+    targetMoisture: 15,
+    targetAsh: 8,
     tip: 'Buffalo needs more green fodder for fat-rich milk production.',
   ),
   _AnimalType(
@@ -90,6 +106,10 @@ const _animalTypes = [
     targetProtein: 14,
     targetFiber: 22,
     targetEnergy: 55,
+    targetCarbohydrate: 50,
+    targetFat: 3.0,
+    targetMoisture: 15,
+    targetAsh: 8,
     tip: 'Goats prefer browsing – add leaves & shrubs when possible.',
   ),
   _AnimalType(
@@ -106,6 +126,10 @@ const _animalTypes = [
     targetProtein: 12,
     targetFiber: 24,
     targetEnergy: 52,
+    targetCarbohydrate: 50,
+    targetFat: 3.0,
+    targetMoisture: 15,
+    targetAsh: 8,
     tip: 'Sheep do well on good quality hay and pasture grazing.',
   ),
   _AnimalType(
@@ -122,6 +146,10 @@ const _animalTypes = [
     targetProtein: 10,
     targetFiber: 28,
     targetEnergy: 55,
+    targetCarbohydrate: 55,
+    targetFat: 3.0,
+    targetMoisture: 15,
+    targetAsh: 7,
     tip:
         'Horses need high-fiber diet. Feed little and often \u2013 at least 3 times a day.',
   ),
@@ -139,6 +167,10 @@ const _animalTypes = [
     targetProtein: 16,
     targetFiber: 8,
     targetEnergy: 72,
+    targetCarbohydrate: 60,
+    targetFat: 5.0,
+    targetMoisture: 12,
+    targetAsh: 6,
     tip:
         'Pigs grow well on grain-based concentrate with kitchen waste supplement.',
   ),
@@ -153,6 +185,10 @@ class _FeedItem {
   final double protein;
   final double fiber;
   final double energy;
+  final double carbohydrate;
+  final double fat;
+  final double moisture;
+  final double ash;
 
   const _FeedItem({
     required this.id,
@@ -163,6 +199,10 @@ class _FeedItem {
     required this.protein,
     required this.fiber,
     required this.energy,
+    required this.carbohydrate,
+    required this.fat,
+    required this.moisture,
+    required this.ash,
   });
 }
 
@@ -219,6 +259,10 @@ class _AnimalFeedCalculatorScreenState
       TextEditingController();
   final TextEditingController _customFiberController = TextEditingController();
   final TextEditingController _customEnergyController = TextEditingController();
+  final TextEditingController _customCarbController = TextEditingController();
+  final TextEditingController _customFatController = TextEditingController();
+  final TextEditingController _customMoistureController = TextEditingController();
+  final TextEditingController _customAshController = TextEditingController();
 
   List<_FeedItem> _feedLibrary = const [
     _FeedItem(
@@ -230,6 +274,10 @@ class _AnimalFeedCalculatorScreenState
       protein: 8.5,
       fiber: 2.2,
       energy: 80,
+      carbohydrate: 72,
+      fat: 4.0,
+      moisture: 12,
+      ash: 1.5,
     ),
     _FeedItem(
       id: 'soybean_meal',
@@ -240,6 +288,10 @@ class _AnimalFeedCalculatorScreenState
       protein: 44,
       fiber: 7,
       energy: 70,
+      carbohydrate: 30,
+      fat: 1.5,
+      moisture: 11,
+      ash: 6.5,
     ),
     _FeedItem(
       id: 'wheat_bran',
@@ -250,6 +302,10 @@ class _AnimalFeedCalculatorScreenState
       protein: 16,
       fiber: 11,
       energy: 60,
+      carbohydrate: 55,
+      fat: 4.5,
+      moisture: 12,
+      ash: 6.0,
     ),
     _FeedItem(
       id: 'cottonseed_cake',
@@ -260,6 +316,10 @@ class _AnimalFeedCalculatorScreenState
       protein: 24,
       fiber: 16,
       energy: 58,
+      carbohydrate: 30,
+      fat: 5.0,
+      moisture: 10,
+      ash: 6.5,
     ),
     _FeedItem(
       id: 'green_fodder',
@@ -270,6 +330,10 @@ class _AnimalFeedCalculatorScreenState
       protein: 10,
       fiber: 28,
       energy: 48,
+      carbohydrate: 40,
+      fat: 2.5,
+      moisture: 75,
+      ash: 10,
     ),
     _FeedItem(
       id: 'dry_hay',
@@ -280,6 +344,10 @@ class _AnimalFeedCalculatorScreenState
       protein: 6,
       fiber: 35,
       energy: 40,
+      carbohydrate: 45,
+      fat: 1.5,
+      moisture: 12,
+      ash: 8.0,
     ),
     _FeedItem(
       id: 'mustard_cake',
@@ -290,6 +358,10 @@ class _AnimalFeedCalculatorScreenState
       protein: 34,
       fiber: 12,
       energy: 62,
+      carbohydrate: 30,
+      fat: 8.0,
+      moisture: 10,
+      ash: 9.0,
     ),
     _FeedItem(
       id: 'mineral_mix',
@@ -300,6 +372,10 @@ class _AnimalFeedCalculatorScreenState
       protein: 0,
       fiber: 0,
       energy: 5,
+      carbohydrate: 0,
+      fat: 0,
+      moisture: 2,
+      ash: 95,
     ),
   ];
 
@@ -317,6 +393,10 @@ class _AnimalFeedCalculatorScreenState
     _customProteinController.dispose();
     _customFiberController.dispose();
     _customEnergyController.dispose();
+    _customCarbController.dispose();
+    _customFatController.dispose();
+    _customMoistureController.dispose();
+    _customAshController.dispose();
     super.dispose();
   }
 
@@ -393,6 +473,10 @@ class _AnimalFeedCalculatorScreenState
     _customProteinController.clear();
     _customFiberController.clear();
     _customEnergyController.clear();
+    _customCarbController.clear();
+    _customFatController.clear();
+    _customMoistureController.clear();
+    _customAshController.clear();
 
     showModalBottomSheet(
       context: context,
@@ -479,6 +563,58 @@ class _AnimalFeedCalculatorScreenState
                   prefixIcon: Icon(Icons.bolt_rounded),
                 ),
               ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _customCarbController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Carb %',
+                        prefixIcon: Icon(Icons.grain_rounded),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _customFatController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Fat %',
+                        prefixIcon: Icon(Icons.water_drop_rounded),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _customMoistureController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Moisture %',
+                        prefixIcon: Icon(Icons.opacity_rounded),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _customAshController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Ash %',
+                        prefixIcon: Icon(Icons.local_fire_department_rounded),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
@@ -490,6 +626,10 @@ class _AnimalFeedCalculatorScreenState
                     final protein = _toDouble(_customProteinController.text);
                     final fiber = _toDouble(_customFiberController.text);
                     final energy = _toDouble(_customEnergyController.text);
+                    final carbohydrate = _toDouble(_customCarbController.text);
+                    final fat = _toDouble(_customFatController.text);
+                    final moisture = _toDouble(_customMoistureController.text);
+                    final ash = _toDouble(_customAshController.text);
 
                     if (name.isEmpty || price <= 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -516,6 +656,10 @@ class _AnimalFeedCalculatorScreenState
                           protein: protein,
                           fiber: fiber,
                           energy: energy,
+                          carbohydrate: carbohydrate,
+                          fat: fat,
+                          moisture: moisture,
+                          ash: ash,
                         ),
                       ];
                     });
@@ -618,6 +762,10 @@ class _AnimalFeedCalculatorScreenState
     final protein = _weightedAverage((i) => i.protein);
     final fiber = _weightedAverage((i) => i.fiber);
     final energy = _weightedAverage((i) => i.energy);
+    final carbohydrate = _weightedAverage((i) => i.carbohydrate);
+    final fat = _weightedAverage((i) => i.fat);
+    final moisture = _weightedAverage((i) => i.moisture);
+    final ash = _weightedAverage((i) => i.ash);
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
@@ -698,7 +846,7 @@ class _AnimalFeedCalculatorScreenState
 
             // ── Summary ──
             if (_selectedItems.isNotEmpty) ...[
-              _summaryCard(protein, fiber, energy),
+              _summaryCard(protein, fiber, energy, carbohydrate, fat, moisture, ash),
               const SizedBox(height: 16),
             ],
 
@@ -1531,7 +1679,8 @@ class _AnimalFeedCalculatorScreenState
 
   // ── Summary Card ──
 
-  Widget _summaryCard(double protein, double fiber, double energy) {
+  Widget _summaryCard(double protein, double fiber, double energy,
+      double carbohydrate, double fat, double moisture, double ash) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1601,6 +1750,38 @@ class _AnimalFeedCalculatorScreenState
             maxVal: 100,
             color: const Color(0xFFFFA000),
             target: _selectedAnimal.targetEnergy,
+          ),
+          const SizedBox(height: 10),
+          _nutrientBar(
+            label: '🍞 Carbohydrate',
+            value: carbohydrate,
+            maxVal: 100,
+            color: const Color(0xFF8D6E63),
+            target: _selectedAnimal.targetCarbohydrate,
+          ),
+          const SizedBox(height: 10),
+          _nutrientBar(
+            label: '🧈 Fat',
+            value: fat,
+            maxVal: 20,
+            color: const Color(0xFFFF7043),
+            target: _selectedAnimal.targetFat,
+          ),
+          const SizedBox(height: 10),
+          _nutrientBar(
+            label: '💧 Moisture',
+            value: moisture,
+            maxVal: 100,
+            color: const Color(0xFF42A5F5),
+            target: _selectedAnimal.targetMoisture,
+          ),
+          const SizedBox(height: 10),
+          _nutrientBar(
+            label: '\ud83e\uddea Ash',
+            value: ash,
+            maxVal: 100,
+            color: const Color(0xFF78909C),
+            target: _selectedAnimal.targetAsh,
           ),
         ],
       ),
