@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import '../../../config/theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../models/models.dart';
+import '../../../providers/group_provider.dart';
 import '../../../widgets/common/marketplace_button.dart';
 
 class AddAnimalScreen extends StatefulWidget {
@@ -48,6 +50,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
   // Step 4
   final _shedController = TextEditingController(text: 'A1');
   AnimalPurpose _purpose = AnimalPurpose.dairy;
+  List<String> _selectedGroupIds = [];
 
   // Step 5 – Purchase (all optional)
   DateTime? _purchaseDate;
@@ -1786,9 +1789,316 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
           );
         }),
         const SizedBox(height: 24),
+        _sectionLabel('📂  Groups (Optional)'),
+        const SizedBox(height: 8),
+        _buildGroupMultiSelect(),
+        const SizedBox(height: 24),
         _buildSummaryCard(),
         const SizedBox(height: 16),
       ],
+    );
+  }
+
+  Widget _buildGroupMultiSelect() {
+    final groupProvider = context.watch<GroupProvider>();
+    final groups = groupProvider.groups;
+
+    if (groups.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: RumenoTheme.textLight),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.info_outline, color: RumenoTheme.textGrey, size: 20),
+            const SizedBox(width: 10),
+            Text('No groups available. Create groups first.',
+                style: TextStyle(color: RumenoTheme.textGrey, fontSize: 14)),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Tap-to-open multi-select box
+        GestureDetector(
+          onTap: () => _showGroupPickerDialog(groupProvider),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: _selectedGroupIds.isNotEmpty
+                    ? RumenoTheme.primaryGreen
+                    : RumenoTheme.textLight,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.folder_outlined,
+                    color: _selectedGroupIds.isNotEmpty
+                        ? RumenoTheme.primaryGreen
+                        : RumenoTheme.textGrey,
+                    size: 22),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    _selectedGroupIds.isEmpty
+                        ? 'Tap to select groups…'
+                        : '${_selectedGroupIds.length} group${_selectedGroupIds.length > 1 ? 's' : ''} selected',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: _selectedGroupIds.isEmpty
+                          ? RumenoTheme.textGrey
+                          : RumenoTheme.textDark,
+                      fontWeight: _selectedGroupIds.isNotEmpty
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                    ),
+                  ),
+                ),
+                Icon(Icons.arrow_drop_down,
+                    color: RumenoTheme.textGrey, size: 26),
+              ],
+            ),
+          ),
+        ),
+        // Selected groups chips
+        if (_selectedGroupIds.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _selectedGroupIds.map((gId) {
+              final group = groupProvider.getGroupById(gId);
+              if (group == null) return const SizedBox.shrink();
+              return Chip(
+                label: Text(
+                  '${group.name} (${group.animalIds.length})',
+                  style: const TextStyle(fontSize: 13, color: Colors.white),
+                ),
+                backgroundColor: RumenoTheme.primaryGreen,
+                deleteIconColor: Colors.white70,
+                onDeleted: () {
+                  setState(() => _selectedGroupIds.remove(gId));
+                },
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+              );
+            }).toList(),
+          ),
+        ],
+      ],
+    );
+  }
+
+  void _showGroupPickerDialog(GroupProvider groupProvider) {
+    final groups = groupProvider.groups;
+    // work on a local copy so cancel discards changes
+    final tempSelected = List<String>.from(_selectedGroupIds);
+    String searchQuery = '';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            final filtered = searchQuery.isEmpty
+                ? groups
+                : groups
+                    .where((g) => g.name
+                        .toLowerCase()
+                        .contains(searchQuery.toLowerCase()))
+                    .toList();
+
+            return Container(
+              height: MediaQuery.of(ctx).size.height * 0.65,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
+                  // Handle bar
+                  Container(
+                    margin: const EdgeInsets.only(top: 10, bottom: 4),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: RumenoTheme.textLight,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  // Header
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.folder_outlined,
+                            color: RumenoTheme.primaryGreen),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text('Select Groups',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if (tempSelected.length == groups.length) {
+                              setModalState(() => tempSelected.clear());
+                            } else {
+                              setModalState(() {
+                                tempSelected.clear();
+                                tempSelected
+                                    .addAll(groups.map((g) => g.id));
+                              });
+                            }
+                          },
+                          child: Text(
+                            tempSelected.length == groups.length
+                                ? 'Deselect All'
+                                : 'Select All',
+                            style: const TextStyle(
+                                color: RumenoTheme.primaryGreen,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Search bar
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: TextField(
+                      onChanged: (v) => setModalState(() => searchQuery = v),
+                      decoration: InputDecoration(
+                        hintText: 'Search groups…',
+                        prefixIcon: const Icon(Icons.search, size: 20),
+                        filled: true,
+                        fillColor: RumenoTheme.backgroundCream,
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 12),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  // Count
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '${tempSelected.length} selected  •  ${filtered.length} groups',
+                        style: TextStyle(
+                            fontSize: 12, color: RumenoTheme.textGrey),
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 16),
+                  // List
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filtered.length,
+                      itemBuilder: (_, i) {
+                        final group = filtered[i];
+                        final isSel = tempSelected.contains(group.id);
+                        return CheckboxListTile(
+                          value: isSel,
+                          activeColor: RumenoTheme.primaryGreen,
+                          controlAffinity: ListTileControlAffinity.leading,
+                          title: Text(group.name,
+                              style: const TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.w500)),
+                          subtitle: Text(
+                            '${group.animalIds.length} animals${group.species != null ? '  •  ${group.species!.name[0].toUpperCase()}${group.species!.name.substring(1)}' : '  •  Mixed'}',
+                            style: TextStyle(
+                                fontSize: 12, color: RumenoTheme.textGrey),
+                          ),
+                          onChanged: (_) {
+                            setModalState(() {
+                              if (isSel) {
+                                tempSelected.remove(group.id);
+                              } else {
+                                tempSelected.add(group.id);
+                              }
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  // Bottom buttons
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              style: OutlinedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                side: const BorderSide(
+                                    color: RumenoTheme.textLight),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: const Text('Cancel'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 2,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedGroupIds = List.from(tempSelected);
+                                });
+                                Navigator.pop(ctx);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                backgroundColor: RumenoTheme.primaryGreen,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: Text(
+                                tempSelected.isEmpty
+                                    ? 'Done'
+                                    : 'Done (${tempSelected.length})',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -1862,6 +2172,33 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
               _sumItem('🏠', _shedController.text),
             ],
           ),
+          if (_selectedGroupIds.isNotEmpty) ...[
+            const Divider(color: Colors.white30, height: 22),
+            Row(
+              children: [
+                const Text('📂', style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Builder(builder: (_) {
+                    final gp = context.read<GroupProvider>();
+                    final names = _selectedGroupIds
+                        .map((id) => gp.getGroupById(id)?.name)
+                        .whereType<String>()
+                        .join(', ');
+                    return Text(
+                      names,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
