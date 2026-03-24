@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../config/theme.dart';
 import '../../../mock/mock_animals.dart';
@@ -39,7 +38,6 @@ class GroupDetailScreen extends StatelessWidget {
     }
 
     final animals = provider.getAnimalsInGroup(groupId);
-    final alerts = provider.getAlertsForGroup(groupId);
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
@@ -56,7 +54,7 @@ class GroupDetailScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
         children: [
           // ── Group Info Header ──
-          _buildInfoHeader(group, animals.length, alerts.length),
+          _buildInfoHeader(group, animals.length),
           const SizedBox(height: 20),
 
           // ── Animals Section ──
@@ -79,27 +77,12 @@ class GroupDetailScreen extends StatelessWidget {
                   .map((a) => _animalChip(context, a, provider, group))
                   .toList(),
             ),
-
-          const SizedBox(height: 24),
-
-          // ── Alerts Section ──
-          _sectionHeader(
-            context,
-            '🔔  Alerts (${alerts.length})',
-            actionLabel: 'Add',
-            onAction: () => _showAddAlertSheet(context, provider, group),
-          ),
-          const SizedBox(height: 8),
-          if (alerts.isEmpty)
-            _emptyCard('🔔', 'No alerts set', 'Tap "Add" to create a reminder')
-          else
-            ...alerts.map((a) => _alertCard(context, a, provider)),
         ],
       ),
     );
   }
 
-  Widget _buildInfoHeader(AnimalGroup group, int animalCount, int alertCount) {
+  Widget _buildInfoHeader(AnimalGroup group, int animalCount) {
     final speciesLabel = group.species != null
         ? '${_speciesEmoji(group.species!)} ${group.species!.name[0].toUpperCase()}${group.species!.name.substring(1)}'
         : '🐾 Mixed Species';
@@ -144,15 +127,8 @@ class GroupDetailScreen extends StatelessWidget {
                     style:
                         const TextStyle(fontSize: 13, color: RumenoTheme.textGrey)),
                 const SizedBox(height: 6),
-                Row(
-                  children: [
-                    _statBadge(Icons.pets, '$animalCount animals',
-                        RumenoTheme.primaryGreen),
-                    const SizedBox(width: 12),
-                    _statBadge(Icons.notifications_active, '$alertCount alerts',
-                        RumenoTheme.warningYellow),
-                  ],
-                ),
+                _statBadge(Icons.pets, '$animalCount animals',
+                    RumenoTheme.primaryGreen),
               ],
             ),
           ),
@@ -236,77 +212,6 @@ class GroupDetailScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(
             color: RumenoTheme.primaryGreen.withValues(alpha: 0.3)),
-      ),
-    );
-  }
-
-  Widget _alertCard(
-      BuildContext context, GroupAlert alert, GroupProvider provider) {
-    final isOverdue =
-        !alert.isDone && alert.dueDate.isBefore(DateTime.now());
-    final color = alert.isDone
-        ? RumenoTheme.successGreen
-        : isOverdue
-            ? RumenoTheme.errorRed
-            : RumenoTheme.warningYellow;
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        leading: Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Center(
-            child: Text(alert.typeEmoji, style: const TextStyle(fontSize: 20)),
-          ),
-        ),
-        title: Text(alert.title,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-              decoration: alert.isDone ? TextDecoration.lineThrough : null,
-            )),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (alert.description != null)
-              Text(alert.description!,
-                  style:
-                      const TextStyle(fontSize: 12, color: RumenoTheme.textGrey)),
-            Text(
-              DateFormat('dd MMM yyyy').format(alert.dueDate),
-              style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: color),
-            ),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: Icon(
-                alert.isDone
-                    ? Icons.check_circle_rounded
-                    : Icons.radio_button_unchecked,
-                color: color,
-              ),
-              onPressed: () => provider.toggleAlertDone(alert.id),
-            ),
-            IconButton(
-              icon:
-                  const Icon(Icons.delete_outline, color: RumenoTheme.errorRed),
-              onPressed: () => provider.deleteAlert(alert.id),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -495,253 +400,6 @@ class GroupDetailScreen extends StatelessWidget {
         },
       ),
     );
-  }
-
-  // ── Add Alert Sheet ─────────────────────────────
-
-  void _showAddAlertSheet(
-      BuildContext context, GroupProvider provider, AnimalGroup group) {
-    final titleCtrl = TextEditingController();
-    final descCtrl = TextEditingController();
-    GroupAlertType selectedType = GroupAlertType.vaccination;
-    DateTime dueDate = DateTime.now().add(const Duration(days: 7));
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModalState) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: EdgeInsets.fromLTRB(
-              20, 12, 20, MediaQuery.of(ctx).viewInsets.bottom + 20),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(2)),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Row(
-                  children: [
-                    Text('🔔', style: TextStyle(fontSize: 26)),
-                    SizedBox(width: 10),
-                    Text('Add Group Alert',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                // Alert type
-                const Text('Alert Type',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: RumenoTheme.textDark)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: GroupAlertType.values.map((t) {
-                    final isSelected = selectedType == t;
-                    final label =
-                        '${_alertTypeEmoji(t)} ${t.name[0].toUpperCase()}${t.name.substring(1)}';
-                    return GestureDetector(
-                      onTap: () =>
-                          setModalState(() => selectedType = t),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? RumenoTheme.primaryGreen
-                                  .withValues(alpha: 0.15)
-                              : RumenoTheme.backgroundCream,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: isSelected
-                                ? RumenoTheme.primaryGreen
-                                : RumenoTheme.textLight,
-                            width: isSelected ? 2 : 1,
-                          ),
-                        ),
-                        child: Text(label,
-                            style: TextStyle(
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: isSelected
-                                  ? RumenoTheme.primaryGreen
-                                  : RumenoTheme.textDark,
-                              fontSize: 13,
-                            )),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-                // Title
-                TextField(
-                  controller: titleCtrl,
-                  decoration: InputDecoration(
-                    hintText: 'Alert title',
-                    filled: true,
-                    fillColor: RumenoTheme.backgroundCream,
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                            color: RumenoTheme.textLight)),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                            color: RumenoTheme.primaryGreen, width: 2)),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 14),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                // Description
-                TextField(
-                  controller: descCtrl,
-                  maxLines: 2,
-                  decoration: InputDecoration(
-                    hintText: 'Description (optional)',
-                    filled: true,
-                    fillColor: RumenoTheme.backgroundCream,
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                            color: RumenoTheme.textLight)),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                            color: RumenoTheme.primaryGreen, width: 2)),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 14),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Due date
-                GestureDetector(
-                  onTap: () async {
-                    final d = await showDatePicker(
-                      context: ctx,
-                      initialDate: dueDate,
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2030),
-                    );
-                    if (d != null) setModalState(() => dueDate = d);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 14),
-                    decoration: BoxDecoration(
-                      color: RumenoTheme.backgroundCream,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: RumenoTheme.textLight),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.calendar_today,
-                            size: 18, color: RumenoTheme.primaryGreen),
-                        const SizedBox(width: 10),
-                        Text(
-                          DateFormat('dd MMM yyyy').format(dueDate),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 14),
-                        ),
-                        const Spacer(),
-                        const Text('Tap to change',
-                            style: TextStyle(
-                                fontSize: 12, color: RumenoTheme.textGrey)),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // Save
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      final title = titleCtrl.text.trim();
-                      if (title.isEmpty) {
-                        ScaffoldMessenger.of(ctx).showSnackBar(
-                          const SnackBar(
-                              content: Text('Please enter a title'),
-                              backgroundColor: RumenoTheme.errorRed),
-                        );
-                        return;
-                      }
-                      final alert = GroupAlert(
-                        id: 'GA_${DateTime.now().millisecondsSinceEpoch}',
-                        groupId: group.id,
-                        title: title,
-                        description: descCtrl.text.trim().isEmpty
-                            ? null
-                            : descCtrl.text.trim(),
-                        type: selectedType,
-                        dueDate: dueDate,
-                      );
-                      provider.addAlert(alert);
-                      Navigator.pop(ctx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Alert "$title" added!'),
-                          backgroundColor: RumenoTheme.successGreen,
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.notifications_active),
-                    label: const Text('Add Alert',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: RumenoTheme.primaryGreen,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _alertTypeEmoji(GroupAlertType t) {
-    switch (t) {
-      case GroupAlertType.vaccination:
-        return '💉';
-      case GroupAlertType.checkup:
-        return '🩺';
-      case GroupAlertType.deworming:
-        return '💊';
-      case GroupAlertType.breeding:
-        return '🐣';
-      case GroupAlertType.general:
-        return '📋';
-    }
   }
 
   void _showInfoTooltip(BuildContext ctx) {
