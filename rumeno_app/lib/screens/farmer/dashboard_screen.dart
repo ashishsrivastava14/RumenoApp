@@ -8,6 +8,7 @@ import '../../config/theme.dart';
 import '../../mock/mock_health.dart';
 import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
+import 'animals/animal_qr_scanner_screen.dart';
 import '../../widgets/common/marketplace_button.dart';
 import '../../l10n/app_localizations.dart';
 // VeterinarianButton is defined in marketplace_button.dart
@@ -1020,6 +1021,8 @@ class _QuickActionsSection extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 12),
+          _ScanAnimalButton(),
         ],
       ),
     );
@@ -1090,6 +1093,85 @@ class _QuickBtn extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+//  SCAN ANIMAL BUTTON  (full-width QR scanner CTA)
+// ─────────────────────────────────────────────────────────────
+
+class _ScanAnimalButton extends StatelessWidget {
+  const _ScanAnimalButton();
+
+  void _openScanner(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => AnimalQrScannerScreen(
+          onAnimalFound: (animal) => context.go('/farmer/animals/${animal.id}'),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _openScanner(context),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1A3A0D), Color(0xFF4A7A1E)],
+          ),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF1A3A0D).withValues(alpha: 0.35),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 26),
+            ),
+            const SizedBox(width: 14),
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Scan Animal QR',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  'Scan a tag to open animal details',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white54, size: 16),
+          ],
         ),
       ),
     );
