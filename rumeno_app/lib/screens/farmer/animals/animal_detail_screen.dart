@@ -1042,21 +1042,6 @@ class _AdgSectionState extends State<_AdgSection> {
     return 'great';
   }
 
-  // Quick-preset weights for "Record Weight" — illiterate-friendly tap targets
-  List<double> get _quickWeights {
-    final current = widget.animal.weightKg;
-    // Generate presets around current weight
-    final step = current > 100 ? 5.0 : 1.0;
-    return [
-      current - step * 2,
-      current - step,
-      current,
-      current + step,
-      current + step * 2,
-      current + step * 3,
-    ].where((w) => w > 0).toList();
-  }
-
   void _showRecordWeightSheet() {
     double? selectedWeight;
     int? selectedBCS;
@@ -1125,39 +1110,9 @@ class _AdgSectionState extends State<_AdgSection> {
                 ),
                 const SizedBox(height: 22),
 
-                // Quick weight presets — big tappable tiles
+                // Weight input
                 const Text('⚖️  How much?', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                 const SizedBox(height: 10),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: _quickWeights.map((w) {
-                    final sel = selectedWeight == w;
-                    return GestureDetector(
-                      onTap: () => setModalState(() {
-                        selectedWeight = w;
-                        weightCtrl.text = w.toStringAsFixed(w == w.roundToDouble() ? 0 : 1);
-                      }),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                        decoration: BoxDecoration(
-                          color: sel ? RumenoTheme.primaryGreen.withValues(alpha: 0.12) : RumenoTheme.backgroundCream,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textLight, width: sel ? 2.5 : 1),
-                        ),
-                        child: Row(mainAxisSize: MainAxisSize.min, children: [
-                          const Text('⚖️', style: TextStyle(fontSize: 20)),
-                          const SizedBox(width: 8),
-                          Text('${w.toStringAsFixed(w == w.roundToDouble() ? 0 : 1)} kg', style: TextStyle(fontSize: 17, fontWeight: sel ? FontWeight.bold : FontWeight.w500, color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textDark)),
-                        ]),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 14),
-
-                // Custom weight input
                 TextField(
                   controller: weightCtrl,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -1165,7 +1120,7 @@ class _AdgSectionState extends State<_AdgSection> {
                   decoration: InputDecoration(
                     suffixText: 'kg',
                     suffixStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RumenoTheme.primaryGreen),
-                    hintText: 'Or type weight',
+                    hintText: 'Enter weight',
                     hintStyle: TextStyle(fontSize: 16, color: Colors.grey.shade400),
                     filled: true,
                     fillColor: RumenoTheme.backgroundCream,
