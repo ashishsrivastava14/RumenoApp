@@ -2,9 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme.dart';
+import '../../../mock/mock_ecommerce.dart';
+import '../../../models/models.dart';
+import '../../../providers/ecommerce_provider.dart';
 
 // ── Data Models ──
 
@@ -2170,6 +2174,9 @@ class _AnimalFeedCalculatorScreenState
             'Based on Feedipedia nutrient data & local cost factors',
             style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
           ),
+          const SizedBox(height: 16),
+          // ── Rumeno Product Recommendations ──
+          _buildRumenoProductRecommendations(),
         ],
       ),
     );
@@ -2188,6 +2195,440 @@ class _AnimalFeedCalculatorScreenState
           style: const TextStyle(fontSize: 11, color: Color(0xFF999999)),
         ),
       ],
+    );
+  }
+
+  // ── Rumeno Product Recommendations ──
+
+  Widget _buildRumenoProductRecommendations() {
+    final feedProducts = mockProducts
+        .where((p) =>
+            p.isRumenoOwned &&
+            (p.category == ProductCategory.animalFeed ||
+                p.category == ProductCategory.supplements))
+        .toList();
+
+    if (feedProducts.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFF8E1), Color(0xFFFFF3CD)],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFFFD54F)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Text('🛒', style: TextStyle(fontSize: 20)),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Recommended Rumeno Products',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF5D4037),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Boost your feed mix with these quality products',
+            style: TextStyle(fontSize: 12, color: Color(0xFF8D6E63)),
+          ),
+          const SizedBox(height: 12),
+          ...feedProducts.map((product) => _buildRumenoProductTile(product)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRumenoProductTile(Product product) {
+    return GestureDetector(
+      onTap: () => context.push('/shop/product/${product.id}'),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Product image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                product.imageUrl,
+                width: 56,
+                height: 56,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8F5E9),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Center(
+                    child: Text('📦', style: TextStyle(fontSize: 28)),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            // Product info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          product.name,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF2D2D2D),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      // Info icon for benefits
+                      GestureDetector(
+                        onTap: () => _showBenefitsDialog(product),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2196F3).withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.info_outline_rounded,
+                            size: 16,
+                            color: Color(0xFF2196F3),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    product.unit,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF999999),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        '₹${product.price.toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF2E7D32),
+                        ),
+                      ),
+                      if (product.mrp != null) ...[
+                        const SizedBox(width: 6),
+                        Text(
+                          '₹${product.mrp!.toStringAsFixed(0)}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF999999),
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE53935).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '${product.discountPercent.toStringAsFixed(0)}% OFF',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFE53935),
+                            ),
+                          ),
+                        ),
+                      ],
+                      const Spacer(),
+                      // Star rating
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 14,
+                            color: Color(0xFFFFA000),
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            product.rating.toStringAsFixed(1),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF5D4037),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Cart button
+            GestureDetector(
+              onTap: () {
+                context.read<EcommerceProvider>().addToCart(product);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Text('🛒', style: TextStyle(fontSize: 18)),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text('${product.name} added to cart!'),
+                        ),
+                      ],
+                    ),
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: RumenoTheme.primaryGreen,
+                    action: SnackBarAction(
+                      label: 'View Cart',
+                      textColor: Colors.white,
+                      onPressed: () => context.push('/shop/cart'),
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: RumenoTheme.primaryGreen,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.add_shopping_cart_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showBenefitsDialog(Product product) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Product image
+              ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Image.asset(
+                  product.imageUrl,
+                  height: 120,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Center(
+                      child: Text('📦', style: TextStyle(fontSize: 48)),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                product.name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Rumeno Verified ✓',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF2E7D32),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                product.description,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF555555),
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              // Tags
+              if (product.tags.isNotEmpty)
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  alignment: WrapAlignment.center,
+                  children: product.tags
+                      .map(
+                        (tag) => Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE3F2FD),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            tag,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF1565C0),
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              const SizedBox(height: 14),
+              // Price row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '₹${product.price.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF2E7D32),
+                    ),
+                  ),
+                  if (product.mrp != null) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      '₹${product.mrp!.toStringAsFixed(0)}',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Color(0xFF999999),
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(width: 8),
+                  // Rating
+                  const Icon(Icons.star_rounded,
+                      size: 18, color: Color(0xFFFFA000)),
+                  Text(
+                    ' ${product.rating}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  Text(
+                    ' (${product.reviewCount})',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF999999),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              // Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Close'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                        context.push('/shop/product/${product.id}');
+                      },
+                      icon: const Icon(Icons.shopping_bag_rounded, size: 18),
+                      label: const Text('View Product'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: RumenoTheme.primaryGreen,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
