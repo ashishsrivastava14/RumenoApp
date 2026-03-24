@@ -957,11 +957,19 @@ class _OverviewTabState extends State<_OverviewTab> {
           ),
         ],
         const SizedBox(height: 16),
-        BarChartWidget(
+        LineChartWidget(
           title: 'Kidding Performance',
-          values: const [1, 2, 1, 2, 1],
-          labels: const ['2022', '2023', '2024', '2025', '2026'],
-          barColor: RumenoTheme.warningYellow,
+          spots: const [
+            FlSpot(0, 1),
+            FlSpot(1, 2),
+            FlSpot(2, 1),
+            FlSpot(3, 2),
+            FlSpot(4, 1),
+          ],
+          bottomLabels: const ['2022', '2023', '2024', '2025', '2026'],
+          lineColor: RumenoTheme.warningYellow,
+          minY: 0,
+          maxY: 3,
         ),
       ],
     );
