@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../../config/theme.dart';
 import '../../../mock/mock_animals.dart';
 import '../../../mock/mock_health.dart';
@@ -946,6 +947,8 @@ class _OverviewTabState extends State<_OverviewTab> {
         _InfoRow('Shed', animal.shedNumber ?? '-'),
         _InfoRow('Purpose', animal.purpose.name.toUpperCase()),
         const SizedBox(height: 20),
+        _AnimalQrCard(animal: animal),
+        const SizedBox(height: 20),
         _AdgSection(animal: animal),
         if (animal.purpose == AnimalPurpose.dairy || animal.purpose == AnimalPurpose.mixed) ...[
           const SizedBox(height: 16),
@@ -972,6 +975,175 @@ class _OverviewTabState extends State<_OverviewTab> {
           maxY: 3,
         ),
       ],
+    );
+  }
+}
+
+// ── Animal QR Code Card ───────────────────────────────────────────────────
+
+class _AnimalQrCard extends StatelessWidget {
+  final Animal animal;
+  const _AnimalQrCard({required this.animal});
+
+  /// QR data encodes the tagId so the scanner can look up the animal.
+  String get _qrData => animal.tagId;
+
+  void _showFullScreen(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                animal.tagId,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '${animal.speciesName} · ${animal.breed}',
+                style: const TextStyle(fontSize: 13, color: RumenoTheme.textGrey),
+              ),
+              const SizedBox(height: 20),
+              QrImageView(
+                data: _qrData,
+                version: QrVersions.auto,
+                size: 240,
+                eyeStyle: const QrEyeStyle(
+                  eyeShape: QrEyeShape.square,
+                  color: Color(0xFF1A3A0D),
+                ),
+                dataModuleStyle: const QrDataModuleStyle(
+                  dataModuleShape: QrDataModuleShape.square,
+                  color: Color(0xFF1A3A0D),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: RumenoTheme.primaryGreen.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: RumenoTheme.primaryGreen.withValues(alpha: 0.3)),
+                ),
+                child: Text(
+                  _qrData,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontFamily: 'monospace',
+                    fontWeight: FontWeight.bold,
+                    color: RumenoTheme.primaryGreen,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Scan with Rumeno app to open animal details',
+                style: TextStyle(fontSize: 11, color: RumenoTheme.textGrey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showFullScreen(context),
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // QR thumbnail
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: RumenoTheme.primaryGreen.withValues(alpha: 0.25),
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(11),
+                child: QrImageView(
+                  data: _qrData,
+                  version: QrVersions.auto,
+                  size: 80,
+                  eyeStyle: const QrEyeStyle(
+                    eyeShape: QrEyeShape.square,
+                    color: Color(0xFF1A3A0D),
+                  ),
+                  dataModuleStyle: const QrDataModuleStyle(
+                    dataModuleShape: QrDataModuleShape.square,
+                    color: Color(0xFF1A3A0D),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Animal QR Code',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: RumenoTheme.textDark,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _qrData,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontFamily: 'monospace',
+                      fontWeight: FontWeight.w600,
+                      color: RumenoTheme.primaryGreen,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Tap to view full-size • Scan to identify animal',
+                    style: TextStyle(fontSize: 11, color: RumenoTheme.textGrey),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.open_in_full_rounded,
+              color: RumenoTheme.primaryGreen.withValues(alpha: 0.7),
+              size: 20,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

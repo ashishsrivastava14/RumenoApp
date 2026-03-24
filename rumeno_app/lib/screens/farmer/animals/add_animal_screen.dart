@@ -2462,6 +2462,32 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
     );
   }
 
+  // ── Save animal to mock store and navigate to detail ──
+  void _saveAnimal() {
+    final newId = (mockAnimals.length + 1).toString();
+    final newAnimal = Animal(
+      id: newId,
+      tagId: _tagController.text.trim(),
+      species: _species,
+      breed: _breedController.text.trim().isEmpty ? 'Unknown' : _breedController.text.trim(),
+      dateOfBirth: _dob,
+      gender: _gender,
+      status: AnimalStatus.active,
+      purpose: _purpose,
+      weightKg: _weight,
+      heightCm: _height,
+      color: _selectedColor,
+      shedNumber: _shedController.text.trim().isEmpty ? null : _shedController.text.trim(),
+      fatherId: _fatherId,
+      motherId: _motherId,
+      numberOfSiblings: _numberOfSiblings,
+      purchaseDate: _purchaseDate,
+      farmerId: 'F001',
+    );
+    mockAnimals.add(newAnimal);
+    context.go('/farmer/animals/$newId');
+  }
+
   // ── Bottom navigation bar ────────────────────
   Widget _buildBottomBar() {
     final isLast = _currentStep == _stepMeta.length - 1;
@@ -2504,21 +2530,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen>
               child: ElevatedButton.icon(
                 onPressed: () {
                   if (isLast) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Row(
-                          children: [
-                            Icon(Icons.check_circle,
-                                color: Colors.white),
-                            SizedBox(width: 10),
-                            Text('Animal added successfully! 🎉'),
-                          ],
-                        ),
-                        backgroundColor: Colors.green,
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                    context.pop();
+                    _saveAnimal();
                   } else {
                     _goToStep(_currentStep + 1);
                   }
