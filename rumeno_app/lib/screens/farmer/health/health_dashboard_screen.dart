@@ -186,6 +186,13 @@ class HealthDashboardScreen extends StatelessWidget {
         'r': null,
         'action': 'hoof'
       },
+      {
+        'e': '👥',
+        'l': 'Groups',
+        's': 'Manage animal groups',
+        'c': RumenoTheme.primaryGreen,
+        'r': '/farmer/groups'
+      },
     ];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -416,7 +423,7 @@ class HealthDashboardScreen extends StatelessWidget {
                                           )
                                         : ListView.separated(
                                             itemCount: filtered.length,
-                                            separatorBuilder: (_, __) =>
+                                            separatorBuilder: (_, _) =>
                                                 const Divider(height: 1),
                                             itemBuilder: (_, i) {
                                               final a = filtered[i];

@@ -136,7 +136,7 @@ class _DewormingScreenState extends State<DewormingScreen>
                                           )
                                         : ListView.separated(
                                             itemCount: filtered.length,
-                                            separatorBuilder: (_, __) =>
+                                            separatorBuilder: (_, _) =>
                                                 const Divider(height: 1),
                                             itemBuilder: (_, i) {
                                               final a = filtered[i];

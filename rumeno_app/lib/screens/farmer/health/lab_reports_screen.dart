@@ -41,10 +41,14 @@ class _LabReportsScreenState extends State<LabReportsScreen>
       }
       if (_filterTest != null && r.testName != _filterTest) return false;
       if (_filterDateFrom != null &&
-          r.testDate.isBefore(_filterDateFrom!)) return false;
+          r.testDate.isBefore(_filterDateFrom!)) {
+        return false;
+      }
       if (_filterDateTo != null &&
           r.testDate.isAfter(
-              _filterDateTo!.add(const Duration(days: 1)))) return false;
+              _filterDateTo!.add(const Duration(days: 1)))) {
+        return false;
+      }
       return true;
     }).toList();
   }
@@ -546,7 +550,7 @@ class _LabReportsScreenState extends State<LabReportsScreen>
                                           )
                                         : ListView.separated(
                                             itemCount: filtered.length,
-                                            separatorBuilder: (_, __) =>
+                                            separatorBuilder: (_, _) =>
                                                 const Divider(height: 1),
                                             itemBuilder: (_, i) {
                                               final a = filtered[i];

@@ -567,7 +567,7 @@ class _VetCard extends StatelessWidget {
               _infoRow('🪪', 'License', vet.licenseNumber),
               _infoRow('🏥', 'Specialization', vet.specialization),
               _infoRow('💵', 'Commission', '${vet.commissionPercent}%'),
-              _infoRow('📊', 'Status', '${statusEmoji} ${vet.status.name}'),
+              _infoRow('📊', 'Status', '$statusEmoji ${vet.status.name}'),
               const SizedBox(height: 24),
               // Close button
               SizedBox(

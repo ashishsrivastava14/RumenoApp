@@ -47,6 +47,7 @@ import '../screens/farmer/more/notification_settings_screen.dart';
 import '../screens/farmer/more/help_support_screen.dart';
 import '../screens/farmer/more/data_export_screen.dart';
 import '../screens/farmer/more/farm_sanitization_screen.dart';
+import '../screens/farmer/groups/group_list_screen.dart';
 import '../screens/farmer/sale/farm_shop_screen.dart';
 import '../screens/farmer/sale/sell_animal_screen.dart';
 import '../screens/farmer/sale/sell_produce_screen.dart';
@@ -253,6 +254,10 @@ GoRouter createRouter(AuthProvider authProvider) {
           GoRoute(
             path: '/farmer/breeding',
             builder: (_, _) => const BreedingDashboardScreen(),
+          ),
+          GoRoute(
+            path: '/farmer/groups',
+            builder: (_, _) => const GroupListScreen(),
           ),
           GoRoute(
             path: '/farmer/more',

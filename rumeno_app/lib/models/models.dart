@@ -637,6 +637,105 @@ class SaleRecord {
   }
 }
 
+// ─── Group Management Models ───
+
+enum GroupAlertType { vaccination, checkup, deworming, breeding, general }
+
+class AnimalGroup {
+  final String id;
+  final String name;
+  final Species? species; // null = mixed-species group
+  final List<String> animalIds;
+  final String farmerId;
+  final DateTime createdAt;
+
+  const AnimalGroup({
+    required this.id,
+    required this.name,
+    this.species,
+    required this.animalIds,
+    required this.farmerId,
+    required this.createdAt,
+  });
+
+  AnimalGroup copyWith({
+    String? name,
+    Species? species,
+    List<String>? animalIds,
+  }) {
+    return AnimalGroup(
+      id: id,
+      name: name ?? this.name,
+      species: species ?? this.species,
+      animalIds: animalIds ?? this.animalIds,
+      farmerId: farmerId,
+      createdAt: createdAt,
+    );
+  }
+}
+
+class GroupAlert {
+  final String id;
+  final String groupId;
+  final String title;
+  final String? description;
+  final GroupAlertType type;
+  final DateTime dueDate;
+  final bool isDone;
+
+  const GroupAlert({
+    required this.id,
+    required this.groupId,
+    required this.title,
+    this.description,
+    required this.type,
+    required this.dueDate,
+    this.isDone = false,
+  });
+
+  GroupAlert copyWith({bool? isDone}) {
+    return GroupAlert(
+      id: id,
+      groupId: groupId,
+      title: title,
+      description: description,
+      type: type,
+      dueDate: dueDate,
+      isDone: isDone ?? this.isDone,
+    );
+  }
+
+  String get typeLabel {
+    switch (type) {
+      case GroupAlertType.vaccination:
+        return 'Vaccination';
+      case GroupAlertType.checkup:
+        return 'Checkup';
+      case GroupAlertType.deworming:
+        return 'Deworming';
+      case GroupAlertType.breeding:
+        return 'Breeding';
+      case GroupAlertType.general:
+        return 'General';
+    }
+  }
+
+  String get typeEmoji {
+    switch (type) {
+      case GroupAlertType.vaccination:
+        return '💉';
+      case GroupAlertType.checkup:
+        return '🩺';
+      case GroupAlertType.deworming:
+        return '💊';
+      case GroupAlertType.breeding:
+        return '🐣';
+      case GroupAlertType.general:
+        return '📋';
+    }
+  }
+}
+
 // ─── Ecommerce Models ───
 
 enum ProductCategory { animalFeed, tonic, supplements, veterinaryMedicines, farmEquipment }
