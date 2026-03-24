@@ -190,11 +190,13 @@ class _OverviewTabState extends State<_OverviewTab> {
     {'emoji': '🤰', 'label': 'Birth Complication'},
     {'emoji': '⚡', 'label': 'Sudden Death'},
     {'emoji': '❓', 'label': 'Unknown'},
+    {'emoji': '✏️', 'label': 'Other'},
   ];
 
   void _showRecordMortalitySheet() {
     DateTime deathDate = DateTime.now();
     String? reason;
+    final otherController = TextEditingController();
 
     showModalBottomSheet(
       context: context,
@@ -264,7 +266,10 @@ class _OverviewTabState extends State<_OverviewTab> {
                   children: _mortalityReasons.map((r) {
                     final sel = reason == r['label'];
                     return GestureDetector(
-                      onTap: () => setModalState(() => reason = r['label'] as String),
+                      onTap: () => setModalState(() {
+                        reason = r['label'] as String;
+                        if (reason != 'Other') otherController.clear();
+                      }),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 180),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -282,6 +287,29 @@ class _OverviewTabState extends State<_OverviewTab> {
                     );
                   }).toList(),
                 ),
+
+                // Other reason text field
+                if (reason == 'Other') ...[
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: otherController,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      labelText: 'Describe the reason',
+                      hintText: 'e.g. Poisoning, old age…',
+                      prefixIcon: const Icon(Icons.edit_note_rounded, color: RumenoTheme.primaryGreen),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: RumenoTheme.primaryGreen, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: RumenoTheme.backgroundCream,
+                    ),
+                    onChanged: (_) => setModalState(() {}),
+                  ),
+                ],
+
                 const SizedBox(height: 28),
 
                 // Save
@@ -294,10 +322,16 @@ class _OverviewTabState extends State<_OverviewTab> {
                         ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Please select a reason'), backgroundColor: RumenoTheme.errorRed, behavior: SnackBarBehavior.floating));
                         return;
                       }
+                      if (reason == 'Other' && otherController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Please describe the reason'), backgroundColor: RumenoTheme.errorRed, behavior: SnackBarBehavior.floating));
+                        return;
+                      }
+                      final finalReason = reason == 'Other' ? otherController.text.trim() : reason;
                       Navigator.pop(ctx);
+                      otherController.dispose();
                       setState(() {
                         _mortalityDate = deathDate;
-                        _mortalityReason = reason;
+                        _mortalityReason = finalReason;
                       });
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Row(children: [const Icon(Icons.check_circle, color: Colors.white), const SizedBox(width: 8), Text('${widget.animal.tagId} marked as deceased')]),
