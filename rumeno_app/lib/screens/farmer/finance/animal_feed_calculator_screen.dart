@@ -3,11 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme.dart';
 import '../../../mock/mock_ecommerce.dart';
 import '../../../models/models.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../providers/ecommerce_provider.dart';
 
 // ── Data Models ──
@@ -388,6 +390,164 @@ class _AnimalFeedCalculatorScreenState
   bool _isAiLoading = false;
   _AnimalType _selectedAnimal = _animalTypes[0]; // Dairy Cow default
   int _numberOfAnimals = 1;
+  bool _consentChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndShowConsent();
+    });
+  }
+
+  Future<void> _checkAndShowConsent() async {
+    final authProvider = context.read<AuthProvider>();
+    final userId = authProvider.currentUser?.id ?? 'unknown';
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'feed_calculator_consent_$userId';
+    final alreadyAccepted = prefs.getBool(key) ?? false;
+    if (!alreadyAccepted && mounted) {
+      _showConsentDialog(prefs, key);
+    }
+  }
+
+  void _showConsentDialog(SharedPreferences prefs, String key) {
+    bool checked = false;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Row(
+            children: [
+              Text('⚠️', style: TextStyle(fontSize: 28)),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Important Notice',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 18,
+                    color: Color(0xFF8A6A0A),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFFF8E1), Color(0xFFFFF3CD)],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFFE1C877),
+                    width: 1.2,
+                  ),
+                ),
+                child: const Text(
+                  'The Feed Calculator provides AI-based suggestions for animal feed composition. '
+                  'These are approximate values and should NOT be used as a substitute for professional veterinary advice.\n\n'
+                  'Always consult a qualified Veterinary Doctor before making changes to your animal\'s diet. '
+                  'Rumeno is not responsible for any outcomes resulting from the use of these suggestions.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.6,
+                    color: Color(0xFF6B4E2E),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Text('🩺', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Always consult your Veterinary Doctor',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.brown.shade700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () {
+                  setDialogState(() => checked = !checked);
+                },
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: Checkbox(
+                        value: checked,
+                        activeColor: const Color(0xFF2E7D32),
+                        onChanged: (v) {
+                          setDialogState(() => checked = v ?? false);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        'I understand and accept this notice',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: checked
+                    ? () async {
+                        await prefs.setBool(key, true);
+                        if (ctx.mounted) Navigator.of(ctx).pop();
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2E7D32),
+                  disabledBackgroundColor: Colors.grey.shade300,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text(
+                  'Continue',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   void dispose() {
