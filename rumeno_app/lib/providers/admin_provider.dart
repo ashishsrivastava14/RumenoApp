@@ -157,6 +157,11 @@ class AppSettings {
   bool emailNotifications;
   bool smsEnabled;
   String defaultLanguage;
+  // AI Feed Mix limits per subscription plan
+  int aiMixLimitFree;
+  int aiMixLimitStarter;
+  int aiMixLimitPro;
+  int aiMixLimitBusiness;
 
   AppSettings({
     this.maintenanceMode = false,
@@ -164,7 +169,21 @@ class AppSettings {
     this.emailNotifications = true,
     this.smsEnabled = true,
     this.defaultLanguage = 'English',
+    this.aiMixLimitFree = 3,
+    this.aiMixLimitStarter = 10,
+    this.aiMixLimitPro = 50,
+    this.aiMixLimitBusiness = -1, // -1 = unlimited
   });
+
+  int getAiMixLimit(String planName) {
+    switch (planName.toLowerCase()) {
+      case 'free': return aiMixLimitFree;
+      case 'starter': return aiMixLimitStarter;
+      case 'pro': return aiMixLimitPro;
+      case 'business': return aiMixLimitBusiness;
+      default: return aiMixLimitFree;
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -467,12 +486,20 @@ class AdminProvider extends ChangeNotifier {
     bool? emailNotifications,
     bool? smsEnabled,
     String? defaultLanguage,
+    int? aiMixLimitFree,
+    int? aiMixLimitStarter,
+    int? aiMixLimitPro,
+    int? aiMixLimitBusiness,
   }) {
     if (maintenanceMode != null) _settings.maintenanceMode = maintenanceMode;
     if (allowNewSignups != null) _settings.allowNewSignups = allowNewSignups;
     if (emailNotifications != null) _settings.emailNotifications = emailNotifications;
     if (smsEnabled != null) _settings.smsEnabled = smsEnabled;
     if (defaultLanguage != null) _settings.defaultLanguage = defaultLanguage;
+    if (aiMixLimitFree != null) _settings.aiMixLimitFree = aiMixLimitFree;
+    if (aiMixLimitStarter != null) _settings.aiMixLimitStarter = aiMixLimitStarter;
+    if (aiMixLimitPro != null) _settings.aiMixLimitPro = aiMixLimitPro;
+    if (aiMixLimitBusiness != null) _settings.aiMixLimitBusiness = aiMixLimitBusiness;
     notifyListeners();
   }
 

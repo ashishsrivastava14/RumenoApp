@@ -8,7 +8,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme.dart';
 import '../../../mock/mock_ecommerce.dart';
+import '../../../mock/mock_farmers.dart';
 import '../../../models/models.dart';
+import '../../../providers/admin_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/ecommerce_provider.dart';
 
@@ -391,11 +393,13 @@ class _AnimalFeedCalculatorScreenState
   _AnimalType _selectedAnimal = _animalTypes[0]; // Dairy Cow default
   int _numberOfAnimals = 1;
   bool _consentChecked = false;
+  int _aiUsageCount = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadAiUsageCount();
       _checkAndShowConsent();
     });
   }
@@ -840,6 +844,40 @@ class _AnimalFeedCalculatorScreenState
     );
   }
 
+  Future<void> _loadAiUsageCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    final month = '${DateTime.now().year}_${DateTime.now().month}';
+    setState(() {
+      _aiUsageCount = prefs.getInt('ai_mix_usage_$month') ?? 0;
+    });
+  }
+
+  Future<void> _incrementAiUsage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final month = '${DateTime.now().year}_${DateTime.now().month}';
+    _aiUsageCount++;
+    await prefs.setInt('ai_mix_usage_$month', _aiUsageCount);
+  }
+
+  int _getAiMixLimit() {
+    final userId = context.read<AuthProvider>().currentUser?.id ?? '';
+    final farmer = mockFarmers.cast<Farmer?>().firstWhere(
+      (f) => f!.id == userId,
+      orElse: () => null,
+    );
+    final planName = farmer?.planName ?? 'Free';
+    return context.read<AdminProvider>().settings.getAiMixLimit(planName);
+  }
+
+  String _getCurrentPlanName() {
+    final userId = context.read<AuthProvider>().currentUser?.id ?? '';
+    final farmer = mockFarmers.cast<Farmer?>().firstWhere(
+      (f) => f!.id == userId,
+      orElse: () => null,
+    );
+    return farmer?.planName ?? 'Free';
+  }
+
   Future<void> _runAiSuggestion() async {
     if (_selectedItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -855,6 +893,13 @@ class _AnimalFeedCalculatorScreenState
           backgroundColor: RumenoTheme.warningYellow,
         ),
       );
+      return;
+    }
+
+    // Check AI usage limit
+    final limit = _getAiMixLimit();
+    if (limit >= 0 && _aiUsageCount >= limit) {
+      _showLimitReachedDialog();
       return;
     }
 
@@ -911,6 +956,7 @@ class _AnimalFeedCalculatorScreenState
         currentCost: _currentCost,
       );
     });
+    await _incrementAiUsage();
   }
 
   double _wf(List<_SelectedFeed> src, double Function(_FeedItem) sel) {
@@ -2058,62 +2104,207 @@ class _AnimalFeedCalculatorScreenState
   // ── AI Button ──
 
   Widget _aiButton() {
-    return GestureDetector(
-      onTap: _isAiLoading ? null : _runAiSuggestion,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        decoration: BoxDecoration(
-          gradient: _isAiLoading
-              ? const LinearGradient(
-                  colors: [Color(0xFF999999), Color(0xFFAAAAAA)],
-                )
-              : const LinearGradient(
-                  colors: [Color(0xFF5B7A2E), Color(0xFF7DA03E)],
+    final limit = _getAiMixLimit();
+    final isUnlimited = limit < 0;
+    final remaining = isUnlimited ? -1 : limit - _aiUsageCount;
+    final isExhausted = !isUnlimited && remaining <= 0;
+
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: _isAiLoading ? null : _runAiSuggestion,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            decoration: BoxDecoration(
+              gradient: _isAiLoading
+                  ? const LinearGradient(
+                      colors: [Color(0xFF999999), Color(0xFFAAAAAA)],
+                    )
+                  : isExhausted
+                      ? const LinearGradient(
+                          colors: [Color(0xFF9E9E9E), Color(0xFFBDBDBD)],
+                        )
+                      : const LinearGradient(
+                          colors: [Color(0xFF5B7A2E), Color(0xFF7DA03E)],
+                        ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: (isExhausted ? Colors.grey : RumenoTheme.primaryGreen)
+                      .withValues(alpha: 0.25),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
                 ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: RumenoTheme.primaryGreen.withValues(alpha: 0.25),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              ],
             ),
-          ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (_isAiLoading) ...[
+                  const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'AI is thinking...',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 17,
+                    ),
+                  ),
+                ] else if (isExhausted) ...[
+                  const Text('🔒', style: TextStyle(fontSize: 22)),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'AI Limit Reached',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 17,
+                    ),
+                  ),
+                ] else ...[
+                  const Text('✨', style: TextStyle(fontSize: 22)),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Ask AI for Best Mix',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 17,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (_isAiLoading) ...[
-              const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: Colors.white,
-                ),
+        const SizedBox(height: 6),
+        // Usage counter
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            color: isExhausted
+                ? const Color(0xFFFFEBEE)
+                : const Color(0xFFF1F9EA),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isUnlimited
+                    ? Icons.all_inclusive_rounded
+                    : isExhausted
+                        ? Icons.warning_amber_rounded
+                        : Icons.auto_awesome_rounded,
+                size: 16,
+                color: isExhausted
+                    ? const Color(0xFFE53935)
+                    : const Color(0xFF5B7A2E),
               ),
-              const SizedBox(width: 12),
-              const Text(
-                'AI is thinking...',
+              const SizedBox(width: 6),
+              Text(
+                isUnlimited
+                    ? '$_aiUsageCount used · Unlimited (${_getCurrentPlanName()})'
+                    : isExhausted
+                        ? '$_aiUsageCount/$limit used · Upgrade for more'
+                        : '$_aiUsageCount/$limit used · ${_getCurrentPlanName()} Plan',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                ),
-              ),
-            ] else ...[
-              const Text('✨', style: TextStyle(fontSize: 22)),
-              const SizedBox(width: 10),
-              const Text(
-                'Ask AI for Best Mix',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isExhausted
+                      ? const Color(0xFFE53935)
+                      : const Color(0xFF5B7A2E),
                 ),
               ),
             ],
-          ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showLimitReachedDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('🔒', style: TextStyle(fontSize: 48)),
+              const SizedBox(height: 12),
+              const Text(
+                'AI Limit Reached',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'You\'ve used all $_aiUsageCount AI suggestions for this month on your ${_getCurrentPlanName()} plan.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14, color: Color(0xFF666666), height: 1.4),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3E5F5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Column(
+                  children: [
+                    Text('🚀 Upgrade for more AI suggestions',
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                    SizedBox(height: 4),
+                    Text('Starter: 10/mo • Pro: 50/mo • Business: Unlimited',
+                        style: TextStyle(fontSize: 12, color: Color(0xFF7B1FA2))),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text('Close'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                        context.push('/farmer/more/subscription');
+                      },
+                      icon: const Icon(Icons.rocket_launch_rounded, size: 18),
+                      label: const Text('Upgrade'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF7B1FA2),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

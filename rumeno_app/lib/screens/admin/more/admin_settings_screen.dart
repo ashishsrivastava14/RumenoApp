@@ -85,6 +85,22 @@ class AdminSettingsScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cache cleared!')));
             }),
           ]),
+          const SizedBox(height: 16),
+
+          _section(context, 'AI Feed Mix Limits', [
+            _aiLimitTile(context, 'Free', '🌱', s.aiMixLimitFree, (v) {
+              context.read<AdminProvider>().updateSettings(aiMixLimitFree: v);
+            }),
+            _aiLimitTile(context, 'Starter', '⭐', s.aiMixLimitStarter, (v) {
+              context.read<AdminProvider>().updateSettings(aiMixLimitStarter: v);
+            }),
+            _aiLimitTile(context, 'Pro', '🏆', s.aiMixLimitPro, (v) {
+              context.read<AdminProvider>().updateSettings(aiMixLimitPro: v);
+            }),
+            _aiLimitTile(context, 'Business', '💎', s.aiMixLimitBusiness, (v) {
+              context.read<AdminProvider>().updateSettings(aiMixLimitBusiness: v);
+            }),
+          ]),
         ],
       ),
     );
@@ -111,6 +127,53 @@ class AdminSettingsScreen extends StatelessWidget {
       subtitle: subtitle != null ? Text(subtitle) : null,
       trailing: onTap != null ? const Icon(Icons.chevron_right_rounded, size: 20) : null,
       onTap: onTap,
+    );
+  }
+
+  Widget _aiLimitTile(BuildContext context, String planName, String emoji, int currentLimit, ValueChanged<int> onChanged) {
+    final isUnlimited = currentLimit < 0;
+    return ListTile(
+      leading: Text(emoji, style: const TextStyle(fontSize: 22)),
+      title: Text('$planName Plan', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+      subtitle: Text(isUnlimited ? 'Unlimited' : '$currentLimit uses/month'),
+      trailing: SizedBox(
+        width: 100,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            InkWell(
+              onTap: () => onChanged(currentLimit <= 0 ? -1 : currentLimit - 1),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.remove, size: 18),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  isUnlimited ? '∞' : '$currentLimit',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () => onChanged(isUnlimited ? 1 : currentLimit + 1),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: RumenoTheme.primaryGreen.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(Icons.add, size: 18, color: RumenoTheme.primaryGreen),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
