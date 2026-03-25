@@ -1,12 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../config/theme.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../widgets/common/marketplace_button.dart';
 
-class HelpSupportScreen extends StatelessWidget {
+class HelpSupportScreen extends StatefulWidget {
   const HelpSupportScreen({super.key});
 
   @override
+  State<HelpSupportScreen> createState() => _HelpSupportScreenState();
+}
+
+class _HelpSupportScreenState extends State<HelpSupportScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _descriptionController = TextEditingController();
+  bool _submitted = false;
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  void _submitEnquiry() {
+    if (_formKey.currentState!.validate()) {
+      setState(() => _submitted = true);
+      _descriptionController.clear();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Enquiry submitted! We will get back to you shortly.'),
+          backgroundColor: RumenoTheme.successGreen,
+        ),
+      );
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) setState(() => _submitted = false);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthProvider>().currentUser;
+
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       appBar: AppBar(
@@ -37,7 +72,7 @@ class HelpSupportScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Choose an option below',
+                    'Fill in the form below and we\'ll get back to you',
                     style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14),
                   ),
                 ],
@@ -46,39 +81,104 @@ class HelpSupportScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Contact options
-            _HelpTile(
-              emoji: '📞',
-              title: 'Call Us',
-              subtitle: 'Talk to our team',
-              color: const Color(0xFF4CAF50),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('📞 Calling support: 1800-XXX-XXXX'), backgroundColor: RumenoTheme.successGreen),
-                );
-              },
-            ),
-            _HelpTile(
-              emoji: '💬',
-              title: 'WhatsApp',
-              subtitle: 'Chat with us',
-              color: const Color(0xFF25D366),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('💬 Opening WhatsApp...'), backgroundColor: Color(0xFF25D366)),
-                );
-              },
-            ),
-            _HelpTile(
-              emoji: '📧',
-              title: 'Email',
-              subtitle: 'Send us a message',
-              color: const Color(0xFF2196F3),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('📧 Opening email...'), backgroundColor: Color(0xFF2196F3)),
-                );
-              },
+            // Enquiry form
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 10, offset: const Offset(0, 4)),
+                ],
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text('✉️', style: TextStyle(fontSize: 20)),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Send an Enquiry',
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: RumenoTheme.textDark),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Name field (readonly)
+                    _buildReadonlyField(
+                      label: 'Name',
+                      value: user?.name ?? '',
+                      icon: Icons.person_outline_rounded,
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Phone field (readonly)
+                    _buildReadonlyField(
+                      label: 'Phone',
+                      value: user?.phone ?? '',
+                      icon: Icons.phone_outlined,
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Description field
+                    Text(
+                      'Description',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: RumenoTheme.textGrey),
+                    ),
+                    const SizedBox(height: 6),
+                    TextFormField(
+                      controller: _descriptionController,
+                      maxLines: 5,
+                      textInputAction: TextInputAction.newline,
+                      decoration: InputDecoration(
+                        hintText: 'Describe your issue or question...',
+                        hintStyle: TextStyle(color: RumenoTheme.textGrey.withValues(alpha: 0.6), fontSize: 14),
+                        filled: true,
+                        fillColor: RumenoTheme.backgroundCream,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: RumenoTheme.primaryGreen, width: 1.5),
+                        ),
+                        contentPadding: const EdgeInsets.all(14),
+                      ),
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) return 'Please describe your issue';
+                        if (v.trim().length < 10) return 'Please provide more details (min 10 characters)';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Submit button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _submitted ? null : _submitEnquiry,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: RumenoTheme.primaryGreen,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          elevation: 0,
+                        ),
+                        child: const Text('Submit Enquiry', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             const SizedBox(height: 24),
@@ -173,69 +273,38 @@ class HelpSupportScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-class _HelpTile extends StatelessWidget {
-  final String emoji;
-  final String title;
-  final String subtitle;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _HelpTile({
-    required this.emoji,
-    required this.title,
-    required this.subtitle,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(color: color.withValues(alpha: 0.12), blurRadius: 8, offset: const Offset(0, 3)),
-          ],
+  Widget _buildReadonlyField({required String label, required String value, required IconData icon}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: RumenoTheme.textGrey),
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(16),
+        const SizedBox(height: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, size: 18, color: RumenoTheme.textGrey),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  value,
+                  style: TextStyle(fontSize: 15, color: RumenoTheme.textDark.withValues(alpha: 0.8)),
+                ),
               ),
-              child: Center(child: Text(emoji, style: const TextStyle(fontSize: 28))),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RumenoTheme.textDark)),
-                  Text(subtitle, style: TextStyle(fontSize: 13, color: RumenoTheme.textGrey)),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(Icons.arrow_forward_rounded, color: color, size: 22),
-            ),
-          ],
+              Icon(Icons.lock_outline_rounded, size: 15, color: RumenoTheme.textGrey.withValues(alpha: 0.5)),
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
