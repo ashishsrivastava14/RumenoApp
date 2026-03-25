@@ -12,6 +12,7 @@ class SanitizationRecord {
   final List<String> sanitizerNames;
   final Map<String, String> sanitizerQuantities;
   final DateTime? nextDate;
+  final String? nextScheduleNotes;
   final List<String> areas;
   final String? notes;
 
@@ -21,6 +22,7 @@ class SanitizationRecord {
     required this.sanitizerNames,
     this.sanitizerQuantities = const <String, String>{},
     this.nextDate,
+    this.nextScheduleNotes,
     this.areas = const [],
     this.notes,
   });
@@ -248,6 +250,7 @@ class _FarmSanitizationScreenState extends State<FarmSanitizationScreen> {
     final TextEditingController otherNameCtrl = TextEditingController();
     final List<String> selectedAreas = [];
     final notesCtrl = TextEditingController();
+    final nextScheduleCtrl = TextEditingController();
 
     showModalBottomSheet(
       context: context,
@@ -699,6 +702,52 @@ class _FarmSanitizationScreenState extends State<FarmSanitizationScreen> {
                             : null,
                       ),
 
+                      const SizedBox(height: 14),
+
+                      // ── Next Schedule Notes ──
+                      TextField(
+                        controller: nextScheduleCtrl,
+                        maxLines: 2,
+                        decoration: InputDecoration(
+                          hintText:
+                              'e.g. Use Phenyl + Quicklime on all sheds…',
+                          hintStyle: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade400),
+                          labelText: 'Next Sanitization Plan',
+                          labelStyle: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.orange,
+                              fontWeight: FontWeight.w600),
+                          prefixIcon: const Padding(
+                            padding: EdgeInsets.only(left: 12, right: 8),
+                            child: Text('📋',
+                                style: TextStyle(fontSize: 18)),
+                          ),
+                          prefixIconConstraints: const BoxConstraints(
+                              minWidth: 0, minHeight: 0),
+                          filled: true,
+                          fillColor: Colors.orange.withValues(alpha: 0.04),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide:
+                                BorderSide(color: Colors.orange.shade200),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide:
+                                BorderSide(color: Colors.orange.shade200),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                                color: Colors.orange, width: 1.5),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 12),
+                        ),
+                      ),
+
                       const SizedBox(height: 24),
 
                       // ─── Step 5: Notes (optional) ────────────────────
@@ -783,6 +832,9 @@ class _FarmSanitizationScreenState extends State<FarmSanitizationScreen> {
                               sanitizerNames: finalSanitizerNames,
                               sanitizerQuantities: quantities,
                               nextDate: nextDate,
+                              nextScheduleNotes: nextScheduleCtrl.text.trim().isEmpty
+                                  ? null
+                                  : nextScheduleCtrl.text.trim(),
                               areas: List.from(selectedAreas),
                               notes: notesCtrl.text.trim().isEmpty
                                   ? null
@@ -1420,6 +1472,48 @@ class _RecordCard extends StatelessWidget {
                           Text(nextBadgeText,
                               style: TextStyle(
                                   fontSize: 11, color: nextBadgeColor)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          // ── Next Schedule Notes ──
+          if (record.nextScheduleNotes != null &&
+              record.nextScheduleNotes!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                      color: Colors.orange.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('📋',
+                        style: TextStyle(fontSize: 16)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Next Sanitization Plan',
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.orange)),
+                          const SizedBox(height: 2),
+                          Text(record.nextScheduleNotes!,
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: RumenoTheme.textDark)),
                         ],
                       ),
                     ),
