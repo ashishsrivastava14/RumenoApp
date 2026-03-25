@@ -2662,6 +2662,9 @@ class _ReproductionTabState extends State<_ReproductionTab> {
     String quarter = 'Rear Left';
     String severity = 'Subclinical';
     final treatmentCtrl = TextEditingController();
+    final nippleCountCtrl = TextEditingController(text: '4');
+    int totalNipples = 4;
+    List<int> affectedNipples = [];
     final quarters = ['Front Left', 'Front Right', 'Rear Left', 'Rear Right'];
     final severities = ['Subclinical', 'Clinical', 'Acute', 'Chronic'];
 
@@ -2688,27 +2691,96 @@ class _ReproductionTabState extends State<_ReproductionTab> {
                 const SizedBox(height: 8),
                 _datePickerTile(ctx, date, (d) => setModalState(() => date = d)),
                 const SizedBox(height: 16),
-                const Text('Udder Quarter', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                const Text('Total Number of Nipples', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
                 const SizedBox(height: 8),
-                GridView.count(
-                  crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 3,
-                  children: quarters.map((q) {
-                    final sel = quarter == q;
-                    return GestureDetector(
-                      onTap: () => setModalState(() => quarter = q),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        decoration: BoxDecoration(
-                          color: sel ? RumenoTheme.primaryGreen : RumenoTheme.backgroundCream,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textLight, width: sel ? 2 : 1),
-                        ),
-                        child: Center(child: Text(q, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? Colors.white : RumenoTheme.textDark))),
-                      ),
-                    );
-                  }).toList(),
+                TextField(
+                  controller: nippleCountCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    hintText: 'Enter total nipples (e.g. 4 for cow, 14 for pig)',
+                    filled: true,
+                    fillColor: RumenoTheme.backgroundCream,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: RumenoTheme.textLight)),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: RumenoTheme.textLight)),
+                  ),
+                  onChanged: (val) {
+                    final n = int.tryParse(val) ?? 0;
+                    if (n > 0 && n <= 30) {
+                      setModalState(() {
+                        totalNipples = n;
+                        affectedNipples = affectedNipples.where((i) => i <= n).toList();
+                        if (n <= 4) {
+                          quarter = quarters.contains(quarter) ? quarter : quarters.first;
+                        }
+                      });
+                    }
+                  },
                 ),
+                const SizedBox(height: 16),
+                Text(
+                  totalNipples <= 4 ? 'Udder Quarter' : 'Affected Nipple(s)',
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark),
+                ),
+                if (totalNipples <= 4) ...[
+                  const SizedBox(height: 4),
+                  const Text('Select the affected quarter', style: TextStyle(fontSize: 12, color: RumenoTheme.textLight)),
+                ] else ...[
+                  const SizedBox(height: 4),
+                  Text('Tap to select which nipple(s) have problem (1-$totalNipples)', style: const TextStyle(fontSize: 12, color: RumenoTheme.textLight)),
+                ],
+                const SizedBox(height: 8),
+                if (totalNipples <= 4)
+                  GridView.count(
+                    crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+                    crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 3,
+                    children: quarters.map((q) {
+                      final sel = quarter == q;
+                      return GestureDetector(
+                        onTap: () => setModalState(() => quarter = q),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          decoration: BoxDecoration(
+                            color: sel ? RumenoTheme.primaryGreen : RumenoTheme.backgroundCream,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: sel ? RumenoTheme.primaryGreen : RumenoTheme.textLight, width: sel ? 2 : 1),
+                          ),
+                          child: Center(child: Text(q, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? Colors.white : RumenoTheme.textDark))),
+                        ),
+                      );
+                    }).toList(),
+                  )
+                else
+                  Wrap(
+                    spacing: 8, runSpacing: 8,
+                    children: List.generate(totalNipples, (i) {
+                      final nippleNum = i + 1;
+                      final sel = affectedNipples.contains(nippleNum);
+                      return GestureDetector(
+                        onTap: () => setModalState(() {
+                          if (sel) {
+                            affectedNipples.remove(nippleNum);
+                          } else {
+                            affectedNipples.add(nippleNum);
+                            affectedNipples.sort();
+                          }
+                        }),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          width: 48, height: 48,
+                          decoration: BoxDecoration(
+                            color: sel ? RumenoTheme.errorRed.withValues(alpha: 0.15) : RumenoTheme.backgroundCream,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: sel ? RumenoTheme.errorRed : RumenoTheme.textLight, width: sel ? 2 : 1),
+                          ),
+                          child: Center(child: Text('$nippleNum', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: sel ? RumenoTheme.errorRed : RumenoTheme.textDark))),
+                        ),
+                      );
+                    }),
+                  ),
+                if (totalNipples > 4 && affectedNipples.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text('Selected: Nipple ${affectedNipples.join(', ')}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: RumenoTheme.primaryGreen)),
+                ],
                 const SizedBox(height: 16),
                 const Text('Severity', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
                 const SizedBox(height: 8),
@@ -2739,9 +2811,20 @@ class _ReproductionTabState extends State<_ReproductionTab> {
                     ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Please enter treatment details'), backgroundColor: RumenoTheme.errorRed));
                     return;
                   }
+                  if (totalNipples > 4 && affectedNipples.isEmpty) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Please select at least one affected nipple'), backgroundColor: RumenoTheme.errorRed));
+                    return;
+                  }
                   Navigator.pop(ctx);
                   setState(() {
-                    _mastitisHistory.add(_MastitisRecord(date: date, quarter: quarter, severity: severity, treatment: treatmentCtrl.text.trim()));
+                    _mastitisHistory.add(_MastitisRecord(
+                      date: date,
+                      quarter: totalNipples <= 4 ? quarter : 'Nipple ${affectedNipples.join(', ')}',
+                      severity: severity,
+                      treatment: treatmentCtrl.text.trim(),
+                      totalNipples: totalNipples,
+                      affectedNipples: List.unmodifiable(affectedNipples),
+                    ));
                   });
                   _showSavedSnackBar('Mastitis record added.');
                 }),
@@ -3048,7 +3131,15 @@ class _MastitisRecord {
   final String severity;
   final String treatment;
   final DateTime? resolvedDate;
-  const _MastitisRecord({required this.date, required this.quarter, required this.severity, required this.treatment, this.resolvedDate});
+  final int totalNipples;
+  final List<int> affectedNipples;
+  const _MastitisRecord({required this.date, required this.quarter, required this.severity, required this.treatment, this.resolvedDate, this.totalNipples = 4, this.affectedNipples = const []});
+
+  String get affectedDisplay {
+    if (totalNipples <= 4) return quarter;
+    if (affectedNipples.isEmpty) return 'None selected';
+    return 'Nipple ${affectedNipples.join(', ')}';
+  }
 }
 
 // ─── Reproduction Section Widgets ───
@@ -3353,7 +3444,9 @@ class _MastitisCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text('Date: ${DateFormat('dd MMM yyyy').format(record.date)}', style: Theme.of(context).textTheme.bodySmall),
-          Text('Quarter: ${record.quarter}', style: Theme.of(context).textTheme.bodySmall),
+          if (record.totalNipples > 4)
+            Text('Total Nipples: ${record.totalNipples}', style: Theme.of(context).textTheme.bodySmall),
+          Text('${record.totalNipples <= 4 ? 'Quarter' : 'Affected'}: ${record.affectedDisplay}', style: Theme.of(context).textTheme.bodySmall),
           Text('Treatment: ${record.treatment}', style: Theme.of(context).textTheme.bodySmall),
           if (isResolved)
             Text('Resolved: ${DateFormat('dd MMM yyyy').format(record.resolvedDate!)}', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: RumenoTheme.successGreen)),
