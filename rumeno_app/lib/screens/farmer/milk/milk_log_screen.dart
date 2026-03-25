@@ -454,7 +454,7 @@ class _MilkLogScreenState extends State<MilkLogScreen> {
             icon: Icons.wb_sunny_rounded,
             emoji: '🌅',
             label: 'Morning',
-            sublabel: '5 AM – 12 PM',
+            sublabel: '',
             isSelected: _selectedSession == MilkSession.morning,
             color: const Color(0xFFFF9800),
             onTap: () {
@@ -468,7 +468,7 @@ class _MilkLogScreenState extends State<MilkLogScreen> {
             icon: Icons.nights_stay_rounded,
             emoji: '🌙',
             label: 'Evening',
-            sublabel: '3 PM – 9 PM',
+            sublabel: '',
             isSelected: _selectedSession == MilkSession.evening,
             color: const Color(0xFF5C6BC0),
             onTap: () {
