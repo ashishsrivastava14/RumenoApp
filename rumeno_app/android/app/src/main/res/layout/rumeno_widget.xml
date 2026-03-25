@@ -34,6 +34,13 @@
             android:textColor="#FFFFFF" />
 
         <TextView
+            android:id="@+id/tv_notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
             android:id="@+id/tv_last_updated"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,183 +48,74 @@
             android:textColor="#C8E6C9" />
     </LinearLayout>
 
-    <!-- Row 1: Total | Pregnant -->
+    <!-- Stats: Single Row with 4 items -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingTop="6dp">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/stat_card_green"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="8dp"
-            android:layout_marginEnd="3dp">
-
-            <TextView
-                android:id="@+id/tv_emoji_total"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:layout_marginEnd="6dp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_total"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="#2E7D32" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Total"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:textColor="#4CAF50" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/stat_card_blue"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="8dp"
-            android:layout_marginStart="3dp">
-
-            <TextView
-                android:id="@+id/tv_emoji_pregnant"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:layout_marginEnd="6dp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_pregnant"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="#1565C0" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Pregnant"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:textColor="#42A5F5" />
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Row 2: Treating | Vax Due -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="6dp">
-
+        <!-- Ongoing Treatment -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/stat_card_orange"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="8dp"
-            android:layout_marginEnd="3dp">
-
-            <TextView
-                android:id="@+id/tv_emoji_treat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:layout_marginEnd="6dp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_treatments"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="#E65100" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Treating"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:textColor="#FFA726" />
-            </LinearLayout>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="6dp"
+            android:layout_marginEnd="2dp">
+            <TextView android:id="@+id/tv_emoji_treat" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" />
+            <TextView android:id="@+id/tv_treatments" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="18sp" android:textStyle="bold" android:textColor="#E65100" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ongoing\nTreatment" android:textSize="8sp" android:textStyle="bold" android:textColor="#FFA726" android:gravity="center" />
         </LinearLayout>
 
+        <!-- Today Milk -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/stat_card_red"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="8dp"
-            android:layout_marginStart="3dp">
+            android:background="@drawable/stat_card_green"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="6dp"
+            android:layout_marginEnd="2dp">
+            <TextView android:id="@+id/tv_emoji_milk" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" />
+            <TextView android:id="@+id/tv_milk_today" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="18sp" android:textStyle="bold" android:textColor="#2E7D32" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Today\nMilk" android:textSize="8sp" android:textStyle="bold" android:textColor="#4CAF50" android:gravity="center" />
+        </LinearLayout>
 
-            <TextView
-                android:id="@+id/tv_emoji_vax"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:layout_marginEnd="6dp" />
+        <!-- Kids 0-1m -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/stat_card_teal"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="6dp"
+            android:layout_marginEnd="2dp">
+            <TextView android:id="@+id/tv_emoji_kids" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" />
+            <TextView android:id="@+id/tv_kids_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="18sp" android:textStyle="bold" android:textColor="#00796B" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Kids\n0-1m" android:textSize="8sp" android:textStyle="bold" android:textColor="#26A69A" android:gravity="center" />
+        </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_vax_due"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="#C62828" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Vax Due"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:textColor="#EF5350" />
-            </LinearLayout>
+        <!-- Pregnant -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/stat_card_blue"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="6dp">
+            <TextView android:id="@+id/tv_emoji_pregnant" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" />
+            <TextView android:id="@+id/tv_pregnant" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="18sp" android:textStyle="bold" android:textColor="#1565C0" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pregnant" android:textSize="8sp" android:textStyle="bold" android:textColor="#42A5F5" android:gravity="center" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Event Banner -->
+    <!-- PPR Vaccination Event Banner -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -226,24 +124,31 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:layout_marginTop="6dp">
-
-        <TextView
-            android:id="@+id/tv_emoji_event"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:layout_marginEnd="6dp" />
-
-        <TextView
-            android:id="@+id/tv_next_event"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="#1B5E20"
-            android:maxLines="1"
-            android:ellipsize="end" />
+        <TextView android:id="@+id/tv_emoji_event" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="14sp" android:layout_marginEnd="6dp" />
+        <TextView android:id="@+id/tv_next_event" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textSize="11sp" android:textStyle="bold" android:textColor="#1B5E20" android:maxLines="1" android:ellipsize="end" />
     </LinearLayout>
+
+    <!-- Vaccination &amp; Health Alerts Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vaccination &amp; Health Alerts"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:textColor="#2E7D32"
+        android:paddingTop="6dp"
+        android:paddingBottom="2dp" />
+
+    <!-- Static Alert TextViews (safe for RemoteViews) -->
+    <TextView android:id="@+id/tv_alert_0" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#37474F" android:paddingTop="1dp" android:paddingBottom="1dp" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
+    <TextView android:id="@+id/tv_alert_1" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#37474F" android:paddingTop="1dp" android:paddingBottom="1dp" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
+    <TextView android:id="@+id/tv_alert_2" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#37474F" android:paddingTop="1dp" android:paddingBottom="1dp" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
+    <TextView android:id="@+id/tv_alert_3" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#37474F" android:paddingTop="1dp" android:paddingBottom="1dp" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
+    <TextView android:id="@+id/tv_alert_4" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#37474F" android:paddingTop="1dp" android:paddingBottom="1dp" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
+    <TextView android:id="@+id/tv_alert_5" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#37474F" android:paddingTop="1dp" android:paddingBottom="1dp" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
+    <TextView android:id="@+id/tv_alert_6" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#37474F" android:paddingTop="1dp" android:paddingBottom="1dp" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
+    <TextView android:id="@+id/tv_alert_7" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#37474F" android:paddingTop="1dp" android:paddingBottom="1dp" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
+    <TextView android:id="@+id/tv_alert_8" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#37474F" android:paddingTop="1dp" android:paddingBottom="1dp" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
+    <TextView android:id="@+id/tv_alert_9" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#37474F" android:paddingTop="1dp" android:paddingBottom="1dp" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
 
 </LinearLayout>
