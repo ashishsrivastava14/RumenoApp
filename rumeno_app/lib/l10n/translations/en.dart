@@ -262,7 +262,7 @@ const Map<String, String> en = {
   'kid_addKid': 'Add Kid',
   'kid_basicInfo': 'Basic Info',
   'kid_motherAnimalId': 'Mother Animal ID (optional)',
-  'kid_avgWeightKg': 'Average Weight (kg)',
+  'kid_avgWeightKg': 'Birth Weight (kg)',
   'kid_coccidiostatLabel': 'Coccidiostat (Anti-Parasite Medicine)',
   'kid_coccidiostatName': 'Coccidiostat Name',
   'kid_saltCompoundName': 'Salt / Compound Name',

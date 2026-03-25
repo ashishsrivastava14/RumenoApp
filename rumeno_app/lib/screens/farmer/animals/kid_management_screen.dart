@@ -1313,7 +1313,7 @@ class _KidFormSheetState extends State<_KidFormSheet> {
             _FormField(
               controller: _weightCtrl,
               hint: 'e.g. 5.5',
-              label: '⚖️  Average Weight (kg)',
+              label: '⚖️  Birth Weight (kg)',
               keyboardType: const TextInputType.numberWithOptions(
                   decimal: true),
               inputFormatters: [
