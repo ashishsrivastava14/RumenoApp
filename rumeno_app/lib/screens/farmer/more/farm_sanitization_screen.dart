@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../config/theme.dart';
@@ -37,11 +37,11 @@ class _Option {
 const List<_Option> _sanitizerOptions = [
   _Option('🧴', 'Bleach (Sodium Hypochlorite)'),
   _Option('🫧', 'Phenyl'),
-  _Option('�', 'Iodine Solution'),
-  _Option('⬜', 'Quicklime (Chuna)'),
+  _Option('\u{1FA78}', 'Iodine Solution'),
+  _Option('🪨', 'Quicklime (Chuna)'),
   _Option('🧪', 'Formalin'),
   _Option('🟣', 'Potassium Permanganate'),
-  _Option('💧', 'Hydrogen Peroxide'),
+  _Option('🫙', 'Hydrogen Peroxide'),
   _Option('🔹', 'Others'),
 ];
 
@@ -50,8 +50,7 @@ const List<_Option> _areaOptions = [
   _Option('🐄', 'Cow Shed'),
   _Option('🐐', 'Goat Pen'),
   _Option('🐷', 'Pig Pen'),
-  _Option('🐔', 'Poultry Area'),
-  _Option('🚿', 'Water Trough'),
+  _Option('\u{1F6E2}\u{FE0F}', 'Water Tank'),
   _Option('🌾', 'Feed Storage'),
   _Option('🚪', 'Entry Gate'),
 ];
@@ -65,7 +64,7 @@ final List<SanitizationRecord> _mockSanitizationRecords = [
     sanitizerNames: ['Bleach (Sodium Hypochlorite)', 'Phenyl'],
     sanitizerQuantities: {'Bleach (Sodium Hypochlorite)': '2 litres', 'Phenyl': '500 ml'},
     nextDate: DateTime.now().add(const Duration(days: 18)),
-    areas: ['Cow Shed', 'Water Trough'],
+    areas: ['Cow Shed', 'Water Tank'],
     notes: 'Full wash done after rain',
   ),
   SanitizationRecord(
