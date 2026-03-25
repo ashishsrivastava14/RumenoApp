@@ -732,6 +732,10 @@ class _KidDetailSheet extends StatelessWidget {
               _DetailCell(
                   emoji: '🐐', label: 'Mother', value: motherLabel),
               _DetailCell(
+                  emoji: '🧬',
+                  label: 'Father (AI)',
+                  value: kid.fatherAiId ?? '—'),
+              _DetailCell(
                   emoji: '🎂',
                   label: 'Date of Birth',
                   value: kid.dateOfBirth != null
@@ -1092,6 +1096,7 @@ class _KidFormSheet extends StatefulWidget {
 class _KidFormSheetState extends State<_KidFormSheet> {
   final _kidIdCtrl = TextEditingController();
   final _motherIdCtrl = TextEditingController();
+  final _fatherAiIdCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
   final _coccNameCtrl = TextEditingController();
   final _coccSaltCtrl = TextEditingController();
@@ -1119,6 +1124,7 @@ class _KidFormSheetState extends State<_KidFormSheet> {
     if (e != null) {
       _kidIdCtrl.text = e.kidId;
       _motherIdCtrl.text = e.motherId ?? '';
+      _fatherAiIdCtrl.text = e.fatherAiId ?? '';
       _weightCtrl.text = e.averageWeightKg?.toString() ?? '';
       _coccNameCtrl.text = e.coccidisostatName ?? '';
       _coccSaltCtrl.text = e.coccidisostatSaltName ?? '';
@@ -1144,6 +1150,7 @@ class _KidFormSheetState extends State<_KidFormSheet> {
   void dispose() {
     _kidIdCtrl.dispose();
     _motherIdCtrl.dispose();
+    _fatherAiIdCtrl.dispose();
     _weightCtrl.dispose();
     _coccNameCtrl.dispose();
     _coccSaltCtrl.dispose();
@@ -1193,6 +1200,9 @@ class _KidFormSheetState extends State<_KidFormSheet> {
       motherId: _motherIdCtrl.text.trim().isEmpty
           ? null
           : _motherIdCtrl.text.trim().toUpperCase(),
+      fatherAiId: _fatherAiIdCtrl.text.trim().isEmpty
+          ? null
+          : _fatherAiIdCtrl.text.trim().toUpperCase(),
       dateOfBirth: _dateOfBirth,
       coccidisostatName: _coccNameCtrl.text.trim().isEmpty
           ? null
@@ -1281,6 +1291,13 @@ class _KidFormSheetState extends State<_KidFormSheet> {
               controller: _motherIdCtrl,
               hint: 'e.g. G-001',
               label: '🐐  Mother Animal ID (optional)',
+              keyboardType: TextInputType.text,
+            ),
+            const SizedBox(height: 12),
+            _FormField(
+              controller: _fatherAiIdCtrl,
+              hint: 'e.g. AI-001',
+              label: '🧬  Father ID from AI (optional)',
               keyboardType: TextInputType.text,
             ),
             const SizedBox(height: 12),

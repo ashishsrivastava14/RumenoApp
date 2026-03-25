@@ -444,6 +444,8 @@ class KidRecord {
   final String kidId;
   /// Optional link to the mother's animal record
   final String? motherId;
+  /// Father ID from Artificial Insemination
+  final String? fatherAiId;
   final DateTime? dateOfBirth;
 
   // Coccidiostat (anti-coccidiosis medication)
@@ -468,6 +470,7 @@ class KidRecord {
     required this.id,
     required this.kidId,
     this.motherId,
+    this.fatherAiId,
     this.dateOfBirth,
     this.coccidisostatName,
     this.coccidisostatSaltName,
@@ -496,6 +499,7 @@ class KidRecord {
   KidRecord copyWith({
     String? kidId,
     String? motherId,
+    String? fatherAiId,
     DateTime? dateOfBirth,
     String? coccidisostatName,
     String? coccidisostatSaltName,
@@ -510,6 +514,7 @@ class KidRecord {
       id: id,
       kidId: kidId ?? this.kidId,
       motherId: motherId ?? this.motherId,
+      fatherAiId: fatherAiId ?? this.fatherAiId,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       coccidisostatName: coccidisostatName ?? this.coccidisostatName,
       coccidisostatSaltName: coccidisostatSaltName ?? this.coccidisostatSaltName,

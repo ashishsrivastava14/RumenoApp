@@ -5,6 +5,7 @@ final List<KidRecord> mockKids = [
     id: 'kid_1',
     kidId: 'K-001',
     motherId: '14', // G-001 Jamunapari goat
+    fatherAiId: 'AI-101',
     dateOfBirth: DateTime(2026, 1, 10),
     coccidisostatName: 'Amprolium',
     coccidisostatSaltName: 'Amprolium HCl',
@@ -20,6 +21,7 @@ final List<KidRecord> mockKids = [
     id: 'kid_2',
     kidId: 'K-002',
     motherId: '16', // G-003 Sirohi goat
+    fatherAiId: 'AI-205',
     dateOfBirth: DateTime(2026, 2, 5),
     coccidisostatName: 'Toltrazuril',
     coccidisostatSaltName: 'Toltrazuril 5%',
