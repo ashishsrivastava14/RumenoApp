@@ -2225,6 +2225,7 @@ class _ReproductionTabState extends State<_ReproductionTab> {
     DateTime aiDate = DateTime.now();
     final bullSemenCtrl = TextEditingController();
     final technicianCtrl = TextEditingController();
+    final notesCtrl = TextEditingController();
     HeatIntensity intensity = HeatIntensity.moderate;
     bool addSync = false;
     String syncProtocol = 'Ovsynch';
@@ -2285,6 +2286,8 @@ class _ReproductionTabState extends State<_ReproductionTab> {
                     );
                   }).toList(),
                 ),
+                const SizedBox(height: 12),
+                _formField(notesCtrl, '📝 Notes (optional)', TextInputType.text),
                 const SizedBox(height: 16),
                 // Synchronization toggle
                 GestureDetector(
@@ -2353,6 +2356,7 @@ class _ReproductionTabState extends State<_ReproductionTab> {
                       technicianName: technicianCtrl.text.trim().isEmpty ? null : technicianCtrl.text.trim(),
                       matingDate: aiDate,
                       isPregnant: false,
+                      notes: notesCtrl.text.trim().isEmpty ? null : notesCtrl.text.trim(),
                     ));
                     if (addSync) {
                       _syncRecords.add(_SyncRecord(date: syncDate, protocol: syncProtocol, status: 'Completed', notes: syncNotesCtrl.text.trim().isEmpty ? null : syncNotesCtrl.text.trim()));

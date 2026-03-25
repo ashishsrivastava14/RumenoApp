@@ -145,6 +145,7 @@ class _BreedingDashboardScreenState extends State<BreedingDashboardScreen> {
     final animalIdCtrl = TextEditingController();
     final bullSemenCtrl = TextEditingController();
     final technicianCtrl = TextEditingController();
+    final notesCtrl = TextEditingController();
     DateTime aiDate = DateTime.now();
     HeatIntensity intensity = HeatIntensity.moderate;
 
@@ -200,6 +201,8 @@ class _BreedingDashboardScreenState extends State<BreedingDashboardScreen> {
                     );
                   }).toList(),
                 ),
+                const SizedBox(height: 12),
+                _formField(notesCtrl, '📝 Notes (optional)', TextInputType.text),
                 const SizedBox(height: 24),
                 _saveButton(ctx, 'Save AI Record', () {
                   if (animalIdCtrl.text.trim().isEmpty || bullSemenCtrl.text.trim().isEmpty) {
@@ -216,6 +219,7 @@ class _BreedingDashboardScreenState extends State<BreedingDashboardScreen> {
                     technicianName: technicianCtrl.text.trim().isEmpty ? null : technicianCtrl.text.trim(),
                     matingDate: aiDate,
                     isPregnant: false,
+                    notes: notesCtrl.text.trim().isEmpty ? null : notesCtrl.text.trim(),
                   );
                   Navigator.pop(ctx);
                   setState(() => _allRecords.add(record));
