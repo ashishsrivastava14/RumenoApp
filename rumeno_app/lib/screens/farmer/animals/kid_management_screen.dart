@@ -1411,7 +1411,7 @@ class _KidFormSheetState extends State<_KidFormSheet> {
             const SizedBox(height: 20),
 
             // ── Section: Feeding ─────────────
-            _SectionHeader(emoji: '🍼', title: 'Feeding & Weaning'),
+            _SectionHeader(emoji: '🍼', title: 'When Kid stop feeding'),
             const SizedBox(height: 10),
             _DatePickerTile(
               emoji: '🍼',
