@@ -2586,6 +2586,7 @@ class _ReproductionTabState extends State<_ReproductionTab> {
   // ── Add Lactation ──
   void _showAddLactationDialog() {
     DateTime startDate = DateTime.now();
+    bool historyConfirmed = false;
 
     showModalBottomSheet(
       context: context,
@@ -2609,6 +2610,35 @@ class _ReproductionTabState extends State<_ReproductionTab> {
                 const Text('Lactation Start Date', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
                 const SizedBox(height: 8),
                 _datePickerTile(ctx, startDate, (d) => setModalState(() => startDate = d)),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: historyConfirmed,
+                      onChanged: (v) => setModalState(() => historyConfirmed = v ?? false),
+                      activeColor: RumenoTheme.primaryGreen,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                    ),
+                    const Expanded(
+                      child: Text(
+                        'History of lactation',
+                        style: TextStyle(fontSize: 15, color: RumenoTheme.textDark),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFFF3CD),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Color(0xFFFFD700)),
+                      ),
+                      child: const Text(
+                        'Not confirmed',
+                        style: TextStyle(fontSize: 11, color: Color(0xFF856404), fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 24),
                 _saveButton(ctx, 'Start Lactation', () {
                   Navigator.pop(ctx);
