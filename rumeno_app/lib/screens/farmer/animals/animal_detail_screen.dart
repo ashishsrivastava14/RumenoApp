@@ -2170,7 +2170,8 @@ class _ReproductionTabState extends State<_ReproductionTab> {
                 Row(
                   children: HeatIntensity.values.map((hi) {
                     final sel = intensity == hi;
-                    final color = switch (hi) { HeatIntensity.strong => RumenoTheme.errorRed, HeatIntensity.moderate => RumenoTheme.warningYellow, HeatIntensity.mild => RumenoTheme.successGreen };
+                    final color = switch (hi) { HeatIntensity.strong => RumenoTheme.errorRed, HeatIntensity.moderate => RumenoTheme.warningYellow, HeatIntensity.mild => RumenoTheme.successGreen, HeatIntensity.repeatHeat => Colors.red.shade900 };
+                    final label = hi == HeatIntensity.repeatHeat ? 'Repeat Heat' : hi.name[0].toUpperCase() + hi.name.substring(1);
                     return Expanded(
                       child: GestureDetector(
                         onTap: () => setModalState(() => intensity = hi),
@@ -2187,7 +2188,7 @@ class _ReproductionTabState extends State<_ReproductionTab> {
                             children: [
                               Icon(Icons.whatshot, color: sel ? color : RumenoTheme.textGrey, size: 24),
                               const SizedBox(height: 4),
-                              Text(hi.name[0].toUpperCase() + hi.name.substring(1), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? color : RumenoTheme.textGrey)),
+                              Text(label, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? color : RumenoTheme.textGrey)),
                             ],
                           ),
                         ),
@@ -2264,7 +2265,8 @@ class _ReproductionTabState extends State<_ReproductionTab> {
                 Row(
                   children: HeatIntensity.values.map((hi) {
                     final sel = intensity == hi;
-                    final color = switch (hi) { HeatIntensity.strong => RumenoTheme.errorRed, HeatIntensity.moderate => RumenoTheme.warningYellow, HeatIntensity.mild => RumenoTheme.successGreen };
+                    final color = switch (hi) { HeatIntensity.strong => RumenoTheme.errorRed, HeatIntensity.moderate => RumenoTheme.warningYellow, HeatIntensity.mild => RumenoTheme.successGreen, HeatIntensity.repeatHeat => Colors.red.shade900 };
+                    final label = hi == HeatIntensity.repeatHeat ? 'Repeat Heat' : hi.name[0].toUpperCase() + hi.name.substring(1);
                     return Expanded(
                       child: GestureDetector(
                         onTap: () => setModalState(() => intensity = hi),
@@ -2277,7 +2279,7 @@ class _ReproductionTabState extends State<_ReproductionTab> {
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: sel ? color : RumenoTheme.textLight, width: sel ? 2 : 1),
                           ),
-                          child: Center(child: Text(hi.name[0].toUpperCase() + hi.name.substring(1), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? color : RumenoTheme.textGrey))),
+                          child: Center(child: Text(label, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? color : RumenoTheme.textGrey))),
                         ),
                       ),
                     );
@@ -3076,11 +3078,13 @@ class _IntensityIndicator extends StatelessWidget {
       HeatIntensity.strong => RumenoTheme.errorRed,
       HeatIntensity.moderate => RumenoTheme.warningYellow,
       HeatIntensity.mild => RumenoTheme.successGreen,
+      HeatIntensity.repeatHeat => Colors.red.shade900,
     };
+    final label = intensity == HeatIntensity.repeatHeat ? 'Repeat Heat' : intensity.name[0].toUpperCase() + intensity.name.substring(1);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
-      child: Text(intensity.name[0].toUpperCase() + intensity.name.substring(1), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color)),
+      child: Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color)),
     );
   }
 }

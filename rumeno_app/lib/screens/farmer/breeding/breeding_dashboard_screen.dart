@@ -91,7 +91,8 @@ class _BreedingDashboardScreenState extends State<BreedingDashboardScreen> {
                 Row(
                   children: HeatIntensity.values.map((hi) {
                     final sel = intensity == hi;
-                    final color = switch (hi) { HeatIntensity.strong => RumenoTheme.errorRed, HeatIntensity.moderate => RumenoTheme.warningYellow, HeatIntensity.mild => RumenoTheme.successGreen };
+                    final color = switch (hi) { HeatIntensity.strong => RumenoTheme.errorRed, HeatIntensity.moderate => RumenoTheme.warningYellow, HeatIntensity.mild => RumenoTheme.successGreen, HeatIntensity.repeatHeat => Colors.red.shade900 };
+                    final label = hi == HeatIntensity.repeatHeat ? 'Repeat Heat' : hi.name[0].toUpperCase() + hi.name.substring(1);
                     return Expanded(
                       child: GestureDetector(
                         onTap: () => setModalState(() => intensity = hi),
@@ -107,7 +108,7 @@ class _BreedingDashboardScreenState extends State<BreedingDashboardScreen> {
                           child: Column(children: [
                             Icon(Icons.whatshot, color: sel ? color : RumenoTheme.textGrey, size: 24),
                             const SizedBox(height: 4),
-                            Text(hi.name[0].toUpperCase() + hi.name.substring(1), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? color : RumenoTheme.textGrey)),
+                            Text(label, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? color : RumenoTheme.textGrey)),
                           ]),
                         ),
                       ),
@@ -179,7 +180,8 @@ class _BreedingDashboardScreenState extends State<BreedingDashboardScreen> {
                 Row(
                   children: HeatIntensity.values.map((hi) {
                     final sel = intensity == hi;
-                    final color = switch (hi) { HeatIntensity.strong => RumenoTheme.errorRed, HeatIntensity.moderate => RumenoTheme.warningYellow, HeatIntensity.mild => RumenoTheme.successGreen };
+                    final color = switch (hi) { HeatIntensity.strong => RumenoTheme.errorRed, HeatIntensity.moderate => RumenoTheme.warningYellow, HeatIntensity.mild => RumenoTheme.successGreen, HeatIntensity.repeatHeat => Colors.red.shade900 };
+                    final label = hi == HeatIntensity.repeatHeat ? 'Repeat Heat' : hi.name[0].toUpperCase() + hi.name.substring(1);
                     return Expanded(
                       child: GestureDetector(
                         onTap: () => setModalState(() => intensity = hi),
@@ -192,7 +194,7 @@ class _BreedingDashboardScreenState extends State<BreedingDashboardScreen> {
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: sel ? color : RumenoTheme.textLight, width: sel ? 2 : 1),
                           ),
-                          child: Center(child: Text(hi.name[0].toUpperCase() + hi.name.substring(1), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? color : RumenoTheme.textGrey))),
+                          child: Center(child: Text(label, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: sel ? color : RumenoTheme.textGrey))),
                         ),
                       ),
                     );

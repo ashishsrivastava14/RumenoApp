@@ -221,7 +221,7 @@ class TreatmentRecord {
   });
 }
 
-enum HeatIntensity { mild, moderate, strong }
+enum HeatIntensity { mild, moderate, strong, repeatHeat }
 
 class BreedingRecord {
   final String id;
