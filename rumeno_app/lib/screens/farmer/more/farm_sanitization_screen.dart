@@ -10,6 +10,7 @@ class SanitizationRecord {
   final String id;
   final DateTime date;
   final List<String> sanitizerNames;
+  final Map<String, String> sanitizerQuantities;
   final DateTime? nextDate;
   final List<String> areas;
   final String? notes;
@@ -18,6 +19,7 @@ class SanitizationRecord {
     required this.id,
     required this.date,
     required this.sanitizerNames,
+    this.sanitizerQuantities = const <String, String>{},
     this.nextDate,
     this.areas = const [],
     this.notes,
@@ -35,13 +37,12 @@ class _Option {
 const List<_Option> _sanitizerOptions = [
   _Option('🧴', 'Bleach (Sodium Hypochlorite)'),
   _Option('🫧', 'Phenyl'),
-  _Option('🟡', 'Dettol Antiseptic'),
-  _Option('🟤', 'Iodine Solution'),
+  _Option('�', 'Iodine Solution'),
   _Option('⬜', 'Quicklime (Chuna)'),
   _Option('🧪', 'Formalin'),
   _Option('🟣', 'Potassium Permanganate'),
   _Option('💧', 'Hydrogen Peroxide'),
-  _Option('🔴', 'Virkon-S'),
+  _Option('🔹', 'Others'),
 ];
 
 const List<_Option> _areaOptions = [
@@ -62,6 +63,7 @@ final List<SanitizationRecord> _mockSanitizationRecords = [
     id: 'san1',
     date: DateTime.now().subtract(const Duration(days: 12)),
     sanitizerNames: ['Bleach (Sodium Hypochlorite)', 'Phenyl'],
+    sanitizerQuantities: {'Bleach (Sodium Hypochlorite)': '2 litres', 'Phenyl': '500 ml'},
     nextDate: DateTime.now().add(const Duration(days: 18)),
     areas: ['Cow Shed', 'Water Trough'],
     notes: 'Full wash done after rain',
@@ -70,13 +72,15 @@ final List<SanitizationRecord> _mockSanitizationRecords = [
     id: 'san2',
     date: DateTime.now().subtract(const Duration(days: 43)),
     sanitizerNames: ['Quicklime (Chuna)', 'Iodine Solution'],
+    sanitizerQuantities: {},
     nextDate: DateTime.now().subtract(const Duration(days: 13)),
     areas: ['Full Farm'],
   ),
   SanitizationRecord(
     id: 'san3',
     date: DateTime.now().subtract(const Duration(days: 80)),
-    sanitizerNames: ['Virkon-S'],
+    sanitizerNames: ['Others'],
+    sanitizerQuantities: {'Others': '1 litre'},
     nextDate: DateTime.now().subtract(const Duration(days: 50)),
     areas: ['Cow Shed', 'Goat Pen', 'Entry Gate'],
     notes: 'After disease outbreak scare',
@@ -241,6 +245,8 @@ class _FarmSanitizationScreenState extends State<FarmSanitizationScreen> {
     DateTime selectedDate = DateTime.now();
     DateTime? nextDate;
     final List<String> selectedSanitizers = [];
+    final Map<String, TextEditingController> quantityControllers = {};
+    final TextEditingController otherNameCtrl = TextEditingController();
     final List<String> selectedAreas = [];
     final notesCtrl = TextEditingController();
 
@@ -350,8 +356,10 @@ class _FarmSanitizationScreenState extends State<FarmSanitizationScreen> {
                               setModalState(() {
                                 if (isSelected) {
                                   selectedSanitizers.remove(opt.name);
+                                  quantityControllers.remove(opt.name);
                                 } else {
                                   selectedSanitizers.add(opt.name);
+                                  quantityControllers[opt.name] = TextEditingController();
                                 }
                               });
                             },
@@ -424,6 +432,129 @@ class _FarmSanitizationScreenState extends State<FarmSanitizationScreen> {
                             ],
                           ),
                         ),
+
+                      // ─── Quantity fields (shown when any sanitizer is selected) ───
+                      if (selectedSanitizers.isNotEmpty) ...[  
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2196F3).withValues(alpha: 0.04),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                                color: const Color(0xFF2196F3).withValues(alpha: 0.2)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: const [
+                                  Text('📏', style: TextStyle(fontSize: 14)),
+                                  SizedBox(width: 6),
+                                  Text('Quantity Used',
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: RumenoTheme.textDark)),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              ...selectedSanitizers.map((name) {
+                                final opt = _sanitizerOptions
+                                    .where((o) => o.name == name)
+                                    .firstOrNull;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: Row(
+                                    children: [
+                                      Text(opt?.emoji ?? '🔹',
+                                          style: const TextStyle(fontSize: 16)),
+                                      const SizedBox(width: 6),
+                                      Expanded(
+                                        child: name == 'Others'
+                                            ? TextField(
+                                                controller: otherNameCtrl,
+                                                decoration: InputDecoration(
+                                                  hintText: 'Enter sanitizer name…',
+                                                  hintStyle: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey.shade400),
+                                                  contentPadding:
+                                                      const EdgeInsets.symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 8),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(10),
+                                                    borderSide: BorderSide(
+                                                        color: Colors.grey.shade300),
+                                                  ),
+                                                  enabledBorder: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(10),
+                                                    borderSide: BorderSide(
+                                                        color: Colors.grey.shade300),
+                                                  ),
+                                                  focusedBorder: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(10),
+                                                    borderSide: const BorderSide(
+                                                        color: Color(0xFF2196F3),
+                                                        width: 1.5),
+                                                  ),
+                                                ),
+                                                style: const TextStyle(fontSize: 13),
+                                              )
+                                            : Text(name,
+                                                style: const TextStyle(
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: RumenoTheme.textDark)),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      SizedBox(
+                                        width: 110,
+                                        child: TextField(
+                                          controller: quantityControllers[name],
+                                          decoration: InputDecoration(
+                                            hintText: 'e.g. 2 L',
+                                            hintStyle: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey.shade400),
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    horizontal: 10, vertical: 8),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey.shade300),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey.shade300),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: const BorderSide(
+                                                  color: Color(0xFF2196F3),
+                                                  width: 1.5),
+                                            ),
+                                          ),
+                                          style: const TextStyle(fontSize: 13),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
+                      ],
 
                       const SizedBox(height: 24),
 
@@ -622,10 +753,36 @@ class _FarmSanitizationScreenState extends State<FarmSanitizationScreen> {
                               );
                               return;
                             }
+                            // Resolve 'Others' to custom typed name
+                            final List<String> finalSanitizerNames =
+                                selectedSanitizers.map((name) {
+                              if (name == 'Others') {
+                                final custom = otherNameCtrl.text.trim();
+                                return custom.isNotEmpty ? custom : 'Others';
+                              }
+                              return name;
+                            }).toList();
+
+                            // Build quantities map
+                            final Map<String, String> quantities = {};
+                            for (final name in selectedSanitizers) {
+                              final resolvedName = name == 'Others'
+                                  ? (otherNameCtrl.text.trim().isNotEmpty
+                                      ? otherNameCtrl.text.trim()
+                                      : 'Others')
+                                  : name;
+                              final qty =
+                                  quantityControllers[name]?.text.trim() ?? '';
+                              if (qty.isNotEmpty) {
+                                quantities[resolvedName] = qty;
+                              }
+                            }
+
                             final rec = SanitizationRecord(
                               id: 'san${DateTime.now().millisecondsSinceEpoch}',
                               date: selectedDate,
-                              sanitizerNames: List.from(selectedSanitizers),
+                              sanitizerNames: finalSanitizerNames,
+                              sanitizerQuantities: quantities,
                               nextDate: nextDate,
                               areas: List.from(selectedAreas),
                               notes: notesCtrl.text.trim().isEmpty
@@ -1118,6 +1275,7 @@ class _RecordCard extends StatelessWidget {
                     final opt = _sanitizerOptions
                         .where((o) => o.name == name)
                         .firstOrNull;
+                    final qty = record.sanitizerQuantities[name];
                     return Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 6),
@@ -1141,6 +1299,23 @@ class _RecordCard extends StatelessWidget {
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                   color: Color(0xFF1565C0))),
+                          if (qty != null && qty.isNotEmpty) ...[  
+                            const SizedBox(width: 5),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF2196F3)
+                                    .withValues(alpha: 0.18),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(qty,
+                                  style: const TextStyle(
+                                      fontSize: 10,
+                                      color: Color(0xFF1565C0),
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                          ],
                         ],
                       ),
                     );
