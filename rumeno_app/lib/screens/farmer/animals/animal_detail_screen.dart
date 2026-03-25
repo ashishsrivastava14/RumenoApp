@@ -2433,10 +2433,35 @@ class _ReproductionTabState extends State<_ReproductionTab> {
   }
 
   // ── Update Pregnancy Status ──
+  /// Returns the estimated gestation period (days) for this animal based on species and breed.
+  int _gestationDaysForAnimal() {
+    final breed = widget.animal.breed.toLowerCase();
+    // Breed-specific overrides
+    if (breed.contains('holstein') || breed.contains('friesian')) return 279;
+    if (breed.contains('jersey')) return 279;
+    if (breed.contains('hereford')) return 285;
+    if (breed.contains('angus')) return 283;
+    if (breed.contains('simmental')) return 288;
+    if (breed.contains('murrah') || breed.contains('nili') || breed.contains('ravi')) return 315;
+    if (breed.contains('boer')) return 150;
+    if (breed.contains('merino')) return 148;
+    // Species defaults
+    switch (widget.animal.species) {
+      case Species.cow: return 280;
+      case Species.buffalo: return 315;
+      case Species.goat: return 150;
+      case Species.sheep: return 148;
+      case Species.pig: return 114;
+      case Species.horse: return 340;
+    }
+  }
+
   void _showUpdatePregnancyDialog() {
     bool isPregnant = true;
+    final gestationDays = _gestationDaysForAnimal();
     DateTime matingDate = DateTime.now().subtract(const Duration(days: 30));
-    DateTime expectedDelivery = DateTime.now().add(const Duration(days: 250));
+    DateTime expectedDelivery = matingDate.add(Duration(days: gestationDays));
+    bool deliveryOverridden = false;
 
     showModalBottomSheet(
       context: context,
@@ -2506,11 +2531,30 @@ class _ReproductionTabState extends State<_ReproductionTab> {
                   const SizedBox(height: 16),
                   const Text('Mating Date', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
                   const SizedBox(height: 8),
-                  _datePickerTile(ctx, matingDate, (d) => setModalState(() => matingDate = d)),
+                  _datePickerTile(ctx, matingDate, (d) => setModalState(() {
+                    matingDate = d;
+                    if (!deliveryOverridden) {
+                      expectedDelivery = d.add(Duration(days: gestationDays));
+                    }
+                  })),
                   const SizedBox(height: 12),
                   const Text('Expected Delivery', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: RumenoTheme.textDark)),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.info_outline, size: 13, color: RumenoTheme.textGrey),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Estimated for ${widget.animal.breed}: ~$gestationDays days gestation',
+                        style: const TextStyle(fontSize: 12, color: RumenoTheme.textGrey),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 8),
-                  _datePickerTile(ctx, expectedDelivery, (d) => setModalState(() => expectedDelivery = d)),
+                  _datePickerTile(ctx, expectedDelivery, (d) => setModalState(() {
+                    expectedDelivery = d;
+                    deliveryOverridden = true;
+                  })),
                 ],
                 const SizedBox(height: 24),
                 _saveButton(ctx, 'Update Status', () {
