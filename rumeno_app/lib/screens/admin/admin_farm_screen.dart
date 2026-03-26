@@ -20,6 +20,7 @@ class AdminFarmScreen extends StatefulWidget {
 class _AdminFarmScreenState extends State<AdminFarmScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tab;
+  String? _selectedFarmerId;
 
   @override
   void initState() {
@@ -33,15 +34,36 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
     super.dispose();
   }
 
+  /// Returns the set of animal IDs belonging to the selected farmer.
+  /// Returns null when no filter is active (show all).
+  Set<String>? get _filteredAnimalIds {
+    if (_selectedFarmerId == null) return null;
+    return mockAnimals
+        .where((a) => a.farmerId == _selectedFarmerId)
+        .map((a) => a.id)
+        .toSet();
+  }
+
+  Farmer? get _selectedFarmer =>
+      _selectedFarmerId == null
+          ? null
+          : mockFarmers.firstWhere((f) => f.id == _selectedFarmerId,
+              orElse: () => mockFarmers.first);
+
   @override
   Widget build(BuildContext context) {
+    final selectedFarmer = _selectedFarmer;
+    final subtitle = selectedFarmer != null
+        ? '${selectedFarmer.farmName}'
+        : 'All Farms & Animals';
+
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       body: NestedScrollView(
         headerSliverBuilder: (context, _) => [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 240,
+            expandedHeight: 300,
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
@@ -63,18 +85,73 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
                         const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text('Farm Management',
+                          children: [
+                            const Text('Farm Management',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold)),
-                            Text('All Farms & Animals',
-                                style: TextStyle(
+                            Text(subtitle,
+                                style: const TextStyle(
                                     color: Colors.white70, fontSize: 14)),
                           ],
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 14),
+                    // ── Farm Filter Dropdown ──
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String?>(
+                          value: _selectedFarmerId,
+                          isExpanded: true,
+                          icon: const Icon(Icons.filter_list_rounded, color: Colors.white, size: 22),
+                          dropdownColor: const Color(0xFF2E7D32),
+                          style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                          hint: const Row(
+                            children: [
+                              Icon(Icons.agriculture_rounded, color: Colors.white70, size: 20),
+                              SizedBox(width: 8),
+                              Text('All Farms', style: TextStyle(color: Colors.white70, fontSize: 15)),
+                            ],
+                          ),
+                          items: [
+                            const DropdownMenuItem<String?>(
+                              value: null,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.select_all_rounded, color: Colors.white70, size: 20),
+                                  SizedBox(width: 8),
+                                  Text('All Farms', style: TextStyle(color: Colors.white)),
+                                ],
+                              ),
+                            ),
+                            ...mockFarmers.map((f) => DropdownMenuItem<String?>(
+                                  value: f.id,
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.agriculture_rounded, color: Colors.white70, size: 20),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          '${f.farmName} (${f.name})',
+                                          style: const TextStyle(color: Colors.white),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ],
+                          onChanged: (v) => setState(() => _selectedFarmerId = v),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -104,14 +181,14 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
         ],
         body: TabBarView(
           controller: _tab,
-          children: const [
-            _AnimalsTab(),
-            _HealthTab(),
-            _BreedingTab(),
-            _MilkTab(),
-            _KidsTab(),
-            _FinanceTab(),
-            _StatsTab(),
+          children: [
+            _AnimalsTab(farmerId: _selectedFarmerId),
+            _HealthTab(farmerId: _selectedFarmerId, animalIds: _filteredAnimalIds),
+            _BreedingTab(farmerId: _selectedFarmerId, animalIds: _filteredAnimalIds),
+            _MilkTab(farmerId: _selectedFarmerId, animalIds: _filteredAnimalIds),
+            _KidsTab(farmerId: _selectedFarmerId),
+            _FinanceTab(farmerId: _selectedFarmerId),
+            _StatsTab(farmerId: _selectedFarmerId, animalIds: _filteredAnimalIds),
           ],
         ),
       ),
@@ -121,7 +198,8 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
 
 // ─── Animals Tab ──────────────────────────────────────────────────────────────
 class _AnimalsTab extends StatefulWidget {
-  const _AnimalsTab();
+  final String? farmerId;
+  const _AnimalsTab({this.farmerId});
 
   @override
   State<_AnimalsTab> createState() => _AnimalsTabState();
@@ -133,7 +211,11 @@ class _AnimalsTabState extends State<_AnimalsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = mockAnimals.where((a) {
+    final baseAnimals = widget.farmerId == null
+        ? mockAnimals
+        : mockAnimals.where((a) => a.farmerId == widget.farmerId).toList();
+
+    final filtered = baseAnimals.where((a) {
       final matchSearch =
           a.breed.toLowerCase().contains(_search.toLowerCase()) ||
               a.tagId.toLowerCase().contains(_search.toLowerCase());
@@ -143,7 +225,7 @@ class _AnimalsTabState extends State<_AnimalsTab> {
     }).toList();
 
     final speciesCounts = <Species, int>{};
-    for (final a in mockAnimals) {
+    for (final a in baseAnimals) {
       speciesCounts[a.species] = (speciesCounts[a.species] ?? 0) + 1;
     }
 
@@ -628,7 +710,9 @@ class _AnimalDetailSheet extends StatelessWidget {
 
 // ─── Health Tab ───────────────────────────────────────────────────────────────
 class _HealthTab extends StatefulWidget {
-  const _HealthTab();
+  final String? farmerId;
+  final Set<String>? animalIds;
+  const _HealthTab({this.farmerId, this.animalIds});
 
   @override
   State<_HealthTab> createState() => _HealthTabState();
@@ -641,20 +725,29 @@ class _HealthTabState extends State<_HealthTab> {
   bool _showAllBreeding = false;
   bool _showAllLab = false;
 
+  bool _matchAnimal(String animalId) =>
+      widget.animalIds == null || widget.animalIds!.contains(animalId);
+
   @override
   Widget build(BuildContext context) {
-    final overdueVax = mockVaccinations.where((v) => v.status == VaccinationStatus.overdue).toList();
-    final dueVax = mockVaccinations.where((v) => v.status == VaccinationStatus.due).toList();
-    final activeTreatments = mockTreatments.where((t) => t.endDate == null || t.endDate!.isAfter(DateTime.now())).toList();
-    final overdueDeworm = mockDewormingRecords.where((d) => d.status == DewormingStatus.overdue).toList();
-    final pregnantAnimals = mockBreedingRecords.where((b) => b.isPregnant == true).toList();
-    final pendingLabs = mockLabReports.where((l) => l.status == LabReportStatus.pending).toList();
+    final vax = mockVaccinations.where((v) => _matchAnimal(v.animalId)).toList();
+    final treats = mockTreatments.where((t) => _matchAnimal(t.animalId)).toList();
+    final deworms = mockDewormingRecords.where((d) => _matchAnimal(d.animalId)).toList();
+    final breeds = mockBreedingRecords.where((b) => _matchAnimal(b.animalId)).toList();
+    final labs = mockLabReports.where((l) => _matchAnimal(l.animalId)).toList();
 
-    final vaxToShow = _showAllVax ? mockVaccinations : mockVaccinations.take(5).toList();
-    final treatToShow = _showAllTreatments ? mockTreatments : mockTreatments.take(4).toList();
-    final dewormToShow = _showAllDeworming ? mockDewormingRecords : mockDewormingRecords.take(4).toList();
-    final breedToShow = _showAllBreeding ? mockBreedingRecords : mockBreedingRecords.take(4).toList();
-    final labToShow = _showAllLab ? mockLabReports : mockLabReports.take(4).toList();
+    final overdueVax = vax.where((v) => v.status == VaccinationStatus.overdue).toList();
+    final dueVax = vax.where((v) => v.status == VaccinationStatus.due).toList();
+    final activeTreatments = treats.where((t) => t.endDate == null || t.endDate!.isAfter(DateTime.now())).toList();
+    final overdueDeworm = deworms.where((d) => d.status == DewormingStatus.overdue).toList();
+    final pregnantAnimals = breeds.where((b) => b.isPregnant == true).toList();
+    final pendingLabs = labs.where((l) => l.status == LabReportStatus.pending).toList();
+
+    final vaxToShow = _showAllVax ? vax : vax.take(5).toList();
+    final treatToShow = _showAllTreatments ? treats : treats.take(4).toList();
+    final dewormToShow = _showAllDeworming ? deworms : deworms.take(4).toList();
+    final breedToShow = _showAllBreeding ? breeds : breeds.take(4).toList();
+    final labToShow = _showAllLab ? labs : labs.take(4).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -753,14 +846,14 @@ class _HealthTabState extends State<_HealthTab> {
           Row(children: [
             const Icon(Icons.vaccines_rounded, size: 22, color: RumenoTheme.primaryGreen),
             const SizedBox(width: 8),
-            Text('Injections (${mockVaccinations.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text('Injections (${vax.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           ]),
           const SizedBox(height: 12),
           ...vaxToShow.map((v) => _VaccinationTile(vaccination: v)),
-          if (mockVaccinations.length > 5)
+          if (vax.length > 5)
             _ShowMoreButton(
               expanded: _showAllVax,
-              total: mockVaccinations.length,
+              total: vax.length,
               onTap: () => setState(() => _showAllVax = !_showAllVax),
             ),
           const SizedBox(height: 20),
@@ -769,14 +862,14 @@ class _HealthTabState extends State<_HealthTab> {
           Row(children: [
             const Icon(Icons.medical_services_rounded, size: 22, color: RumenoTheme.errorRed),
             const SizedBox(width: 8),
-            Text('Treatments (${mockTreatments.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text('Treatments (${treats.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           ]),
           const SizedBox(height: 12),
           ...treatToShow.map((t) => _TreatmentTile(treatment: t)),
-          if (mockTreatments.length > 4)
+          if (treats.length > 4)
             _ShowMoreButton(
               expanded: _showAllTreatments,
-              total: mockTreatments.length,
+              total: treats.length,
               onTap: () => setState(() => _showAllTreatments = !_showAllTreatments),
             ),
           const SizedBox(height: 20),
@@ -785,14 +878,14 @@ class _HealthTabState extends State<_HealthTab> {
           Row(children: [
             const Icon(Icons.pest_control_rounded, size: 22, color: Colors.teal),
             const SizedBox(width: 8),
-            Text('Deworming (${mockDewormingRecords.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text('Deworming (${deworms.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           ]),
           const SizedBox(height: 12),
           ...dewormToShow.map((d) => _DewormingTile(deworming: d)),
-          if (mockDewormingRecords.length > 4)
+          if (deworms.length > 4)
             _ShowMoreButton(
               expanded: _showAllDeworming,
-              total: mockDewormingRecords.length,
+              total: deworms.length,
               onTap: () => setState(() => _showAllDeworming = !_showAllDeworming),
             ),
           const SizedBox(height: 20),
@@ -801,14 +894,14 @@ class _HealthTabState extends State<_HealthTab> {
           Row(children: [
             const Icon(Icons.child_friendly_rounded, size: 22, color: Colors.pink),
             const SizedBox(width: 8),
-            Text('Breeding (${mockBreedingRecords.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text('Breeding (${breeds.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           ]),
           const SizedBox(height: 12),
           ...breedToShow.map((b) => _BreedingTile(breeding: b)),
-          if (mockBreedingRecords.length > 4)
+          if (breeds.length > 4)
             _ShowMoreButton(
               expanded: _showAllBreeding,
-              total: mockBreedingRecords.length,
+              total: breeds.length,
               onTap: () => setState(() => _showAllBreeding = !_showAllBreeding),
             ),
           const SizedBox(height: 20),
@@ -817,14 +910,14 @@ class _HealthTabState extends State<_HealthTab> {
           Row(children: [
             const Icon(Icons.science_rounded, size: 22, color: Colors.purple),
             const SizedBox(width: 8),
-            Text('Lab Reports (${mockLabReports.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text('Lab Reports (${labs.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           ]),
           const SizedBox(height: 12),
           ...labToShow.map((l) => _LabReportTile(labReport: l)),
-          if (mockLabReports.length > 4)
+          if (labs.length > 4)
             _ShowMoreButton(
               expanded: _showAllLab,
-              total: mockLabReports.length,
+              total: labs.length,
               onTap: () => setState(() => _showAllLab = !_showAllLab),
             ),
           const SizedBox(height: 20),
@@ -1306,7 +1399,9 @@ class _TreatmentTile extends StatelessWidget {
 
 // ─── Breeding Tab ─────────────────────────────────────────────────────────────
 class _BreedingTab extends StatefulWidget {
-  const _BreedingTab();
+  final String? farmerId;
+  final Set<String>? animalIds;
+  const _BreedingTab({this.farmerId, this.animalIds});
 
   @override
   State<_BreedingTab> createState() => _BreedingTabState();
@@ -1315,17 +1410,21 @@ class _BreedingTab extends StatefulWidget {
 class _BreedingTabState extends State<_BreedingTab> {
   String _filter = 'all'; // 'all', 'pregnant', 'ai', 'natural'
 
+  bool _matchAnimal(String animalId) =>
+      widget.animalIds == null || widget.animalIds!.contains(animalId);
+
   @override
   Widget build(BuildContext context) {
-    final pregnant = mockBreedingRecords.where((b) => b.isPregnant).length;
-    final aiCount = mockBreedingRecords.where((b) => b.aiDone).length;
-    final naturalCount = mockBreedingRecords.where((b) => !b.aiDone).length;
-    final upcoming = mockBreedingRecords
+    final allRecords = mockBreedingRecords.where((b) => _matchAnimal(b.animalId)).toList();
+    final pregnant = allRecords.where((b) => b.isPregnant).length;
+    final aiCount = allRecords.where((b) => b.aiDone).length;
+    final naturalCount = allRecords.where((b) => !b.aiDone).length;
+    final upcoming = allRecords
         .where((b) => b.isPregnant && b.expectedDelivery != null && b.expectedDelivery!.isAfter(DateTime.now()))
         .toList()
       ..sort((a, b) => a.expectedDelivery!.compareTo(b.expectedDelivery!));
 
-    final filtered = mockBreedingRecords.where((b) {
+    final filtered = allRecords.where((b) {
       if (_filter == 'pregnant') return b.isPregnant;
       if (_filter == 'ai') return b.aiDone;
       if (_filter == 'natural') return !b.aiDone;
@@ -1465,18 +1564,26 @@ class _FilterChip extends StatelessWidget {
 
 // ─── Milk Tab ─────────────────────────────────────────────────────────────────
 class _MilkTab extends StatelessWidget {
-  const _MilkTab();
+  final String? farmerId;
+  final Set<String>? animalIds;
+  const _MilkTab({this.farmerId, this.animalIds});
+
+  bool _matchAnimal(String animalId) =>
+      animalIds == null || animalIds!.contains(animalId);
 
   @override
   Widget build(BuildContext context) {
     final today = DateTime.now();
     final yesterday = today.subtract(const Duration(days: 1));
-    final todayTotal = totalMilkForDate(today);
-    final yesterdayTotal = totalMilkForDate(yesterday);
-    final todayRecords = milkRecordsForDate(today);
+
+    final allMilkRecords = mockMilkRecords.where((r) => _matchAnimal(r.animalId)).toList();
+    final todayTotal = allMilkRecords.where((r) => r.date.year == today.year && r.date.month == today.month && r.date.day == today.day).fold(0.0, (s, r) => s + r.quantityLitres);
+    final yesterdayTotal = allMilkRecords.where((r) => r.date.year == yesterday.year && r.date.month == yesterday.month && r.date.day == yesterday.day).fold(0.0, (s, r) => s + r.quantityLitres);
+    final todayRecords = allMilkRecords.where((r) => r.date.year == today.year && r.date.month == today.month && r.date.day == today.day).toList();
     final morningTotal = todayRecords.where((r) => r.session == MilkSession.morning).fold(0.0, (s, r) => s + r.quantityLitres);
     final eveningTotal = todayRecords.where((r) => r.session == MilkSession.evening).fold(0.0, (s, r) => s + r.quantityLitres);
-    final dairyAnimals = getDairyAnimals(mockAnimals);
+    final baseAnimals = farmerId == null ? mockAnimals : mockAnimals.where((a) => a.farmerId == farmerId).toList();
+    final dairyAnimals = getDairyAnimals(baseAnimals);
     final change = yesterdayTotal > 0 ? ((todayTotal - yesterdayTotal) / yesterdayTotal * 100) : 0.0;
 
     // Per-animal milk summary (today)
@@ -1696,14 +1803,18 @@ class _MilkStatCard extends StatelessWidget {
 
 // ─── Kids Tab ─────────────────────────────────────────────────────────────────
 class _KidsTab extends StatelessWidget {
-  const _KidsTab();
+  final String? farmerId;
+  const _KidsTab({this.farmerId});
 
   @override
   Widget build(BuildContext context) {
-    final totalK = mockKids.length;
-    final weaned = mockKids.where((k) => k.isWeaned).length;
-    final coccDue = mockKids.where((k) => k.coccidisostatDue).length;
-    final onReplacer = mockKids.where((k) => k.milkReplacerStartDate != null).length;
+    final kids = farmerId == null
+        ? mockKids
+        : mockKids.where((k) => k.farmerId == farmerId).toList();
+    final totalK = kids.length;
+    final weaned = kids.where((k) => k.isWeaned).length;
+    final coccDue = kids.where((k) => k.coccidisostatDue).length;
+    final onReplacer = kids.where((k) => k.milkReplacerStartDate != null).length;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -1763,7 +1874,7 @@ class _KidsTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          ...mockKids.map((kid) {
+          ...kids.map((kid) {
             final mother = getAnimalById(kid.motherId ?? '');
             final ageInDays = kid.dateOfBirth != null ? DateTime.now().difference(kid.dateOfBirth!).inDays : 0;
             final coccStatus = kid.coccidisostatDue;
@@ -1902,30 +2013,38 @@ class _KidsTab extends StatelessWidget {
 
 // ─── Finance Tab ──────────────────────────────────────────────────────────────
 class _FinanceTab extends StatelessWidget {
-  const _FinanceTab();
+  final String? farmerId;
+  const _FinanceTab({this.farmerId});
 
   @override
   Widget build(BuildContext context) {
-    final totalExp = mockExpenses.fold(0.0, (s, e) => s + e.amount);
-    final totalSale = mockSales.fold(0.0, (s, e) => s + e.amount);
+    final expenses = farmerId == null
+        ? mockExpenses
+        : mockExpenses.where((e) => e.farmerId == farmerId).toList();
+    final sales = farmerId == null
+        ? mockSales
+        : mockSales.where((s) => s.farmerId == farmerId).toList();
+
+    final totalExp = expenses.fold(0.0, (s, e) => s + e.amount);
+    final totalSale = sales.fold(0.0, (s, e) => s + e.amount);
     final profit = totalSale - totalExp;
 
     // Expense by category
     final catExpenses = <ExpenseCategory, double>{};
-    for (final e in mockExpenses) {
+    for (final e in expenses) {
       catExpenses[e.category] = (catExpenses[e.category] ?? 0) + e.amount;
     }
     final sortedCats = catExpenses.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
 
     // Sales by type
     final saleByType = <SaleType, double>{};
-    for (final s in mockSales) {
+    for (final s in sales) {
       saleByType[s.type] = (saleByType[s.type] ?? 0) + s.amount;
     }
 
     // Recent transactions (combined, sorted by date)
-    final recentExpenses = mockExpenses.take(5).toList();
-    final recentSales = mockSales.take(5).toList();
+    final recentExpenses = expenses.take(5).toList();
+    final recentSales = sales.take(5).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -2049,7 +2168,7 @@ class _FinanceTab extends StatelessWidget {
             children: [
               const Text('📤', style: TextStyle(fontSize: 20)),
               const SizedBox(width: 8),
-              Text('Recent Expenses (${mockExpenses.length} total)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Recent Expenses (${expenses.length} total)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ],
           ),
           const SizedBox(height: 10),
@@ -2075,7 +2194,7 @@ class _FinanceTab extends StatelessWidget {
             children: [
               const Text('📥', style: TextStyle(fontSize: 20)),
               const SizedBox(width: 8),
-              Text('Recent Sales (${mockSales.length} total)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Recent Sales (${sales.length} total)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ],
           ),
           const SizedBox(height: 10),
@@ -2148,26 +2267,38 @@ class _FinanceSummaryItem extends StatelessWidget {
 
 // ─── Stats Tab ────────────────────────────────────────────────────────────────
 class _StatsTab extends StatelessWidget {
-  const _StatsTab();
+  final String? farmerId;
+  final Set<String>? animalIds;
+  const _StatsTab({this.farmerId, this.animalIds});
+
+  bool _matchAnimal(String animalId) =>
+      animalIds == null || animalIds!.contains(animalId);
 
   @override
   Widget build(BuildContext context) {
-    final total = mockAnimals.length;
-    final active = mockAnimals.where((a) => a.status == AnimalStatus.active).length;
-    final pregnant = mockAnimals.where((a) => a.status == AnimalStatus.pregnant).length;
-    final sick = mockAnimals.where((a) => a.status == AnimalStatus.sick || a.status == AnimalStatus.underTreatment).length;
-    final deceased = mockAnimals.where((a) => a.status == AnimalStatus.deceased).length;
-    final overdueVax = mockVaccinations.where((v) => v.status == VaccinationStatus.overdue).length;
-    final overdueDeworm = mockDewormingRecords.where((d) => d.status == DewormingStatus.overdue).length;
-    final pendingLabs = mockLabReports.where((l) => l.status == LabReportStatus.pending).length;
+    final animals = farmerId == null
+        ? mockAnimals
+        : mockAnimals.where((a) => a.farmerId == farmerId).toList();
+    final vax = mockVaccinations.where((v) => _matchAnimal(v.animalId)).toList();
+    final deworms = mockDewormingRecords.where((d) => _matchAnimal(d.animalId)).toList();
+    final labs = mockLabReports.where((l) => _matchAnimal(l.animalId)).toList();
+
+    final total = animals.length;
+    final active = animals.where((a) => a.status == AnimalStatus.active).length;
+    final pregnant = animals.where((a) => a.status == AnimalStatus.pregnant).length;
+    final sick = animals.where((a) => a.status == AnimalStatus.sick || a.status == AnimalStatus.underTreatment).length;
+    final deceased = animals.where((a) => a.status == AnimalStatus.deceased).length;
+    final overdueVax = vax.where((v) => v.status == VaccinationStatus.overdue).length;
+    final overdueDeworm = deworms.where((d) => d.status == DewormingStatus.overdue).length;
+    final pendingLabs = labs.where((l) => l.status == LabReportStatus.pending).length;
 
     final purposeCounts = <AnimalPurpose, int>{};
-    for (final a in mockAnimals) {
+    for (final a in animals) {
       purposeCounts[a.purpose] = (purposeCounts[a.purpose] ?? 0) + 1;
     }
 
     final farmerCounts = <String, int>{};
-    for (final a in mockAnimals) {
+    for (final a in animals) {
       farmerCounts[a.farmerId] = (farmerCounts[a.farmerId] ?? 0) + 1;
     }
 
@@ -2197,9 +2328,9 @@ class _StatsTab extends StatelessWidget {
           // Health summary
           const Text('Health Overview', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           const SizedBox(height: 12),
-          _ProgressRow(emoji: '💉', label: 'Overdue Injections', count: overdueVax, total: mockVaccinations.length, color: RumenoTheme.errorRed),
-          _ProgressRow(emoji: '🐛', label: 'Overdue Deworming', count: overdueDeworm, total: mockDewormingRecords.length, color: Colors.orange),
-          _ProgressRow(emoji: '🔬', label: 'Pending Lab Reports', count: pendingLabs, total: mockLabReports.length, color: Colors.purple),
+          _ProgressRow(emoji: '💉', label: 'Overdue Injections', count: overdueVax, total: vax.length, color: RumenoTheme.errorRed),
+          _ProgressRow(emoji: '🐛', label: 'Overdue Deworming', count: overdueDeworm, total: deworms.length, color: Colors.orange),
+          _ProgressRow(emoji: '🔬', label: 'Pending Lab Reports', count: pendingLabs, total: labs.length, color: Colors.purple),
           _ProgressRow(emoji: '🤰', label: 'Pregnant Animals', count: pregnant, total: total, color: Colors.pink),
           const SizedBox(height: 24),
           const Text('Purpose Breakdown', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
