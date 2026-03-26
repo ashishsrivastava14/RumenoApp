@@ -3,8 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
+import '../../mock/mock_health.dart';
 import '../../providers/admin_provider.dart';
 import '../../providers/ecommerce_provider.dart';
+import '../../providers/group_provider.dart';
 import '../../models/models.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
@@ -22,8 +24,22 @@ class AdminDashboardScreen extends StatelessWidget {
     final greeting = _getGreeting();
     final admin = context.watch<AdminProvider>();
     final eco = context.watch<EcommerceProvider>();
+    final gp = context.watch<GroupProvider>();
     final pendingOrders = eco.orders.where((o) => o.status == OrderStatus.pending).length;
     final pendingVendors = eco.pendingVendors.length;
+
+    // Cross-module stats
+    final shopRevenue = eco.orders
+        .where((o) => o.status == OrderStatus.delivered)
+        .fold<double>(0, (s, o) => s + o.totalAmount);
+    final lowStockCount = eco.allProductsUnfiltered.where((p) => p.stockQuantity <= 10).length;
+    final activeVets = admin.vets.where((v) => v.status == VetStatus.active).length;
+    final pendingVetsCount = admin.vets.where((v) => v.status == VetStatus.pending).length;
+    final scheduledConsults = admin.consultations.where((c) => c.status == ConsultStatus.scheduled).length;
+    final now = DateTime.now();
+    final overdueVax = mockVaccinations.where((v) => v.status == VaccinationStatus.overdue).length;
+    final activeTreatments = mockTreatments.where((t) => t.status == TreatmentStatus.active).length;
+    final overdueGroupAlerts = gp.alerts.where((a) => !a.isDone && a.dueDate.isBefore(now)).length;
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
@@ -138,6 +154,7 @@ class AdminDashboardScreen extends StatelessWidget {
                         label: 'Farmers',
                         value: '${admin.totalFarmers}',
                         color: const Color(0xFF1565C0),
+                        trend: '+3 this week',
                         onTap: () => context.go('/admin/farmers'),
                       ),
                       _BigKpiCard(
@@ -145,6 +162,7 @@ class AdminDashboardScreen extends StatelessWidget {
                         label: 'Animals',
                         value: '${admin.totalAnimals}',
                         color: const Color(0xFF2E7D32),
+                        trend: '+12 this month',
                         onTap: () => context.go('/admin/farm'),
                       ),
                       _BigKpiCard(
@@ -152,6 +170,7 @@ class AdminDashboardScreen extends StatelessWidget {
                         label: 'Vets',
                         value: '${admin.vets.length}',
                         color: const Color(0xFFAD1457),
+                        trend: '$activeVets active',
                         onTap: () => context.go('/admin/vets'),
                       ),
                       _BigKpiCard(
@@ -159,10 +178,49 @@ class AdminDashboardScreen extends StatelessWidget {
                         label: 'Revenue',
                         value: _formatCurrency(admin.totalRevenue),
                         color: const Color(0xFFE65100),
+                        trend: '₹${(admin.monthlyRevenue / 1000).toStringAsFixed(1)}k/mo',
                         onTap: () => context.go('/admin/more/payments'),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 16),
+
+                  // ─── Shop KPIs (Mini Row) ───────────────────────────────
+                  _MiniKpiRow(
+                    title: '🛒 Shop',
+                    items: [
+                      _MiniKpiItem(emoji: '📦', label: 'Products', value: '${eco.allProductsUnfiltered.length}'),
+                      _MiniKpiItem(emoji: '📄', label: 'Orders', value: '${eco.orders.length}'),
+                      _MiniKpiItem(emoji: '🚨', label: 'Low Stock', value: '$lowStockCount', isAlert: lowStockCount > 0),
+                      _MiniKpiItem(emoji: '💰', label: 'Revenue', value: _formatCurrency(shopRevenue)),
+                    ],
+                    onTap: () => context.go('/admin/shop'),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // ─── Vet KPIs (Mini Row) ────────────────────────────────
+                  _MiniKpiRow(
+                    title: '🩺 Veterinary',
+                    items: [
+                      _MiniKpiItem(emoji: '👨‍⚕️', label: 'Active', value: '$activeVets'),
+                      _MiniKpiItem(emoji: '📋', label: 'Scheduled', value: '$scheduledConsults'),
+                      _MiniKpiItem(emoji: '⏳', label: 'Pending', value: '$pendingVetsCount', isAlert: pendingVetsCount > 0),
+                    ],
+                    onTap: () => context.go('/admin/vets'),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // ─── Farm Health KPIs (Mini Row) ────────────────────────
+                  _MiniKpiRow(
+                    title: '🏥 Farm Health',
+                    items: [
+                      _MiniKpiItem(emoji: '💉', label: 'Vax Overdue', value: '$overdueVax', isAlert: overdueVax > 0),
+                      _MiniKpiItem(emoji: '💊', label: 'Treatments', value: '$activeTreatments', isAlert: activeTreatments > 0),
+                      _MiniKpiItem(emoji: '🐾', label: 'Groups', value: '${gp.groups.length}'),
+                    ],
+                    onTap: () => context.go('/admin/farm'),
+                  ),
+
                   const SizedBox(height: 24),
 
                   // ─── Quick Actions (Big Visual Tiles) ───────────────────
@@ -279,6 +337,36 @@ class AdminDashboardScreen extends StatelessWidget {
                       color: Colors.green,
                       onTap: () {},
                     ),
+                  if (overdueVax > 0) ...[                    _AlertBanner(
+                      emoji: '💉',
+                      icon: Icons.vaccines_rounded,
+                      title: '$overdueVax Vaccination${overdueVax > 1 ? 's' : ''} Overdue',
+                      subtitle: 'Animals need immediate attention',
+                      color: Colors.red,
+                      onTap: () => context.go('/admin/farm'),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  if (overdueGroupAlerts > 0) ...[                    _AlertBanner(
+                      emoji: '🐾',
+                      icon: Icons.group_work_rounded,
+                      title: '$overdueGroupAlerts Group Alert${overdueGroupAlerts > 1 ? 's' : ''} Overdue',
+                      subtitle: 'Review group health actions',
+                      color: Colors.orange,
+                      onTap: () => context.go('/admin/more/groups'),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  if (lowStockCount > 0) ...[                    _AlertBanner(
+                      emoji: '📦',
+                      icon: Icons.inventory_2_rounded,
+                      title: '$lowStockCount Product${lowStockCount > 1 ? 's' : ''} Low/Out of Stock',
+                      subtitle: 'Restock needed',
+                      color: const Color(0xFFE65100),
+                      onTap: () => context.go('/admin/shop'),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                   const SizedBox(height: 24),
 
                   // ─── Subscription Overview ──────────────────────────────
@@ -657,6 +745,91 @@ class _PlanPill extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ─── Mini KPI Row ─────────────────────────────────────────────────────────────
+class _MiniKpiRow extends StatelessWidget {
+  final String title;
+  final List<_MiniKpiItem> items;
+  final VoidCallback? onTap;
+
+  const _MiniKpiRow({required this.title, required this.items, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                  ),
+                ),
+                const Icon(Icons.chevron_right, size: 18, color: Colors.grey),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: items
+                  .map((item) => Expanded(child: item))
+                  .toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Mini KPI Item ────────────────────────────────────────────────────────────
+class _MiniKpiItem extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final String value;
+  final bool isAlert;
+
+  const _MiniKpiItem({
+    required this.emoji,
+    required this.label,
+    required this.value,
+    this.isAlert = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 18)),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: isAlert ? Colors.red.shade700 : Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }

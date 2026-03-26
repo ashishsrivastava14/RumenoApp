@@ -73,6 +73,7 @@ import '../screens/admin/admin_more_screen.dart';
 import '../screens/admin/admin_farm_screen.dart';
 import '../screens/admin/admin_shop_screen.dart';
 import '../screens/admin/admin_vets_screen.dart';
+import '../screens/admin/admin_groups_screen.dart';
 import '../screens/admin/more/admin_subscriptions_screen.dart';
 import '../screens/admin/more/admin_payments_screen.dart';
 import '../screens/admin/more/admin_partners_screen.dart';
@@ -457,6 +458,11 @@ GoRouter createRouter(AuthProvider authProvider) {
                 path: 'marketplace',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (_, _) => const AdminMarketplaceScreen(),
+              ),
+              GoRoute(
+                path: 'groups',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminGroupsScreen(),
               ),
             ],
           ),

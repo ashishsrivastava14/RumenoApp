@@ -20,7 +20,7 @@ class _AdminShopScreenState extends State<AdminShopScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 5, vsync: this);
+    _tab = TabController(length: 8, vsync: this);
   }
 
   @override
@@ -87,8 +87,11 @@ class _AdminShopScreenState extends State<AdminShopScreen>
                 Tab(icon: Text('📊', style: TextStyle(fontSize: 16)), text: 'Overview'),
                 Tab(icon: Text('📦', style: TextStyle(fontSize: 16)), text: 'Products'),
                 Tab(icon: Text('📄', style: TextStyle(fontSize: 16)), text: 'Orders'),
+                Tab(icon: Text('🚚', style: TextStyle(fontSize: 16)), text: 'Delivery'),
+                Tab(icon: Text('⭐', style: TextStyle(fontSize: 16)), text: 'Reviews'),
                 Tab(icon: Text('🏪', style: TextStyle(fontSize: 16)), text: 'Vendors'),
                 Tab(icon: Text('🎟️', style: TextStyle(fontSize: 16)), text: 'Coupons'),
+                Tab(icon: Text('🚨', style: TextStyle(fontSize: 16)), text: 'Stock'),
               ],
             ),
           ),
@@ -99,8 +102,11 @@ class _AdminShopScreenState extends State<AdminShopScreen>
             _OverviewTab(),
             _ProductsTab(),
             _OrdersTab(),
+            _DeliveryTab(),
+            _ReviewsTab(),
             _VendorsTab(),
             _CouponsTab(),
+            _StockAlertsTab(),
           ],
         ),
       ),
@@ -2838,6 +2844,534 @@ class _EmptyState extends StatelessWidget {
           Text(message,
               style: TextStyle(color: Colors.grey[500], fontSize: 14)),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Delivery Tab ─────────────────────────────────────────────────────────────
+class _DeliveryTab extends StatelessWidget {
+  const _DeliveryTab();
+
+  @override
+  Widget build(BuildContext context) {
+    final eco = context.watch<EcommerceProvider>();
+    final orders = eco.orders;
+
+    final shipped = orders.where((o) => o.status == OrderStatus.shipped).toList();
+    final packed = orders.where((o) => o.status == OrderStatus.packed).toList();
+    final confirmed = orders.where((o) => o.status == OrderStatus.confirmed).toList();
+    final delivered = orders.where((o) => o.status == OrderStatus.delivered).toList();
+    final pendingDispatch = [...confirmed, ...packed];
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // KPI row
+          Row(
+            children: [
+              _DeliveryKpi(emoji: '📦', label: 'To Dispatch', value: '${pendingDispatch.length}', color: Colors.orange),
+              const SizedBox(width: 10),
+              _DeliveryKpi(emoji: '🚚', label: 'In Transit', value: '${shipped.length}', color: const Color(0xFF1565C0)),
+              const SizedBox(width: 10),
+              _DeliveryKpi(emoji: '✅', label: 'Delivered', value: '${delivered.length}', color: Colors.green),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // In transit
+          if (shipped.isNotEmpty) ...[
+            const Text('🚚 In Transit', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            ...shipped.map((o) => _DeliveryOrderCard(order: o, statusColor: const Color(0xFF1565C0))),
+            const SizedBox(height: 16),
+          ],
+
+          // Pending dispatch
+          if (pendingDispatch.isNotEmpty) ...[
+            const Text('📦 Pending Dispatch', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            ...pendingDispatch.map((o) => _DeliveryOrderCard(order: o, statusColor: Colors.orange)),
+            const SizedBox(height: 16),
+          ],
+
+          // Recently delivered
+          const Text('✅ Recently Delivered', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          if (delivered.isEmpty)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Center(child: Text('No deliveries yet', style: TextStyle(color: Colors.grey[500]))),
+              ),
+            )
+          else
+            ...delivered.take(10).map((o) => _DeliveryOrderCard(order: o, statusColor: Colors.green)),
+        ],
+      ),
+    );
+  }
+}
+
+class _DeliveryKpi extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final String value;
+  final Color color;
+  const _DeliveryKpi({required this.emoji, required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [color.withValues(alpha: 0.15), color.withValues(alpha: 0.05)]),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 22)),
+            const SizedBox(height: 4),
+            Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
+            Text(label, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.7))),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DeliveryOrderCard extends StatelessWidget {
+  final Order order;
+  final Color statusColor;
+  const _DeliveryOrderCard({required this.order, required this.statusColor});
+
+  @override
+  Widget build(BuildContext context) {
+    final eco = context.read<EcommerceProvider>();
+    final itemCount = order.items.length;
+    final statusEmoji = switch (order.status) {
+      OrderStatus.confirmed => '🔵',
+      OrderStatus.packed => '📦',
+      OrderStatus.shipped => '🚚',
+      OrderStatus.delivered => '✅',
+      _ => '⏳',
+    };
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(statusEmoji, style: const TextStyle(fontSize: 20)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('#${order.id}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      Text('$itemCount item${itemCount > 1 ? 's' : ''} • ₹${order.totalAmount.toStringAsFixed(0)}',
+                          style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
+                  child: Text(order.statusLabel, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: statusColor)),
+                ),
+              ],
+            ),
+            if (order.trackingNumber != null) ...[
+              const SizedBox(height: 6),
+              Text('📍 Tracking: ${order.trackingNumber}', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+            ],
+            const SizedBox(height: 6),
+            Text('🏠 ${order.address.addressLine1}, ${order.address.city}', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+            if (order.status == OrderStatus.confirmed || order.status == OrderStatus.packed) ...[
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (order.status == OrderStatus.confirmed)
+                    _ActionChip(
+                      label: 'Mark Packed',
+                      color: Colors.orange,
+                      onTap: () => eco.updateOrderStatus(order.id, OrderStatus.packed),
+                    ),
+                  if (order.status == OrderStatus.packed) ...[
+                    _ActionChip(
+                      label: 'Mark Shipped',
+                      color: const Color(0xFF1565C0),
+                      onTap: () => eco.updateOrderStatus(order.id, OrderStatus.shipped),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+            if (order.status == OrderStatus.shipped)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    _ActionChip(
+                      label: 'Mark Delivered',
+                      color: Colors.green,
+                      onTap: () => eco.updateOrderStatus(order.id, OrderStatus.delivered),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionChip extends StatelessWidget {
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  const _ActionChip({required this.label, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(16)),
+        child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+      ),
+    );
+  }
+}
+
+// ─── Reviews Tab ──────────────────────────────────────────────────────────────
+class _ReviewsTab extends StatelessWidget {
+  const _ReviewsTab();
+
+  @override
+  Widget build(BuildContext context) {
+    final eco = context.watch<EcommerceProvider>();
+    final products = eco.allProductsUnfiltered;
+    final allReviews = <ProductReview>[];
+    for (final p in products) {
+      allReviews.addAll(eco.getReviewsForProduct(p.id));
+    }
+    allReviews.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    // Stats
+    final avgRating = allReviews.isNotEmpty
+        ? allReviews.map((r) => r.rating).reduce((a, b) => a + b) / allReviews.length
+        : 0.0;
+    final fiveStar = allReviews.where((r) => r.rating == 5).length;
+    final lowRating = allReviews.where((r) => r.rating <= 2).length;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // KPIs
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [Color(0xFF1565C0), Color(0xFF1976D2)]),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _ReviewKpi(value: '${allReviews.length}', label: 'Total', emoji: '📝'),
+                _ReviewKpi(value: avgRating.toStringAsFixed(1), label: 'Avg Rating', emoji: '⭐'),
+                _ReviewKpi(value: '$fiveStar', label: '5-Star', emoji: '🌟'),
+                _ReviewKpi(value: '$lowRating', label: 'Low (≤2)', emoji: '⚠️'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Rating distribution
+          const Text('📊 Rating Distribution', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          ...List.generate(5, (i) {
+            final star = 5 - i;
+            final count = allReviews.where((r) => r.rating.round() == star).length;
+            final pct = allReviews.isNotEmpty ? count / allReviews.length : 0.0;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children: [
+                  SizedBox(width: 24, child: Text('$star⭐', style: const TextStyle(fontSize: 11))),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: pct,
+                        backgroundColor: Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(star >= 4 ? Colors.green : star == 3 ? Colors.orange : Colors.red),
+                        minHeight: 8,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  SizedBox(width: 24, child: Text('$count', style: TextStyle(fontSize: 11, color: Colors.grey[600]))),
+                ],
+              ),
+            );
+          }),
+
+          const SizedBox(height: 20),
+
+          // Recent reviews
+          const Text('💬 All Reviews', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          if (allReviews.isEmpty)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Center(child: Text('No reviews yet', style: TextStyle(color: Colors.grey[500]))),
+              ),
+            )
+          else
+            ...allReviews.map((r) {
+              final product = products.where((p) => p.id == r.productId).firstOrNull;
+              return _ReviewCard(review: r, productName: product?.name ?? 'Unknown Product');
+            }),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewKpi extends StatelessWidget {
+  final String value;
+  final String label;
+  final String emoji;
+  const _ReviewKpi({required this.value, required this.label, required this.emoji});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 18)),
+        const SizedBox(height: 4),
+        Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text(label, style: TextStyle(fontSize: 9, color: Colors.white.withValues(alpha: 0.8))),
+      ],
+    );
+  }
+}
+
+class _ReviewCard extends StatelessWidget {
+  final ProductReview review;
+  final String productName;
+  const _ReviewCard({required this.review, required this.productName});
+
+  @override
+  Widget build(BuildContext context) {
+    final stars = '⭐' * review.rating.round();
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: const Color(0xFF1565C0).withValues(alpha: 0.1),
+                  child: Text(review.userName[0], style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1565C0))),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(review.userName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                      Text(productName, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                    ],
+                  ),
+                ),
+                Text(stars, style: const TextStyle(fontSize: 12)),
+              ],
+            ),
+            if (review.comment != null) ...[
+              const SizedBox(height: 8),
+              Text(review.comment!, style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+            ],
+            const SizedBox(height: 4),
+            Text('${review.createdAt.day}/${review.createdAt.month}/${review.createdAt.year}',
+                style: TextStyle(fontSize: 10, color: Colors.grey[400])),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Stock Alerts Tab ─────────────────────────────────────────────────────────
+class _StockAlertsTab extends StatelessWidget {
+  const _StockAlertsTab();
+
+  @override
+  Widget build(BuildContext context) {
+    final eco = context.watch<EcommerceProvider>();
+    final products = eco.allProductsUnfiltered;
+
+    final outOfStock = products.where((p) => p.stockQuantity == 0).toList();
+    final lowStock = products.where((p) => p.stockQuantity > 0 && p.stockQuantity <= 10).toList();
+    final healthyStock = products.where((p) => p.stockQuantity > 10).toList();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // KPIs
+          Row(
+            children: [
+              _StockKpi(emoji: '🔴', label: 'Out of Stock', value: '${outOfStock.length}', color: Colors.red),
+              const SizedBox(width: 10),
+              _StockKpi(emoji: '🟡', label: 'Low Stock', value: '${lowStock.length}', color: Colors.orange),
+              const SizedBox(width: 10),
+              _StockKpi(emoji: '🟢', label: 'Healthy', value: '${healthyStock.length}', color: Colors.green),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Out of stock
+          if (outOfStock.isNotEmpty) ...[
+            const Text('🔴 Out of Stock — Needs Immediate Restock', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red)),
+            const SizedBox(height: 8),
+            ...outOfStock.map((p) => _StockProductCard(product: p, severity: _StockSeverity.outOfStock)),
+            const SizedBox(height: 16),
+          ],
+
+          // Low stock
+          if (lowStock.isNotEmpty) ...[
+            const Text('🟡 Low Stock — Reorder Soon', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.orange)),
+            const SizedBox(height: 8),
+            ...lowStock.map((p) => _StockProductCard(product: p, severity: _StockSeverity.low)),
+            const SizedBox(height: 16),
+          ],
+
+          // Healthy stock summary
+          const Text('🟢 Healthy Stock', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+          const SizedBox(height: 8),
+          if (healthyStock.isEmpty)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Center(child: Text('No products with healthy stock', style: TextStyle(color: Colors.grey[500]))),
+              ),
+            )
+          else
+            ...healthyStock.map((p) => _StockProductCard(product: p, severity: _StockSeverity.healthy)),
+        ],
+      ),
+    );
+  }
+}
+
+enum _StockSeverity { outOfStock, low, healthy }
+
+class _StockKpi extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final String value;
+  final Color color;
+  const _StockKpi({required this.emoji, required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [color.withValues(alpha: 0.15), color.withValues(alpha: 0.05)]),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 22)),
+            const SizedBox(height: 4),
+            Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
+            Text(label, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.7))),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StockProductCard extends StatelessWidget {
+  final Product product;
+  final _StockSeverity severity;
+  const _StockProductCard({required this.product, required this.severity});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = switch (severity) {
+      _StockSeverity.outOfStock => Colors.red,
+      _StockSeverity.low => Colors.orange,
+      _StockSeverity.healthy => Colors.green,
+    };
+    final emoji = switch (severity) {
+      _StockSeverity.outOfStock => '🔴',
+      _StockSeverity.low => '🟡',
+      _StockSeverity.healthy => '🟢',
+    };
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      color: severity == _StockSeverity.outOfStock ? Colors.red[50] : null,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 20)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(product.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  Text('${product.vendorName} • ${product.categoryName}', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
+                  child: Text('${product.stockQuantity} ${product.unit}',
+                      style: TextStyle(fontWeight: FontWeight.bold, color: color, fontSize: 12)),
+                ),
+                const SizedBox(height: 2),
+                Text('₹${product.price.toStringAsFixed(0)}/${product.unit}', style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

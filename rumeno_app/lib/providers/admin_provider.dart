@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import '../mock/mock_animals.dart';
+import '../mock/mock_health.dart';
+import '../mock/mock_milk.dart';
+import '../mock/mock_kids.dart';
+import '../mock/mock_finance.dart';
+import '../mock/mock_sales.dart';
+import '../models/models.dart';
 
 // ─── Health Config Item Model ─────────────────────────────────────────────────
 class HealthConfigItem {
@@ -508,6 +514,34 @@ class AdminProvider extends ChangeNotifier {
   // ═══════════════════════════════════════════════════════════════════════════
   int get totalFarmers => _plans.fold<int>(0, (s, p) => s + p.userCount);
   int get totalAnimals => mockAnimals.length;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Farm Data Aggregation (Breeding, Milk, Kids, Finance)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Breeding
+  int get totalBreedingRecords => mockBreedingRecords.length;
+  int get pregnantAnimalCount => mockBreedingRecords.where((b) => b.isPregnant).length;
+  int get aiBreedingCount => mockBreedingRecords.where((b) => b.aiDone).length;
+  List<BreedingRecord> get upcomingDeliveries => mockBreedingRecords
+      .where((b) => b.isPregnant && b.expectedDelivery != null && b.expectedDelivery!.isAfter(DateTime.now()))
+      .toList()
+    ..sort((a, b) => a.expectedDelivery!.compareTo(b.expectedDelivery!));
+
+  // Milk
+  double get todayMilkTotal => totalMilkForDate(DateTime.now());
+  double get yesterdayMilkTotal => totalMilkForDate(DateTime.now().subtract(const Duration(days: 1)));
+  int get dairyAnimalCount => getDairyAnimals(mockAnimals).length;
+
+  // Kids
+  int get totalKids => mockKids.length;
+  int get weanedKidsCount => mockKids.where((k) => k.isWeaned).length;
+  int get coccidiostatDueCount => mockKids.where((k) => k.coccidisostatDue).length;
+
+  // Finance
+  double get totalExpenses => mockExpenses.fold(0.0, (s, e) => s + e.amount);
+  double get totalSales => mockSales.fold(0.0, (s, e) => s + e.amount);
+  double get totalProfit => totalSales - totalExpenses;
 
   List<Map<String, dynamic>> get recentActivity {
     final activities = <Map<String, dynamic>>[];

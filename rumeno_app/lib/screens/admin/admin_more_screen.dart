@@ -134,7 +134,14 @@ class AdminMoreScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   _menuSection(context, [
                     _MenuTile(
-                      emoji: '💰',
+                      emoji: '�',
+                      color: const Color(0xFF00695C),
+                      label: 'Animal Groups',
+                      subtitle: 'View & manage all farmer groups',
+                      onTap: () => context.go('/admin/more/groups'),
+                    ),
+                    _MenuTile(
+                      emoji: '�💰',
                       color: const Color(0xFF00695C),
                       label: 'Payments & Billing',
                       subtitle: 'View transactions & invoices',
@@ -181,7 +188,7 @@ class AdminMoreScreen extends StatelessWidget {
                       label: 'Announcements',
                       subtitle: 'App-wide messages',
                       onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Coming soon')),
+                        const SnackBar(content: Text('📣 Announcements — coming soon!')),
                       ),
                     ),
                     // Support Tickets hidden for now
@@ -212,7 +219,7 @@ class AdminMoreScreen extends StatelessWidget {
                       label: 'Security & Access',
                       subtitle: 'Roles & permissions',
                       onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Coming soon')),
+                        const SnackBar(content: Text('🔒 Security & Access — coming soon!')),
                       ),
                     ),
                     _MenuTile(
@@ -221,7 +228,7 @@ class AdminMoreScreen extends StatelessWidget {
                       label: 'Data Backup',
                       subtitle: 'Export & backup all data',
                       onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Generating backup...')),
+                        const SnackBar(content: Text('💾 Generating backup…')),
                       ),
                     ),
                   ]),

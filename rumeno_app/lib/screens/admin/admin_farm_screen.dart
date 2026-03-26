@@ -4,6 +4,10 @@ import '../../config/theme.dart';
 import '../../mock/mock_animals.dart';
 import '../../mock/mock_farmers.dart';
 import '../../mock/mock_health.dart';
+import '../../mock/mock_milk.dart';
+import '../../mock/mock_kids.dart';
+import '../../mock/mock_finance.dart';
+import '../../mock/mock_sales.dart';
 import '../../models/models.dart';
 
 class AdminFarmScreen extends StatefulWidget {
@@ -20,7 +24,7 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 3, vsync: this);
+    _tab = TabController(length: 7, vsync: this);
   }
 
   @override
@@ -78,16 +82,22 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
             ),
             bottom: TabBar(
               controller: _tab,
+              isScrollable: true,
               indicatorColor: Colors.white,
               indicatorWeight: 3,
               labelColor: Colors.white,
               unselectedLabelColor: Colors.white60,
               labelStyle:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              tabAlignment: TabAlignment.start,
               tabs: const [
-                Tab(icon: Text('🐾', style: TextStyle(fontSize: 24)), text: 'Animals'),
-                Tab(icon: Text('💊', style: TextStyle(fontSize: 24)), text: 'Health'),
-                Tab(icon: Text('📊', style: TextStyle(fontSize: 24)), text: 'Stats'),
+                Tab(icon: Text('🐾', style: TextStyle(fontSize: 20)), text: 'Animals'),
+                Tab(icon: Text('💊', style: TextStyle(fontSize: 20)), text: 'Health'),
+                Tab(icon: Text('🤰', style: TextStyle(fontSize: 20)), text: 'Breeding'),
+                Tab(icon: Text('🥛', style: TextStyle(fontSize: 20)), text: 'Milk'),
+                Tab(icon: Text('🐐', style: TextStyle(fontSize: 20)), text: 'Kids'),
+                Tab(icon: Text('💰', style: TextStyle(fontSize: 20)), text: 'Finance'),
+                Tab(icon: Text('📊', style: TextStyle(fontSize: 20)), text: 'Stats'),
               ],
             ),
           ),
@@ -97,6 +107,10 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
           children: const [
             _AnimalsTab(),
             _HealthTab(),
+            _BreedingTab(),
+            _MilkTab(),
+            _KidsTab(),
+            _FinanceTab(),
             _StatsTab(),
           ],
         ),
@@ -1286,6 +1300,848 @@ class _TreatmentTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ─── Breeding Tab ─────────────────────────────────────────────────────────────
+class _BreedingTab extends StatefulWidget {
+  const _BreedingTab();
+
+  @override
+  State<_BreedingTab> createState() => _BreedingTabState();
+}
+
+class _BreedingTabState extends State<_BreedingTab> {
+  String _filter = 'all'; // 'all', 'pregnant', 'ai', 'natural'
+
+  @override
+  Widget build(BuildContext context) {
+    final pregnant = mockBreedingRecords.where((b) => b.isPregnant).length;
+    final aiCount = mockBreedingRecords.where((b) => b.aiDone).length;
+    final naturalCount = mockBreedingRecords.where((b) => !b.aiDone).length;
+    final upcoming = mockBreedingRecords
+        .where((b) => b.isPregnant && b.expectedDelivery != null && b.expectedDelivery!.isAfter(DateTime.now()))
+        .toList()
+      ..sort((a, b) => a.expectedDelivery!.compareTo(b.expectedDelivery!));
+
+    final filtered = mockBreedingRecords.where((b) {
+      if (_filter == 'pregnant') return b.isPregnant;
+      if (_filter == 'ai') return b.aiDone;
+      if (_filter == 'natural') return !b.aiDone;
+      return true;
+    }).toList();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // KPI Cards
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            childAspectRatio: 1.6,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            children: [
+              _KpiCard(emoji: '🤰', label: 'Pregnant', value: '$pregnant', color: Colors.pink),
+              _KpiCard(emoji: '🔬', label: 'AI Done', value: '$aiCount', color: RumenoTheme.infoBlue),
+              _KpiCard(emoji: '💕', label: 'Natural', value: '$naturalCount', color: Colors.purple),
+              _KpiCard(emoji: '📅', label: 'Upcoming', value: '${upcoming.length}', color: Colors.orange),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Upcoming Deliveries Alert
+          if (upcoming.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.pink.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.pink.withValues(alpha: 0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Text('🍼', style: TextStyle(fontSize: 24)),
+                      SizedBox(width: 8),
+                      Text('Upcoming Deliveries', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.pink)),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  ...upcoming.take(3).map((b) {
+                    final animal = getAnimalById(b.animalId);
+                    final daysLeft = b.expectedDelivery!.difference(DateTime.now()).inDays;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(color: Colors.pink.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
+                            child: Text(animal?.tagId ?? b.animalId, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.pink)),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(child: Text('${b.expectedDelivery!.day}/${b.expectedDelivery!.month}/${b.expectedDelivery!.year}', style: TextStyle(fontSize: 13, color: Colors.grey[600]))),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: daysLeft < 30 ? RumenoTheme.errorRed.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text('$daysLeft days', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: daysLeft < 30 ? RumenoTheme.errorRed : Colors.orange)),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+
+          // Filter Chips
+          Row(
+            children: [
+              const Text('🤰 Records ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              const Spacer(),
+              _FilterChip(label: 'All', selected: _filter == 'all', onTap: () => setState(() => _filter = 'all')),
+              const SizedBox(width: 6),
+              _FilterChip(label: 'Pregnant', selected: _filter == 'pregnant', onTap: () => setState(() => _filter = 'pregnant')),
+              const SizedBox(width: 6),
+              _FilterChip(label: 'AI', selected: _filter == 'ai', onTap: () => setState(() => _filter = 'ai')),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Breeding Records List
+          ...filtered.map((b) => _BreedingTile(breeding: b)),
+          if (filtered.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(40),
+                child: Column(
+                  children: [
+                    const Text('🤰', style: TextStyle(fontSize: 48)),
+                    const SizedBox(height: 12),
+                    Text('No records match filter', style: TextStyle(color: Colors.grey[500], fontSize: 15)),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const _FilterChip({required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? RumenoTheme.primaryGreen : Colors.grey.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: selected ? Colors.white : Colors.grey[600])),
+      ),
+    );
+  }
+}
+
+// ─── Milk Tab ─────────────────────────────────────────────────────────────────
+class _MilkTab extends StatelessWidget {
+  const _MilkTab();
+
+  @override
+  Widget build(BuildContext context) {
+    final today = DateTime.now();
+    final yesterday = today.subtract(const Duration(days: 1));
+    final todayTotal = totalMilkForDate(today);
+    final yesterdayTotal = totalMilkForDate(yesterday);
+    final todayRecords = milkRecordsForDate(today);
+    final morningTotal = todayRecords.where((r) => r.session == MilkSession.morning).fold(0.0, (s, r) => s + r.quantityLitres);
+    final eveningTotal = todayRecords.where((r) => r.session == MilkSession.evening).fold(0.0, (s, r) => s + r.quantityLitres);
+    final dairyAnimals = getDairyAnimals(mockAnimals);
+    final change = yesterdayTotal > 0 ? ((todayTotal - yesterdayTotal) / yesterdayTotal * 100) : 0.0;
+
+    // Per-animal milk summary (today)
+    final animalMilk = <String, double>{};
+    for (final r in todayRecords) {
+      animalMilk[r.animalId] = (animalMilk[r.animalId] ?? 0) + r.quantityLitres;
+    }
+    final sortedAnimals = animalMilk.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Today's Production Card
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [Color(0xFF1565C0), Color(0xFF42A5F5)]),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    Text('🥛', style: TextStyle(fontSize: 32)),
+                    SizedBox(width: 10),
+                    Text("Today's Production", style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('${todayTotal.toStringAsFixed(1)} L', style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: (change >= 0 ? Colors.green : Colors.red).withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${change >= 0 ? '↑' : '↓'} ${change.abs().toStringAsFixed(1)}%',
+                        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    _MilkSessionBadge(icon: '🌅', label: 'Morning', value: '${morningTotal.toStringAsFixed(1)} L'),
+                    const SizedBox(width: 12),
+                    _MilkSessionBadge(icon: '🌙', label: 'Evening', value: '${eveningTotal.toStringAsFixed(1)} L'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Quick Stats
+          GridView.count(
+            crossAxisCount: 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            childAspectRatio: 1.2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            children: [
+              _MilkStatCard(emoji: '🐄', value: '${dairyAnimals.length}', label: 'Dairy Animals'),
+              _MilkStatCard(emoji: '📝', value: '${todayRecords.length}', label: 'Entries Today'),
+              _MilkStatCard(emoji: '📅', value: '${yesterdayTotal.toStringAsFixed(0)} L', label: 'Yesterday'),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Per Animal Production
+          const Row(
+            children: [
+              Text('🐄', style: TextStyle(fontSize: 22)),
+              SizedBox(width: 8),
+              Text('Per Animal (Today)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (sortedAnimals.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(30),
+                child: Column(
+                  children: [
+                    const Text('🥛', style: TextStyle(fontSize: 48)),
+                    const SizedBox(height: 8),
+                    Text('No milk entries today', style: TextStyle(color: Colors.grey[500], fontSize: 14)),
+                  ],
+                ),
+              ),
+            )
+          else
+            ...sortedAnimals.map((entry) {
+              final animal = getAnimalById(entry.key);
+              final maxMilk = sortedAnimals.first.value;
+              return Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                elevation: 1,
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44, height: 44,
+                        decoration: BoxDecoration(color: RumenoTheme.infoBlue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                        child: Center(child: Text(_speciesEmoji(animal?.species), style: const TextStyle(fontSize: 24))),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(animal?.tagId ?? entry.key, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                            const SizedBox(height: 4),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: maxMilk > 0 ? entry.value / maxMilk : 0,
+                                backgroundColor: RumenoTheme.infoBlue.withValues(alpha: 0.1),
+                                valueColor: const AlwaysStoppedAnimation(RumenoTheme.infoBlue),
+                                minHeight: 8,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text('${entry.value.toStringAsFixed(1)} L', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: RumenoTheme.infoBlue)),
+                    ],
+                  ),
+                ),
+              );
+            }),
+        ],
+      ),
+    );
+  }
+
+  static String _speciesEmoji(Species? species) {
+    if (species == null) return '🐾';
+    const icons = {Species.cow: '🐄', Species.buffalo: '🐃', Species.goat: '🐐', Species.sheep: '🐑', Species.pig: '🐷', Species.horse: '🐴'};
+    return icons[species] ?? '🐾';
+  }
+}
+
+class _MilkSessionBadge extends StatelessWidget {
+  final String icon;
+  final String label;
+  final String value;
+  const _MilkSessionBadge({required this.icon, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 20)),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: const TextStyle(color: Colors.white60, fontSize: 11)),
+                Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MilkStatCard extends StatelessWidget {
+  final String emoji;
+  final String value;
+  final String label;
+  const _MilkStatCard({required this.emoji, required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 6, offset: const Offset(0, 2))],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 24)),
+          const SizedBox(height: 4),
+          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[600]), textAlign: TextAlign.center),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Kids Tab ─────────────────────────────────────────────────────────────────
+class _KidsTab extends StatelessWidget {
+  const _KidsTab();
+
+  @override
+  Widget build(BuildContext context) {
+    final totalK = mockKids.length;
+    final weaned = mockKids.where((k) => k.isWeaned).length;
+    final coccDue = mockKids.where((k) => k.coccidisostatDue).length;
+    final onReplacer = mockKids.where((k) => k.milkReplacerStartDate != null).length;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // KPIs
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            childAspectRatio: 1.6,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            children: [
+              _KpiCard(emoji: '🐐', label: 'Total Kids', value: '$totalK', color: RumenoTheme.primaryGreen),
+              _KpiCard(emoji: '🍼', label: 'On Replacer', value: '$onReplacer', color: RumenoTheme.infoBlue),
+              _KpiCard(emoji: '🌾', label: 'Weaned', value: '$weaned', color: Colors.teal),
+              _KpiCard(emoji: '💊', label: 'Coccidiostat Due', value: '$coccDue', color: coccDue > 0 ? RumenoTheme.errorRed : Colors.grey),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Alert: Coccidiostat Due
+          if (coccDue > 0)
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: RumenoTheme.errorRed.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: RumenoTheme.errorRed.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Text('⚠️', style: TextStyle(fontSize: 28)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('$coccDue Kid${coccDue > 1 ? 's' : ''} Need Coccidiostat', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: RumenoTheme.errorRed)),
+                        Text('Medicine due or overdue', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          // Kid Cards List
+          const Row(
+            children: [
+              Text('🐐', style: TextStyle(fontSize: 22)),
+              SizedBox(width: 8),
+              Text('All Kids', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...mockKids.map((kid) {
+            final mother = getAnimalById(kid.motherId ?? '');
+            final ageInDays = kid.dateOfBirth != null ? DateTime.now().difference(kid.dateOfBirth!).inDays : 0;
+            final coccStatus = kid.coccidisostatDue;
+
+            return Card(
+              margin: const EdgeInsets.only(bottom: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              elevation: 1,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () => _showKidDetail(context, kid, mother),
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 52, height: 52,
+                        decoration: BoxDecoration(
+                          color: RumenoTheme.primaryGreen.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Center(child: Text('🐐', style: TextStyle(fontSize: 28))),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(kid.kidId, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                const SizedBox(width: 8),
+                                if (coccStatus)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(color: RumenoTheme.errorRed.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
+                                    child: const Text('💊 DUE', style: TextStyle(fontSize: 10, color: RumenoTheme.errorRed, fontWeight: FontWeight.bold)),
+                                  ),
+                                if (kid.isWeaned)
+                                  Container(
+                                    margin: const EdgeInsets.only(left: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(color: Colors.teal.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
+                                    child: const Text('🌾 WEANED', style: TextStyle(fontSize: 10, color: Colors.teal, fontWeight: FontWeight.bold)),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text('Mother: ${mother?.tagId ?? 'Unknown'} · $ageInDays days old',
+                                style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                            if (kid.averageWeightKg != null)
+                              Text('${kid.averageWeightKg!.toStringAsFixed(1)} kg',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey[500], fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  void _showKidDetail(BuildContext context, KidRecord kid, Animal? mother) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 16),
+            const Text('🐐 Kid Details', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            _kidInfoRow(Icons.tag_rounded, 'Kid ID', kid.kidId),
+            _kidInfoRow(Icons.pets_rounded, 'Mother', mother?.tagId ?? kid.motherId ?? 'Unknown'),
+            if (kid.fatherAiId != null) _kidInfoRow(Icons.science_rounded, 'Father AI ID', kid.fatherAiId!),
+            if (kid.dateOfBirth != null) _kidInfoRow(Icons.cake_rounded, 'Born', '${kid.dateOfBirth!.day}/${kid.dateOfBirth!.month}/${kid.dateOfBirth!.year}'),
+            if (kid.averageWeightKg != null) _kidInfoRow(Icons.monitor_weight_rounded, 'Weight', '${kid.averageWeightKg!.toStringAsFixed(1)} kg'),
+            if (kid.coccidisostatName != null) _kidInfoRow(Icons.medication_rounded, 'Coccidiostat', kid.coccidisostatName!),
+            if (kid.coccidisostatNextDate != null) _kidInfoRow(Icons.event_rounded, 'Next Dose', '${kid.coccidisostatNextDate!.day}/${kid.coccidisostatNextDate!.month}/${kid.coccidisostatNextDate!.year}'),
+            if (kid.weaningDate != null) _kidInfoRow(Icons.grass_rounded, 'Weaning Date', '${kid.weaningDate!.day}/${kid.weaningDate!.month}/${kid.weaningDate!.year}'),
+            _kidInfoRow(Icons.check_circle_rounded, 'Weaned', kid.isWeaned ? 'Yes ✅' : 'No ❌'),
+            if (kid.milkReplacerStartDate != null) _kidInfoRow(Icons.local_drink_rounded, 'Milk Replacer Since', '${kid.milkReplacerStartDate!.day}/${kid.milkReplacerStartDate!.month}/${kid.milkReplacerStartDate!.year}'),
+            if (kid.notes != null) _kidInfoRow(Icons.note_rounded, 'Notes', kid.notes!),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: RumenoTheme.primaryGreen,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+                child: const Text('Close', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _kidInfoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(width: 38, height: 38, decoration: BoxDecoration(color: RumenoTheme.primaryGreen.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10)), child: Icon(icon, color: RumenoTheme.primaryGreen, size: 18)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(label, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+              Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Finance Tab ──────────────────────────────────────────────────────────────
+class _FinanceTab extends StatelessWidget {
+  const _FinanceTab();
+
+  @override
+  Widget build(BuildContext context) {
+    final totalExp = mockExpenses.fold(0.0, (s, e) => s + e.amount);
+    final totalSale = mockSales.fold(0.0, (s, e) => s + e.amount);
+    final profit = totalSale - totalExp;
+
+    // Expense by category
+    final catExpenses = <ExpenseCategory, double>{};
+    for (final e in mockExpenses) {
+      catExpenses[e.category] = (catExpenses[e.category] ?? 0) + e.amount;
+    }
+    final sortedCats = catExpenses.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+
+    // Sales by type
+    final saleByType = <SaleType, double>{};
+    for (final s in mockSales) {
+      saleByType[s.type] = (saleByType[s.type] ?? 0) + s.amount;
+    }
+
+    // Recent transactions (combined, sorted by date)
+    final recentExpenses = mockExpenses.take(5).toList();
+    final recentSales = mockSales.take(5).toList();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Summary Cards
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: profit >= 0
+                    ? [const Color(0xFF2E7D32), const Color(0xFF66BB6A)]
+                    : [const Color(0xFFC62828), const Color(0xFFEF5350)],
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _FinanceSummaryItem(emoji: '📥', label: 'Income', value: '₹${_fmtAmount(totalSale)}'),
+                    _FinanceSummaryItem(emoji: '📤', label: 'Expenses', value: '₹${_fmtAmount(totalExp)}'),
+                    _FinanceSummaryItem(emoji: profit >= 0 ? '📈' : '📉', label: 'Profit', value: '₹${_fmtAmount(profit.abs())}'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Expense Breakdown
+          const Row(
+            children: [
+              Text('📤', style: TextStyle(fontSize: 22)),
+              SizedBox(width: 8),
+              Text('Expense Breakdown', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...sortedCats.map((entry) {
+            final pct = totalExp > 0 ? entry.value / totalExp : 0.0;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(_catEmoji(entry.key), style: const TextStyle(fontSize: 18)),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(entry.key.name[0].toUpperCase() + entry.key.name.substring(1), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14))),
+                      Text('₹${_fmtAmount(entry.value)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(color: Colors.orange.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
+                        child: Text('${(pct * 100).toStringAsFixed(0)}%', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.orange)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(value: pct, backgroundColor: Colors.orange.withValues(alpha: 0.1), valueColor: const AlwaysStoppedAnimation(Colors.orange), minHeight: 8),
+                  ),
+                ],
+              ),
+            );
+          }),
+          const SizedBox(height: 20),
+
+          // Sales by Type
+          const Row(
+            children: [
+              Text('📥', style: TextStyle(fontSize: 22)),
+              SizedBox(width: 8),
+              Text('Sales by Type', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            childAspectRatio: 2.0,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            children: saleByType.entries.map((entry) {
+              return Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 6, offset: const Offset(0, 2))],
+                ),
+                child: Row(
+                  children: [
+                    Text(_saleTypeEmoji(entry.key), style: const TextStyle(fontSize: 28)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(entry.key.name[0].toUpperCase() + entry.key.name.substring(1), style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                          Text('₹${_fmtAmount(entry.value)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 20),
+
+          // Recent Expenses
+          Row(
+            children: [
+              const Text('📤', style: TextStyle(fontSize: 20)),
+              const SizedBox(width: 8),
+              Text('Recent Expenses (${mockExpenses.length} total)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...recentExpenses.map((e) => Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                  leading: Container(
+                    width: 40, height: 40,
+                    decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                    child: Center(child: Text(_catEmoji(e.category), style: const TextStyle(fontSize: 20))),
+                  ),
+                  title: Text(e.subCategory ?? e.categoryName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  subtitle: Text('${e.date.day}/${e.date.month}/${e.date.year} · ${e.vendorName ?? ''}', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                  trailing: Text('-₹${_fmtAmount(e.amount)}', style: const TextStyle(color: RumenoTheme.errorRed, fontWeight: FontWeight.bold, fontSize: 14)),
+                ),
+              )),
+          const SizedBox(height: 16),
+
+          // Recent Sales
+          Row(
+            children: [
+              const Text('📥', style: TextStyle(fontSize: 20)),
+              const SizedBox(width: 8),
+              Text('Recent Sales (${mockSales.length} total)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...recentSales.map((s) => Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                  leading: Container(
+                    width: 40, height: 40,
+                    decoration: BoxDecoration(color: RumenoTheme.successGreen.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                    child: Center(child: Text(_saleTypeEmoji(s.type), style: const TextStyle(fontSize: 20))),
+                  ),
+                  title: Text(s.buyerName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  subtitle: Text('${s.date.day}/${s.date.month}/${s.date.year} · ${s.type.name}', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                  trailing: Text('+₹${_fmtAmount(s.amount)}', style: const TextStyle(color: RumenoTheme.successGreen, fontWeight: FontWeight.bold, fontSize: 14)),
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+
+  static String _fmtAmount(double amount) {
+    if (amount >= 100000) return '${(amount / 100000).toStringAsFixed(1)}L';
+    if (amount >= 1000) return '${(amount / 1000).toStringAsFixed(1)}K';
+    return amount.toStringAsFixed(0);
+  }
+
+  static String _catEmoji(ExpenseCategory cat) {
+    switch (cat) {
+      case ExpenseCategory.feed: return '🌾';
+      case ExpenseCategory.medicine: return '💊';
+      case ExpenseCategory.veterinary: return '🩺';
+      case ExpenseCategory.labour: return '👷';
+      case ExpenseCategory.equipment: return '🔧';
+      case ExpenseCategory.transport: return '🚜';
+      case ExpenseCategory.other: return '📦';
+    }
+  }
+
+  static String _saleTypeEmoji(SaleType type) {
+    switch (type) {
+      case SaleType.animal: return '🐄';
+      case SaleType.milk: return '🥛';
+      case SaleType.produce: return '🧈';
+      case SaleType.other: return '📦';
+    }
+  }
+}
+
+class _FinanceSummaryItem extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final String value;
+  const _FinanceSummaryItem({required this.emoji, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 28)),
+        const SizedBox(height: 4),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+      ],
     );
   }
 }

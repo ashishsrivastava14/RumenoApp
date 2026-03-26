@@ -1,6 +1,9 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../mock/mock_animals.dart';
+import '../../mock/mock_health.dart';
+import '../../models/models.dart';
 import '../../providers/admin_provider.dart';
 
 class AdminVetsScreen extends StatefulWidget {
@@ -17,7 +20,7 @@ class _AdminVetsScreenState extends State<AdminVetsScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 3, vsync: this);
+    _tab = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -75,13 +78,17 @@ class _AdminVetsScreenState extends State<AdminVetsScreen>
             ),
             bottom: TabBar(
               controller: _tab,
+              isScrollable: true,
               indicatorColor: Colors.white,
               labelColor: Colors.white,
               unselectedLabelColor: Colors.white60,
+              tabAlignment: TabAlignment.start,
               tabs: const [
-                Tab(icon: Text('👨‍⚕️', style: TextStyle(fontSize: 18)), text: 'Vets'),
-                Tab(icon: Text('📋', style: TextStyle(fontSize: 18)), text: 'Consults'),
-                Tab(icon: Text('💰', style: TextStyle(fontSize: 18)), text: 'Earnings'),
+                Tab(icon: Text('👨‍⚕️', style: TextStyle(fontSize: 16)), text: 'Vets'),
+                Tab(icon: Text('📋', style: TextStyle(fontSize: 16)), text: 'Consults'),
+                Tab(icon: Text('📅', style: TextStyle(fontSize: 16)), text: 'Schedule'),
+                Tab(icon: Text('💰', style: TextStyle(fontSize: 16)), text: 'Earnings'),
+                Tab(icon: Text('📊', style: TextStyle(fontSize: 16)), text: 'Performance'),
               ],
             ),
           ),
@@ -91,7 +98,9 @@ class _AdminVetsScreenState extends State<AdminVetsScreen>
           children: [
             _VetsTab(),
             _ConsultationsTab(),
+            _ScheduleTab(),
             _EarningsTab(),
+            _PerformanceTab(),
           ],
         ),
       ),
@@ -741,22 +750,18 @@ class _ConsultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color c;
-    IconData ico;
     String emoji;
     switch (data.status) {
       case ConsultStatus.completed:
         c = RumenoTheme.successGreen;
-        ico = Icons.check_circle_rounded;
         emoji = '✅';
         break;
       case ConsultStatus.scheduled:
         c = RumenoTheme.infoBlue;
-        ico = Icons.schedule_rounded;
         emoji = '📅';
         break;
       case ConsultStatus.pending:
         c = RumenoTheme.warningYellow;
-        ico = Icons.pending_rounded;
         emoji = '⏳';
         break;
     }
@@ -1002,6 +1007,350 @@ class _EarningCard extends StatelessWidget {
           Text('${(pct * 100).toStringAsFixed(1)}% of total earnings', style: TextStyle(fontSize: 9, color: Colors.grey[500])),
         ],
       ),
+    );
+  }
+}
+
+// ─── Schedule Tab ───────────────────────────────────────────────────────────
+class _ScheduleTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final admin = context.watch<AdminProvider>();
+    // Scheduled consults
+    final scheduled = admin.consultations.where((c) => c.status == ConsultStatus.scheduled).toList();
+
+    // Upcoming events from mock data
+    final events = List.of(mockUpcomingEvents)
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    // Pending vaccinations (due/overdue)
+    final now = DateTime.now();
+    final pendingVax = mockVaccinations.where((v) {
+      final next = v.nextDueDate;
+      return next != null && next.isBefore(now.add(const Duration(days: 14)));
+    }).toList();
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // KPI row
+        Row(
+          children: [
+            _ScheduleKpi(emoji: '📅', label: 'Scheduled', value: '${scheduled.length}', color: const Color(0xFF880E4F)),
+            const SizedBox(width: 10),
+            _ScheduleKpi(emoji: '🗓️', label: 'Events', value: '${events.length}', color: const Color(0xFF4A148C)),
+            const SizedBox(width: 10),
+            _ScheduleKpi(emoji: '💉', label: 'Pending Vax', value: '${pendingVax.length}', color: Colors.orange[800]!),
+          ],
+        ),
+        const SizedBox(height: 20),
+
+        // Scheduled consultations
+        const Text('📋 Upcoming Consultations', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        if (scheduled.isEmpty)
+          const Card(child: Padding(padding: EdgeInsets.all(24), child: Center(child: Text('No scheduled consultations', style: TextStyle(color: Colors.grey)))))
+        else
+          ...scheduled.map((c) => _ScheduledConsultCard(consult: c)),
+
+        const SizedBox(height: 20),
+
+        // Upcoming farm events
+        const Text('🗓️ Upcoming Farm Events', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        ...events.map((e) => _EventCard(event: e)),
+
+        const SizedBox(height: 20),
+
+        // Pending vaccinations
+        const Text('💉 Pending Vaccinations (Due Soon)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        if (pendingVax.isEmpty)
+          const Card(child: Padding(padding: EdgeInsets.all(24), child: Center(child: Text('All vaccinations up to date ✅', style: TextStyle(color: Colors.green)))))
+        else
+          ...pendingVax.map((v) {
+            final animal = getAnimalById(v.animalId);
+            final dueDate = v.nextDueDate!;
+            final overdue = dueDate.isBefore(now);
+            return Card(
+              margin: const EdgeInsets.only(bottom: 8),
+              color: overdue ? Colors.red[50] : Colors.orange[50],
+              child: ListTile(
+                leading: Text(overdue ? '🔴' : '🟡', style: const TextStyle(fontSize: 22)),
+                title: Text(v.vaccineName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: Text('${animal?.tagId ?? v.animalId} • ${overdue ? 'OVERDUE' : 'Due'}: ${dueDate.day}/${dueDate.month}/${dueDate.year}'),
+                trailing: Icon(overdue ? Icons.warning_amber : Icons.schedule, color: overdue ? Colors.red : Colors.orange),
+              ),
+            );
+          }),
+      ],
+    );
+  }
+}
+
+class _ScheduleKpi extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final String value;
+  final Color color;
+  const _ScheduleKpi({required this.emoji, required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [color.withValues(alpha: 0.15), color.withValues(alpha: 0.05)]),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 22)),
+            const SizedBox(height: 4),
+            Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
+            Text(label, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.7))),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ScheduledConsultCard extends StatelessWidget {
+  final ConsultModel consult;
+  const _ScheduledConsultCard({required this.consult});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading: const Text('📋', style: TextStyle(fontSize: 22)),
+        title: Text(consult.farmName, style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text('Vet: ${consult.vetName} • ${consult.date}'),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(color: Colors.blue[100], borderRadius: BorderRadius.circular(8)),
+          child: const Text('Scheduled', style: TextStyle(fontSize: 10, color: Colors.blue, fontWeight: FontWeight.w600)),
+        ),
+      ),
+    );
+  }
+}
+
+class _EventCard extends StatelessWidget {
+  final UpcomingEvent event;
+  const _EventCard({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    final type = event.eventType;
+    final emoji = switch (type) {
+      'Vaccination' => '💉',
+      'Breeding' => '🐄',
+      'Treatment' => '💊',
+      'Health Check' || 'Health' => '🩺',
+      _ => '📌',
+    };
+    final date = event.date;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading: Text(emoji, style: const TextStyle(fontSize: 22)),
+        title: Text(event.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text('$type • ${date.day}/${date.month}/${date.year}'),
+        trailing: Text('${date.day}/${date.month}', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+      ),
+    );
+  }
+}
+
+// ─── Performance Tab ────────────────────────────────────────────────────────
+class _PerformanceTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final admin = context.watch<AdminProvider>();
+    final vets = admin.vets.where((v) => v.status == VetStatus.active).toList();
+    final consults = admin.consultations;
+
+    // Overall stats
+    final completed = consults.where((c) => c.status == ConsultStatus.completed).length;
+    final total = consults.length;
+    final completionRate = total > 0 ? (completed / total * 100) : 0.0;
+    final avgRating = vets.isNotEmpty ? vets.map((v) => v.rating).reduce((a, b) => a + b) / vets.length : 0.0;
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // Overall KPIs
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: [Color(0xFF880E4F), Color(0xFFAD1457)]),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('📊 Overall Performance', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _PerfKpi(value: '${vets.length}', label: 'Active Vets', emoji: '👨‍⚕️'),
+                  _PerfKpi(value: '$completed/$total', label: 'Completed', emoji: '✅'),
+                  _PerfKpi(value: '${completionRate.toStringAsFixed(0)}%', label: 'Success Rate', emoji: '📈'),
+                  _PerfKpi(value: avgRating.toStringAsFixed(1), label: 'Avg Rating', emoji: '⭐'),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // Per-vet performance breakdown
+        const Text('👨‍⚕️ Vet Performance Comparison', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        ...vets.map((vet) {
+          final vetConsults = consults.where((c) => c.vetName == vet.name).toList();
+          final vetCompleted = vetConsults.where((c) => c.status == ConsultStatus.completed).length;
+          final vetRate = vetConsults.isNotEmpty ? (vetCompleted / vetConsults.length * 100) : 0.0;
+          return _VetPerformanceCard(vet: vet, totalConsults: vetConsults.length, completedConsults: vetCompleted, completionRate: vetRate);
+        }),
+
+        const SizedBox(height: 20),
+
+        // Top performers
+        const Text('🏆 Leaderboard', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        ..._buildLeaderboard(vets, consults),
+      ],
+    );
+  }
+
+  List<Widget> _buildLeaderboard(List<VetModel> vets, List<ConsultModel> consults) {
+    if (vets.isEmpty) return [const Card(child: Padding(padding: EdgeInsets.all(24), child: Center(child: Text('No active vets', style: TextStyle(color: Colors.grey)))))];
+
+    // Sort by earnings
+    final sorted = List<VetModel>.from(vets)..sort((a, b) => b.earnings.compareTo(a.earnings));
+    final medals = ['🥇', '🥈', '🥉'];
+    return sorted.asMap().entries.map((entry) {
+      final i = entry.key;
+      final vet = entry.value;
+      final vetConsults = consults.where((c) => c.vetName == vet.name).length;
+      return Card(
+        margin: const EdgeInsets.only(bottom: 6),
+        color: i < 3 ? Colors.amber[50] : null,
+        child: ListTile(
+          leading: Text(i < 3 ? medals[i] : '${i + 1}.', style: TextStyle(fontSize: i < 3 ? 26 : 16)),
+          title: Text(vet.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+          subtitle: Text('⭐ ${vet.rating.toStringAsFixed(1)} • $vetConsults consults'),
+          trailing: Text('₹${vet.earnings.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFAD1457), fontSize: 15)),
+        ),
+      );
+    }).toList();
+  }
+}
+
+class _PerfKpi extends StatelessWidget {
+  final String value;
+  final String label;
+  final String emoji;
+  const _PerfKpi({required this.value, required this.label, required this.emoji});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 18)),
+        const SizedBox(height: 4),
+        Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text(label, style: TextStyle(fontSize: 9, color: Colors.white.withValues(alpha: 0.8))),
+      ],
+    );
+  }
+}
+
+class _VetPerformanceCard extends StatelessWidget {
+  final VetModel vet;
+  final int totalConsults;
+  final int completedConsults;
+  final double completionRate;
+  const _VetPerformanceCard({required this.vet, required this.totalConsults, required this.completedConsults, required this.completionRate});
+
+  @override
+  Widget build(BuildContext context) {
+    final rateColor = completionRate >= 80 ? Colors.green : completionRate >= 50 ? Colors.orange : Colors.red;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Text('👨‍⚕️', style: TextStyle(fontSize: 28)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(vet.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                      Text(vet.specialization, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(color: rateColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
+                  child: Text('${completionRate.toStringAsFixed(0)}%', style: TextStyle(fontWeight: FontWeight.bold, color: rateColor, fontSize: 13)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _VetStat(emoji: '📋', label: 'Total', value: '$totalConsults'),
+                _VetStat(emoji: '✅', label: 'Done', value: '$completedConsults'),
+                _VetStat(emoji: '⭐', label: 'Rating', value: vet.rating.toStringAsFixed(1)),
+                _VetStat(emoji: '💰', label: 'Earned', value: '₹${vet.earnings.toStringAsFixed(0)}'),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: completionRate / 100,
+                backgroundColor: Colors.grey[200],
+                valueColor: AlwaysStoppedAnimation<Color>(rateColor),
+                minHeight: 5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _VetStat extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final String value;
+  const _VetStat({required this.emoji, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 14)),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+        Text(label, style: TextStyle(fontSize: 9, color: Colors.grey[500])),
+      ],
     );
   }
 }
