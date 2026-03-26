@@ -110,7 +110,7 @@ class AdminDashboardScreen extends StatelessWidget {
                               const Icon(Icons.notifications_rounded,
                                   color: Colors.white, size: 24),
                               Positioned(
-                                right: -2,
+                                right: 0,
                                 top: -2,
                                 child: Container(
                                   width: 10,
@@ -511,25 +511,30 @@ class _BigKpiCard extends StatelessWidget {
               children: [
                 Text(emoji, style: const TextStyle(fontSize: 32)),
                 if (trend != null)
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.25),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.trending_up_rounded,
-                            color: Colors.white, size: 14),
-                        const SizedBox(width: 3),
-                        Text(trend!,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold)),
-                      ],
+                  Flexible(
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.trending_up_rounded,
+                              color: Colors.white, size: 14),
+                          const SizedBox(width: 3),
+                          Flexible(
+                            child: Text(trend!,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
               ],
