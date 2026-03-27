@@ -154,13 +154,7 @@ class AdminMoreScreen extends StatelessWidget {
                       subtitle: 'Approve, suspend vendors',
                       onTap: () => context.go('/admin/more/vendors'),
                     ),
-                    _MenuTile(
-                      emoji: '📦',
-                      color: const Color(0xFF1976D2),
-                      label: 'Marketplace Settings',
-                      subtitle: 'Configure products & categories',
-                      onTap: () => context.go('/admin/more/marketplace'),
-                    ),
+
                     _MenuTile(
                       emoji: '🌾',
                       color: const Color(0xFF33691E),

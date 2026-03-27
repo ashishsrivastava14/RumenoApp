@@ -82,7 +82,7 @@ import '../screens/admin/more/admin_notifications_screen.dart';
 import '../screens/admin/more/admin_reports_screen.dart';
 import '../screens/admin/more/admin_settings_screen.dart';
 import '../screens/admin/more/admin_vendors_screen.dart';
-import '../screens/admin/more/admin_marketplace_screen.dart';
+
 import '../screens/admin/more/admin_feed_config_screen.dart';
 import '../screens/admin/more/admin_faq_screen.dart';
 import '../screens/admin/more/admin_translations_screen.dart';
@@ -464,11 +464,7 @@ GoRouter createRouter(AuthProvider authProvider) {
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (_, _) => const AdminVendorsScreen(),
               ),
-              GoRoute(
-                path: 'marketplace',
-                parentNavigatorKey: _rootNavigatorKey,
-                builder: (_, _) => const AdminMarketplaceScreen(),
-              ),
+
               GoRoute(
                 path: 'groups',
                 parentNavigatorKey: _rootNavigatorKey,
