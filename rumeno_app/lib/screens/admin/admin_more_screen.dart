@@ -175,13 +175,13 @@ class AdminMoreScreen extends StatelessWidget {
                       subtitle: 'Manage help articles & FAQs',
                       onTap: () => context.go('/admin/more/faq'),
                     ),
-                    _MenuTile(
-                      emoji: '🌐',
-                      color: const Color(0xFF1565C0),
-                      label: 'Translations',
-                      subtitle: 'Manage app translations',
-                      onTap: () => context.go('/admin/more/translations'),
-                    ),
+                    // _MenuTile(
+                    //   emoji: '🌐',
+                    //   color: const Color(0xFF1565C0),
+                    //   label: 'Translations',
+                    //   subtitle: 'Manage app translations',
+                    //   onTap: () => context.go('/admin/more/translations'),
+                    // ),
                     // _MenuTile(
                     //   emoji: '�',
                     //   color: const Color(0xFF00695C),
