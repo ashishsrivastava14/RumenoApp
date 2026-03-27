@@ -33,18 +33,23 @@ Rumeno is a digital farm management platform that empowers farmers to manage the
 |---|---|---|
 | 🔐 Auth | Login, OTP Verification, Role Selection | **3** |
 | 💫 Splash | Splash Screen | **1** |
-| 🌾 Farmer — Tabs | Dashboard, More | **2** |
-| 🌾 Farmer — Animals | Animal List, Add Animal, Animal Detail, Kid Management | **4** |
+| 🌾 Farmer — Dashboard | Dashboard | **1** |
+| 🌾 Farmer — Animals | Animal List, Add Animal, Animal Detail, Kid Management, QR Scanner | **5** |
 | 🌾 Farmer — Health | Health Dashboard, Vaccination, Treatment, Deworming, Lab Reports | **5** |
 | 🌾 Farmer — Finance | Finance Dashboard, Expense List, Reports, Feed Calculator | **4** |
 | 🌾 Farmer — Milk | Milk Log | **1** |
 | 🌾 Farmer — Breeding | Breeding Dashboard | **1** |
-| 🌾 Farmer — More | Farm Profile, Subscription, Team Management, Notification Settings, Farm Sanitization, Data Export, Help & Support | **7** |
-| 🩺 Vet | Vet Dashboard, Farms List, Farm Detail, Animal Health, Consultations, Schedule, Earnings | **7** |
-| 🛠️ Admin — Tabs | Dashboard, Farmers, Farm, Animals, Vets, Shop, Health Config, More | **8** |
+| 🌾 Farmer — Sale | Farm Shop, Sell Animal, Sell Produce, Sale History | **4** |
+| 🌾 Farmer — Groups | Group List, Group Detail | **2** |
+| 🌾 Farmer — More | More Home, Farm Profile, Subscription, Team Management, Notification Settings, Farm Sanitization, Data Export, Help & Support | **8** |
+| 🩺 Vet (4 tabs) | Vet Dashboard, Farms List, Farm Detail, Animal Health, Consultations, Schedule, Earnings | **7** |
+| 🛠️ Admin — Tabs (6 tabs) | Dashboard, Farmers, Farm, Shop, Vets, More | **6** |
+| 🛠️ Admin — Screens | Animals, Health Config, Categories, Groups | **4** |
 | 🛠️ Admin — More | Vendors, Subscriptions, Settings, Reports, Payments, Partners, Notifications, Marketplace | **8** |
 | 🛒 Shop | Shop Home, Search, Category, Product Detail, Cart, Checkout, Order Success, Orders List, Order Detail, Account, Vendor Registration | **11** |
-| | **Total** | **62** |
+| | **Total** | **71** |
+
+> **Navigation Tabs:** Farmer (5 — Home, Animals, Health, Finance, More) · Vet (4 — Dashboard, Farms, Health, Earnings) · Admin (6 — Home, Farmers, Farm, Shop, Vets, More) = **15 total**
 
 ---
 
@@ -56,7 +61,7 @@ Rumeno is a digital farm management platform that empowers farmers to manage the
 - **OTP Verification** – 4-digit OTP verification with resend support
 - **Multi-language** – Hindi and English support on login itself
 
-### 🌾 Farmer Portal (24 screens)
+### 🌾 Farmer Portal (31 screens)
 
 #### Dashboard
 - Personalized greeting (morning/afternoon/evening)
@@ -69,7 +74,7 @@ Rumeno is a digital farm management platform that empowers farmers to manage the
 - **Animal Detail** – 8-tab detail view: Overview, Health, Vaccination, Breeding, Reproduction, Production, Finance, Family
 - **Add Animal** – 5-step wizard: Species & basics → Appearance (weight, height, color, photo) → Family (parents, siblings) → Shed & purpose → Purchase info (optional)
 - **Kid Management** – Track newborns: milk status, weaning, medicine schedules, add/edit/delete kid records with pagination
-- **QR Code Scanning** – Scan animal tags via camera
+- **QR Code Scanner** – Dedicated scan screen: scan animal tags via camera, flashlight toggle, auto-navigate to animal detail on match
 - **Record Death** – Log death with date, reason (disease, pneumonia, diarrhea, snake bite, predator, cold, birth complication, sudden death, unknown)
 - **Record Castration** – Log castration date and details
 - Supports 6 species: Cow, Buffalo, Goat, Sheep, Pig, Horse
@@ -107,6 +112,16 @@ Rumeno is a digital farm management platform that empowers farmers to manage the
 - **Farm Sanitization** – Log sanitization records with 9 sanitizer options, 8 area options, schedule next sanitization
 - **Help & Support** – Call, WhatsApp, email contact options, FAQ section
 
+#### Sale & Farm Shop (4 screens)
+- **Farm Shop** – Farmer's own produce storefront, list and manage items for sale
+- **Sell Animal** – Log animal sale with buyer details, price, and date
+- **Sell Produce** – Record milk, manure, or other produce sales
+- **Sale History** – Full sale log with filter by type (animal, produce), date range, and totals
+
+#### Farmer Groups (2 screens)
+- **Group List** – View and manage farmer cooperative or community groups the farm belongs to
+- **Group Detail** – Group members, shared resources, announcements, and group-level stats
+
 ### 🩺 Veterinarian Portal (7 screens)
 - **Vet Dashboard** – Hero header with greeting, key metrics (total farms, animals, active treatments), quick action cards, upcoming visits preview
 - **Farms List** – Browse assigned farms with search, farm cards showing owner, plan, animal count, location
@@ -116,7 +131,7 @@ Rumeno is a digital farm management platform that empowers farmers to manage the
 - **Schedule** – Upcoming farm visits grouped by date, pending vaccinations list, event cards with time and location
 - **Earnings** – Financial summary (this month, total earned, pending, commission %), monthly earnings line chart, commission breakdown bar chart, payout history
 
-### 🛠️ Admin Portal (16 screens)
+### 🛠️ Admin Portal (18 screens)
 - **Admin Dashboard** – Greeting header with notification bell, key metrics grid (total farmers, animals, active plans, revenue), pending items alerts, quick access module grid, recent activity feed
 - **Farmers Management** – Search and filter farmers by plan, stats header, farmer cards with plan badges, export option
 - **Farm Management** – 3-tab view (Animals, Health, Stats) across all farms, species-based overview, health protocol monitoring
@@ -132,6 +147,8 @@ Rumeno is a digital farm management platform that empowers farmers to manage the
 - **Payments** – Revenue summary, trend charts, recent payment list with status (success, failed, refunded)
 - **Partners & Vets** – Partner management (vets, affiliates), referral tracking, earnings per partner
 - **Push Notifications** – Compose and send notifications, audience targeting, notification history
+- **Categories** – Manage product and animal categories: add, edit, delete, reorder
+- **Groups** – Manage farmer groups and cooperatives: create groups, assign members, monitor activity
 - **Marketplace Admin** – Marketplace stats, quick actions, category-wise stats (product count, stock, revenue)
 
 ### 🛒 Ecommerce / Marketplace (11 screens)
@@ -203,16 +220,18 @@ rumeno_app/
 │   ├── providers/                  # State management (auth, ecommerce, admin, locale)
 │   ├── screens/
 │   │   ├── auth/                   # Login, OTP, role selection (3 screens)
-│   │   ├── farmer/                 # Farmer portal (24 screens)
-│   │   │   ├── animals/            # Animal list, detail, add, kid management
+│   │   ├── farmer/                 # Farmer portal (31 screens)
+│   │   │   ├── animals/            # Animal list, detail, add, kid management, QR scanner
 │   │   │   ├── health/             # Vaccination, treatment, deworming, lab reports
 │   │   │   ├── breeding/           # Breeding dashboard
 │   │   │   ├── finance/            # Finance dashboard, expenses, reports, feed calc
 │   │   │   ├── milk/               # Milk production logging
+│   │   │   ├── sale/               # Farm shop, sell animal, sell produce, sale history
+│   │   │   ├── groups/             # Group list and detail
 │   │   │   └── more/               # Profile, team, subscription, export, settings
 │   │   ├── vet/                    # Veterinarian portal (7 screens)
-│   │   ├── admin/                  # Admin portal (16 screens)
-│   │   │   └── more/               # Vendors, subscriptions, reports, settings
+│   │   ├── admin/                  # Admin portal (18 screens)
+│   │   │   └── more/               # Vendors, subscriptions, reports, settings, categories, groups
 │   │   └── shop/                   # Marketplace / Ecommerce (11 screens)
 │   ├── widgets/
 │   │   ├── cards/                  # Animal, health, vaccination, expense, farmer cards
