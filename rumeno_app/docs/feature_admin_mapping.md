@@ -175,7 +175,7 @@ flowchart LR
 | 14 | Team Management | `/farmer/more/team` | Farmers list | `/admin/farmers` | ⚠️ No dedicated admin team oversight |
 | 15 | Notification Settings | `/farmer/more/notifications` | Notifications | `/admin/more/notifications` | ✅ Covered |
 | 16 | Data Export | `/farmer/more/export` | Reports | `/admin/more/reports` | ✅ Covered |
-| 17 | Farm Sanitization | `/farmer/more/sanitization` | Health Config (partial) | `/admin/farm` | ⚠️ No admin sanitization protocols |
+| 17 | Farm Sanitization | `/farmer/more/sanitization` | Sanitization Config | `/admin/farm/sanitization-config` | ✅ Covered |
 | 18 | Farm Profile | `/farmer/more/profile` | Farmers list | `/admin/farmers` | ✅ Covered |
 | 19 | Help & Support | `/farmer/more/help` | Settings | `/admin/more/settings` | ⚠️ No admin FAQ/content management |
 | 20 | Sell Animal/Produce | `/farmer/sale/*` | Shop + Marketplace | `/admin/shop` | ⚠️ No admin moderation for farmer listings |

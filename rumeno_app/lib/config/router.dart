@@ -69,6 +69,7 @@ import '../screens/admin/admin_dashboard_screen.dart';
 import '../screens/admin/admin_farmers_screen.dart';
 import '../screens/admin/admin_animals_screen.dart';
 import '../screens/admin/admin_health_config_screen.dart';
+import '../screens/admin/admin_sanitization_config_screen.dart';
 import '../screens/admin/admin_more_screen.dart';
 import '../screens/admin/admin_farm_screen.dart';
 import '../screens/admin/admin_shop_screen.dart';
@@ -403,6 +404,11 @@ GoRouter createRouter(AuthProvider authProvider) {
                 path: 'animals',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (_, _) => const AdminAnimalsScreen(),
+              ),
+              GoRoute(
+                path: 'sanitization-config',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminSanitizationConfigScreen(),
               ),
             ],
           ),

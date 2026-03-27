@@ -24,6 +24,61 @@ class HealthConfigItem {
   });
 }
 
+// ─── Sanitization Protocol Config Models ──────────────────────────────────────
+class SanitizationSanitizer {
+  final String id;
+  String name;
+  String emoji;
+  String dilution;
+  String safety;
+  bool isActive;
+
+  SanitizationSanitizer({
+    required this.id,
+    required this.name,
+    this.emoji = '🧴',
+    this.dilution = '',
+    this.safety = '',
+    this.isActive = true,
+  });
+}
+
+class SanitizationArea {
+  final String id;
+  String name;
+  String emoji;
+  String frequency;
+  bool isActive;
+
+  SanitizationArea({
+    required this.id,
+    required this.name,
+    this.emoji = '🏠',
+    this.frequency = '',
+    this.isActive = true,
+  });
+}
+
+class SanitizationProtocol {
+  final String id;
+  String name;
+  String areaId;
+  List<String> sanitizerIds;
+  String frequency;
+  String instructions;
+  bool isActive;
+
+  SanitizationProtocol({
+    required this.id,
+    required this.name,
+    required this.areaId,
+    this.sanitizerIds = const [],
+    this.frequency = '',
+    this.instructions = '',
+    this.isActive = true,
+  });
+}
+
 // ─── Vet Model ────────────────────────────────────────────────────────────────
 enum VetStatus { active, pending, inactive }
 
@@ -220,6 +275,11 @@ class AdminProvider extends ChangeNotifier {
   // ─── Settings ───────────────────────────────────────────────────────────
   final AppSettings _settings = AppSettings();
 
+  // ─── Sanitization Protocols ─────────────────────────────────────────────
+  final List<SanitizationSanitizer> _sanitizers = [];
+  final List<SanitizationArea> _sanitizationAreas = [];
+  final List<SanitizationProtocol> _sanitizationProtocols = [];
+
   AdminProvider() {
     _loadMockData();
   }
@@ -309,6 +369,35 @@ class AdminProvider extends ChangeNotifier {
       PaymentModel(id: 'PAY5', userName: 'Lisa Davis', plan: 'Pro', amount: 999, date: DateTime(2025, 7, 11), status: 'Success', method: 'UPI'),
       PaymentModel(id: 'PAY6', userName: 'Robert Taylor', plan: 'Starter', amount: 499, date: DateTime(2025, 7, 10), status: 'Refunded', method: 'Card'),
       PaymentModel(id: 'PAY7', userName: 'Brian Roberts', plan: 'Pro', amount: 999, date: DateTime(2025, 7, 9), status: 'Success', method: 'UPI'),
+    ]);
+
+    // Sanitization Sanitizers
+    _sanitizers.addAll([
+      SanitizationSanitizer(id: 'SAN1', name: 'Bleach (Sodium Hypochlorite)', emoji: '🧴', dilution: '1:10 with water', safety: 'Wear gloves, avoid eyes'),
+      SanitizationSanitizer(id: 'SAN2', name: 'Phenyl', emoji: '🫧', dilution: '1:20 with water', safety: 'Keep away from feed'),
+      SanitizationSanitizer(id: 'SAN3', name: 'Iodine Solution', emoji: '🩸', dilution: '1:100 with water', safety: 'Stains surfaces'),
+      SanitizationSanitizer(id: 'SAN4', name: 'Quicklime (Chuna)', emoji: '🪨', dilution: 'Sprinkle dry', safety: 'Avoid inhalation, use mask'),
+      SanitizationSanitizer(id: 'SAN5', name: 'Formalin', emoji: '🧪', dilution: '2-5% solution', safety: 'Toxic — ventilate area, PPE required'),
+      SanitizationSanitizer(id: 'SAN6', name: 'Potassium Permanganate', emoji: '🟣', dilution: '1:1000 with water', safety: 'Stains skin, use gloves'),
+      SanitizationSanitizer(id: 'SAN7', name: 'Hydrogen Peroxide', emoji: '🫙', dilution: '3% solution', safety: 'Keep away from heat'),
+    ]);
+
+    // Sanitization Areas
+    _sanitizationAreas.addAll([
+      SanitizationArea(id: 'AR1', name: 'Full Farm', emoji: '🏠', frequency: 'Monthly'),
+      SanitizationArea(id: 'AR2', name: 'Cow Shed', emoji: '🐄', frequency: 'Every 2 weeks'),
+      SanitizationArea(id: 'AR3', name: 'Goat Pen', emoji: '🐐', frequency: 'Every 2 weeks'),
+      SanitizationArea(id: 'AR4', name: 'Pig Pen', emoji: '🐷', frequency: 'Weekly'),
+      SanitizationArea(id: 'AR5', name: 'Water Tank', emoji: '🛢️', frequency: 'Monthly'),
+      SanitizationArea(id: 'AR6', name: 'Feed Storage', emoji: '🌾', frequency: 'Monthly'),
+      SanitizationArea(id: 'AR7', name: 'Entry Gate', emoji: '🚪', frequency: 'Weekly'),
+    ]);
+
+    // Sanitization Protocols
+    _sanitizationProtocols.addAll([
+      SanitizationProtocol(id: 'SP1', name: 'Weekly Gate Disinfection', areaId: 'AR7', sanitizerIds: ['SAN1', 'SAN4'], frequency: 'Weekly', instructions: 'Spray bleach at entry, sprinkle lime on footbath area'),
+      SanitizationProtocol(id: 'SP2', name: 'Cow Shed Deep Clean', areaId: 'AR2', sanitizerIds: ['SAN1', 'SAN2'], frequency: 'Every 2 weeks', instructions: 'Remove all bedding, wash floors with phenyl, disinfect troughs with bleach'),
+      SanitizationProtocol(id: 'SP3', name: 'Water Tank Flush', areaId: 'AR5', sanitizerIds: ['SAN6'], frequency: 'Monthly', instructions: 'Drain tank, scrub walls, add KMnO4 solution, rinse after 30 min'),
     ]);
   }
 
@@ -508,6 +597,58 @@ class AdminProvider extends ChangeNotifier {
     if (aiMixLimitBusiness != null) _settings.aiMixLimitBusiness = aiMixLimitBusiness;
     notifyListeners();
   }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Sanitization Protocols Config
+  // ═══════════════════════════════════════════════════════════════════════════
+  List<SanitizationSanitizer> get sanitizers => List.unmodifiable(_sanitizers);
+  List<SanitizationArea> get sanitizationAreas => List.unmodifiable(_sanitizationAreas);
+  List<SanitizationProtocol> get sanitizationProtocols => List.unmodifiable(_sanitizationProtocols);
+
+  // Sanitizers
+  void addSanitizer(SanitizationSanitizer s) { _sanitizers.add(s); notifyListeners(); }
+  void updateSanitizer(String id, {String? name, String? emoji, String? dilution, String? safety, bool? isActive}) {
+    final idx = _sanitizers.indexWhere((s) => s.id == id);
+    if (idx == -1) return;
+    if (name != null) _sanitizers[idx].name = name;
+    if (emoji != null) _sanitizers[idx].emoji = emoji;
+    if (dilution != null) _sanitizers[idx].dilution = dilution;
+    if (safety != null) _sanitizers[idx].safety = safety;
+    if (isActive != null) _sanitizers[idx].isActive = isActive;
+    notifyListeners();
+  }
+  void deleteSanitizer(String id) { _sanitizers.removeWhere((s) => s.id == id); notifyListeners(); }
+
+  // Areas
+  void addSanitizationArea(SanitizationArea a) { _sanitizationAreas.add(a); notifyListeners(); }
+  void updateSanitizationArea(String id, {String? name, String? emoji, String? frequency, bool? isActive}) {
+    final idx = _sanitizationAreas.indexWhere((a) => a.id == id);
+    if (idx == -1) return;
+    if (name != null) _sanitizationAreas[idx].name = name;
+    if (emoji != null) _sanitizationAreas[idx].emoji = emoji;
+    if (frequency != null) _sanitizationAreas[idx].frequency = frequency;
+    if (isActive != null) _sanitizationAreas[idx].isActive = isActive;
+    notifyListeners();
+  }
+  void deleteSanitizationArea(String id) { _sanitizationAreas.removeWhere((a) => a.id == id); notifyListeners(); }
+
+  // Protocols
+  void addSanitizationProtocol(SanitizationProtocol p) { _sanitizationProtocols.add(p); notifyListeners(); }
+  void updateSanitizationProtocol(String id, {String? name, String? areaId, List<String>? sanitizerIds, String? frequency, String? instructions, bool? isActive}) {
+    final idx = _sanitizationProtocols.indexWhere((p) => p.id == id);
+    if (idx == -1) return;
+    if (name != null) _sanitizationProtocols[idx].name = name;
+    if (areaId != null) _sanitizationProtocols[idx].areaId = areaId;
+    if (sanitizerIds != null) _sanitizationProtocols[idx].sanitizerIds = sanitizerIds;
+    if (frequency != null) _sanitizationProtocols[idx].frequency = frequency;
+    if (instructions != null) _sanitizationProtocols[idx].instructions = instructions;
+    if (isActive != null) _sanitizationProtocols[idx].isActive = isActive;
+    notifyListeners();
+  }
+  void deleteSanitizationProtocol(String id) { _sanitizationProtocols.removeWhere((p) => p.id == id); notifyListeners(); }
+
+  String sanitizerNameById(String id) => _sanitizers.where((s) => s.id == id).firstOrNull?.name ?? id;
+  String areaNameById(String id) => _sanitizationAreas.where((a) => a.id == id).firstOrNull?.name ?? id;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // Dashboard Stats (computed from all data)
