@@ -226,6 +226,29 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           const SizedBox(height: 24),
+                          // Vet registration link
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'Are you a veterinarian? ',
+                                style: TextStyle(color: Colors.black54, fontSize: 13),
+                              ),
+                              GestureDetector(
+                                onTap: () => context.go('/vet/register'),
+                                child: const Text(
+                                  'Register here',
+                                  style: TextStyle(
+                                    color: RumenoTheme.primaryGreen,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 13,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
                         ],
                       ),
                     ),

@@ -7,6 +7,7 @@ import '../screens/splash/splash_screen.dart';
 import '../screens/auth/role_selection_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/otp_screen.dart';
+import '../screens/auth/vet_register_screen.dart';
 
 // Shop / Ecommerce
 import '../screens/shop/shop_home_screen.dart';
@@ -161,6 +162,10 @@ GoRouter createRouter(AuthProvider authProvider) {
       GoRoute(
         path: '/shop/account',
         builder: (_, _) => const ShopAccountScreen(),
+      ),
+      GoRoute(
+        path: '/vet/register',
+        builder: (_, _) => const VetRegisterScreen(),
       ),
       GoRoute(
         path: '/shop/vendor-register',
