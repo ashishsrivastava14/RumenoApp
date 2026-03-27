@@ -44,7 +44,7 @@ class _SearchScreenState extends State<SearchScreen> {
       products = products.where((p) => p.category == _filterCategory).toList();
     }
     if (_filterAnimal != null) {
-      products = products.where((p) => (p.targetAnimals ?? <ProductAnimal>[]).contains(_filterAnimal)).toList();
+      products = products.where((p) => p.targetAnimals.contains(_filterAnimal)).toList();
     }
 
     return Scaffold(

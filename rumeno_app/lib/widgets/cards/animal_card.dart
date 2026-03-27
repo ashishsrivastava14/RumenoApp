@@ -52,23 +52,6 @@ class AnimalCard extends StatelessWidget {
     }
   }
 
-  Color _speciesColor(Species species) {
-    switch (species) {
-      case Species.cow:
-        return Colors.brown;
-      case Species.buffalo:
-        return Colors.blueGrey;
-      case Species.goat:
-        return Colors.orange;
-      case Species.sheep:
-        return Colors.teal;
-      case Species.pig:
-        return Colors.pink;
-      case Species.horse:
-        return Colors.indigo;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

@@ -1398,10 +1398,8 @@ class _EventCard extends StatelessWidget {
 class _SectionTitle extends StatelessWidget {
   final String title;
   final Widget? icon;
-  final String? actionLabel;
-  final VoidCallback? onAction;
 
-  const _SectionTitle({required this.title, this.icon, this.actionLabel, this.onAction});
+  const _SectionTitle({required this.title, this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -1437,22 +1435,6 @@ class _SectionTitle extends StatelessWidget {
             ),
           ],
         ),
-        if (onAction != null)
-          TextButton(
-            onPressed: onAction,
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-              minimumSize: const Size(60, 32),
-            ),
-            child: Text(
-              actionLabel ?? 'View All',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF5B7A2E),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
       ],
     );
   }

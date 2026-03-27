@@ -392,7 +392,6 @@ class _AnimalFeedCalculatorScreenState
   bool _isAiLoading = false;
   _AnimalType _selectedAnimal = _animalTypes[0]; // Dairy Cow default
   int _numberOfAnimals = 1;
-  bool _consentChecked = false;
   int _aiUsageCount = 0;
 
   @override

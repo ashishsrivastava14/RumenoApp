@@ -331,14 +331,6 @@ class _AlertTile extends StatelessWidget {
     }
   }
 
-  IconData get _icon {
-    switch (alert.severity) {
-      case AlertSeverity.high:   return Icons.error_rounded;
-      case AlertSeverity.medium: return Icons.warning_amber_rounded;
-      case AlertSeverity.low:    return Icons.info_rounded;
-    }
-  }
-
   String get _emoji {
     switch (alert.severity) {
       case AlertSeverity.high:   return '🚨';
@@ -380,16 +372,6 @@ class _EventTile extends StatelessWidget {
       case 'Breeding':    return const Color(0xFF9C27B0);
       case 'Health':      return RumenoTheme.primaryGreen;
       default:            return RumenoTheme.accentOlive;
-    }
-  }
-
-  IconData _typeIcon(String t) {
-    switch (t) {
-      case 'Vaccination': return Icons.vaccines_rounded;
-      case 'Treatment':   return Icons.medical_services_rounded;
-      case 'Breeding':    return Icons.favorite_rounded;
-      case 'Health':      return Icons.health_and_safety_rounded;
-      default:            return Icons.event_rounded;
     }
   }
 
@@ -559,14 +541,6 @@ class _TreatmentCardState extends State<_TreatmentCard> {
       case TreatmentStatus.active:    return l10n.commonActive;
       case TreatmentStatus.completed: return l10n.commonCompleted;
       case TreatmentStatus.followUp:  return l10n.commonFollowUp;
-    }
-  }
-
-  IconData get _statusIcon {
-    switch (widget.record.status) {
-      case TreatmentStatus.active:    return Icons.local_hospital_rounded;
-      case TreatmentStatus.completed: return Icons.check_circle_rounded;
-      case TreatmentStatus.followUp:  return Icons.schedule_rounded;
     }
   }
 
@@ -873,14 +847,6 @@ class _VaccineCard extends StatelessWidget {
       case VaccinationStatus.done:    return RumenoTheme.successGreen;
       case VaccinationStatus.due:     return RumenoTheme.warningYellow;
       case VaccinationStatus.overdue: return RumenoTheme.errorRed;
-    }
-  }
-
-  IconData get _icon {
-    switch (record.status) {
-      case VaccinationStatus.done:    return Icons.check_circle_rounded;
-      case VaccinationStatus.due:     return Icons.schedule_rounded;
-      case VaccinationStatus.overdue: return Icons.warning_rounded;
     }
   }
 
@@ -1375,8 +1341,7 @@ class _FilterChip extends StatelessWidget {
   final bool selected;
   final Color color;
   final VoidCallback onTap;
-  final String? emoji;
-  const _FilterChip({required this.label, required this.icon, required this.selected, required this.color, required this.onTap, this.emoji});
+  const _FilterChip({required this.label, required this.icon, required this.selected, required this.color, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -1393,13 +1358,8 @@ class _FilterChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (emoji != null) ...[
-              Text(emoji!, style: TextStyle(fontSize: 16, color: selected ? Colors.white : null)),
-              const SizedBox(width: 5),
-            ] else ...[
-              Icon(icon, size: 14, color: selected ? Colors.white : color),
-              const SizedBox(width: 5),
-            ],
+            Icon(icon, size: 14, color: selected ? Colors.white : color),
+            const SizedBox(width: 5),
             Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: selected ? Colors.white : color)),
           ],
         ),
