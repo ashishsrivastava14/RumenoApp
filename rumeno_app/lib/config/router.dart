@@ -85,6 +85,7 @@ import '../screens/admin/more/admin_vendors_screen.dart';
 import '../screens/admin/more/admin_marketplace_screen.dart';
 import '../screens/admin/more/admin_feed_config_screen.dart';
 import '../screens/admin/more/admin_faq_screen.dart';
+import '../screens/admin/more/admin_translations_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _farmerShellKey = GlobalKey<NavigatorState>();
@@ -482,6 +483,11 @@ GoRouter createRouter(AuthProvider authProvider) {
                 path: 'faq',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (_, _) => const AdminFaqScreen(),
+              ),
+              GoRoute(
+                path: 'translations',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminTranslationsScreen(),
               ),
             ],
           ),

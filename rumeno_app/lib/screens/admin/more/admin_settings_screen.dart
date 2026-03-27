@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../config/theme.dart';
 import '../../../providers/admin_provider.dart';
@@ -37,6 +38,9 @@ class AdminSettingsScreen extends StatelessWidget {
               );
             }),
             _settingTile('App Version', subtitle: '2.1.0 (Build 45)', icon: Icons.info_outline_rounded),
+            _settingTile('Manage Translations', subtitle: 'View & edit all app translations', icon: Icons.translate_rounded, onTap: () {
+              context.go('/admin/more/translations');
+            }),
           ]),
           const SizedBox(height: 16),
 
