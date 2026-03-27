@@ -309,6 +309,41 @@ class ExpenseRecord {
 
 enum SubscriptionPlan { free, starter, pro, business }
 
+enum TeamRole { owner, manager, staffEdit, staffView }
+
+class TeamMember {
+  final String id;
+  final String name;
+  final String phone;
+  final TeamRole role;
+  final String farmerId;
+  final DateTime joinedDate;
+  final bool isActive;
+
+  const TeamMember({
+    required this.id,
+    required this.name,
+    required this.phone,
+    required this.role,
+    required this.farmerId,
+    required this.joinedDate,
+    this.isActive = true,
+  });
+
+  String get roleName {
+    switch (role) {
+      case TeamRole.owner:
+        return 'Owner';
+      case TeamRole.manager:
+        return 'Manager';
+      case TeamRole.staffEdit:
+        return 'Staff (Edit)';
+      case TeamRole.staffView:
+        return 'Staff (View)';
+    }
+  }
+}
+
 class Farmer {
   final String id;
   final String name;

@@ -5,6 +5,7 @@ import '../../config/theme.dart';
 import '../../mock/mock_farmers.dart';
 import '../../models/models.dart';
 import '../../widgets/cards/farmer_card.dart';
+import 'admin_team_management_screen.dart';
 
 class AdminFarmersScreen extends StatefulWidget {
   const AdminFarmersScreen({super.key});
@@ -345,6 +346,15 @@ class _AdminFarmersScreenState extends State<AdminFarmersScreen> {
           Navigator.pop(ctx);
           _showDeleteConfirmation(context, farmer);
         },
+        onTeam: () {
+          Navigator.pop(ctx);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AdminTeamManagementScreen(farmer: farmer),
+            ),
+          );
+        },
       ),
     );
   }
@@ -486,6 +496,7 @@ class _FarmerDetailSheet extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onCall;
   final VoidCallback onDelete;
+  final VoidCallback onTeam;
 
   const _FarmerDetailSheet({
     required this.farmer,
@@ -493,6 +504,7 @@ class _FarmerDetailSheet extends StatelessWidget {
     required this.onEdit,
     required this.onCall,
     required this.onDelete,
+    required this.onTeam,
   });
 
   Color _planColor(SubscriptionPlan p) {
@@ -624,7 +636,7 @@ class _FarmerDetailSheet extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Action buttons - large, colorful, icon-first
-              // Row 1: Call & Edit
+              // Row 1: Call, Edit & Team
               Row(
                 children: [
                   Expanded(
@@ -642,6 +654,15 @@ class _FarmerDetailSheet extends StatelessWidget {
                       label: 'Edit',
                       color: const Color(0xFF1565C0),
                       onTap: onEdit,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _ActionButton(
+                      icon: Icons.groups_rounded,
+                      label: 'Team',
+                      color: const Color(0xFF00897B),
+                      onTap: onTeam,
                     ),
                   ),
                 ],
