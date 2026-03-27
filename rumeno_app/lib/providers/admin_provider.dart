@@ -210,7 +210,91 @@ class PaymentModel {
     required this.method,
   });
 }
+// ─── Feed Formula Models ─────────────────────────────────────────────────
+class FeedIngredient {
+  final String id;
+  String name;
+  String emoji;
+  double pricePerKg;
+  double protein;
+  double fiber;
+  double energy;
+  double carbohydrate;
+  double fat;
+  double moisture;
+  double ash;
+  bool isActive;
 
+  FeedIngredient({
+    required this.id,
+    required this.name,
+    this.emoji = '🌾',
+    required this.pricePerKg,
+    required this.protein,
+    required this.fiber,
+    required this.energy,
+    required this.carbohydrate,
+    required this.fat,
+    required this.moisture,
+    required this.ash,
+    this.isActive = true,
+  });
+}
+
+class FeedAnimalType {
+  final String id;
+  String name;
+  String emoji;
+  double bodyWeightKg;
+  double dailyFeedKg;
+  double greenFodderKg;
+  double dryFodderKg;
+  double concentrateKg;
+  double targetProtein;
+  double targetFiber;
+  double targetEnergy;
+  String tip;
+  bool isActive;
+
+  FeedAnimalType({
+    required this.id,
+    required this.name,
+    this.emoji = '🐄',
+    required this.bodyWeightKg,
+    required this.dailyFeedKg,
+    required this.greenFodderKg,
+    required this.dryFodderKg,
+    required this.concentrateKg,
+    required this.targetProtein,
+    required this.targetFiber,
+    required this.targetEnergy,
+    this.tip = '',
+    this.isActive = true,
+  });
+}
+
+// ─── FAQ / Content Model ─────────────────────────────────────────────────
+class FaqItem {
+  final String id;
+  String question;
+  String answer;
+  String category; // 'General', 'Animals', 'Health', 'Finance', 'Shop', 'Subscription'
+  int sortOrder;
+  bool isPublished;
+  final DateTime createdAt;
+  DateTime updatedAt;
+
+  FaqItem({
+    required this.id,
+    required this.question,
+    required this.answer,
+    required this.category,
+    this.sortOrder = 0,
+    this.isPublished = true,
+    required this.createdAt,
+    DateTime? updatedAt,
+  }) : updatedAt = updatedAt ?? createdAt;
+}
 // ─── App Settings Model ──────────────────────────────────────────────────────
 class AppSettings {
   bool maintenanceMode;
@@ -279,6 +363,13 @@ class AdminProvider extends ChangeNotifier {
   final List<SanitizationSanitizer> _sanitizers = [];
   final List<SanitizationArea> _sanitizationAreas = [];
   final List<SanitizationProtocol> _sanitizationProtocols = [];
+
+  // ─── Feed Formula Config ────────────────────────────────────────────────
+  final List<FeedIngredient> _feedIngredients = [];
+  final List<FeedAnimalType> _feedAnimalTypes = [];
+
+  // ─── FAQ / Content ──────────────────────────────────────────────────────
+  final List<FaqItem> _faqItems = [];
 
   AdminProvider() {
     _loadMockData();
@@ -398,6 +489,40 @@ class AdminProvider extends ChangeNotifier {
       SanitizationProtocol(id: 'SP1', name: 'Weekly Gate Disinfection', areaId: 'AR7', sanitizerIds: ['SAN1', 'SAN4'], frequency: 'Weekly', instructions: 'Spray bleach at entry, sprinkle lime on footbath area'),
       SanitizationProtocol(id: 'SP2', name: 'Cow Shed Deep Clean', areaId: 'AR2', sanitizerIds: ['SAN1', 'SAN2'], frequency: 'Every 2 weeks', instructions: 'Remove all bedding, wash floors with phenyl, disinfect troughs with bleach'),
       SanitizationProtocol(id: 'SP3', name: 'Water Tank Flush', areaId: 'AR5', sanitizerIds: ['SAN6'], frequency: 'Monthly', instructions: 'Drain tank, scrub walls, add KMnO4 solution, rinse after 30 min'),
+    ]);
+
+    // Feed Ingredients
+    _feedIngredients.addAll([
+      FeedIngredient(id: 'FI1', name: 'Maize', emoji: '🌽', pricePerKg: 27, protein: 8.5, fiber: 2.2, energy: 80, carbohydrate: 72, fat: 4.0, moisture: 12, ash: 1.5),
+      FeedIngredient(id: 'FI2', name: 'Soybean Meal', emoji: '🫘', pricePerKg: 52, protein: 44, fiber: 7, energy: 70, carbohydrate: 30, fat: 1.5, moisture: 11, ash: 6.5),
+      FeedIngredient(id: 'FI3', name: 'Wheat Bran', emoji: '🌾', pricePerKg: 24, protein: 16, fiber: 11, energy: 60, carbohydrate: 55, fat: 4.5, moisture: 12, ash: 6.0),
+      FeedIngredient(id: 'FI4', name: 'Cottonseed Cake', emoji: '🧶', pricePerKg: 36, protein: 24, fiber: 16, energy: 58, carbohydrate: 30, fat: 5.0, moisture: 10, ash: 6.5),
+      FeedIngredient(id: 'FI5', name: 'Green Fodder', emoji: '🌿', pricePerKg: 8, protein: 10, fiber: 28, energy: 48, carbohydrate: 40, fat: 2.5, moisture: 75, ash: 10),
+      FeedIngredient(id: 'FI6', name: 'Dry Hay', emoji: '🟫', pricePerKg: 12, protein: 6, fiber: 32, energy: 42, carbohydrate: 45, fat: 2.0, moisture: 12, ash: 8),
+      FeedIngredient(id: 'FI7', name: 'Mustard Cake', emoji: '🟡', pricePerKg: 32, protein: 34, fiber: 12, energy: 62, carbohydrate: 28, fat: 8.0, moisture: 10, ash: 9),
+      FeedIngredient(id: 'FI8', name: 'Mineral Mix', emoji: '🧂', pricePerKg: 85, protein: 0, fiber: 0, energy: 0, carbohydrate: 0, fat: 0, moisture: 5, ash: 90),
+    ]);
+
+    // Feed Animal Types
+    _feedAnimalTypes.addAll([
+      FeedAnimalType(id: 'FA1', name: 'Dairy Cow', emoji: '🐄', bodyWeightKg: 400, dailyFeedKg: 25, greenFodderKg: 15, dryFodderKg: 5, concentrateKg: 5, targetProtein: 16, targetFiber: 18, targetEnergy: 65, tip: 'Give 1 kg extra concentrate for every 2.5 litres of milk above 5 litres.'),
+      FeedAnimalType(id: 'FA2', name: 'Buffalo', emoji: '🐃', bodyWeightKg: 500, dailyFeedKg: 30, greenFodderKg: 20, dryFodderKg: 5, concentrateKg: 5, targetProtein: 14, targetFiber: 20, targetEnergy: 60, tip: 'Buffalo needs more green fodder for fat-rich milk production.'),
+      FeedAnimalType(id: 'FA3', name: 'Goat', emoji: '🐐', bodyWeightKg: 40, dailyFeedKg: 4, greenFodderKg: 2, dryFodderKg: 1, concentrateKg: 1, targetProtein: 14, targetFiber: 22, targetEnergy: 55, tip: 'Goats prefer browsing – add leaves & shrubs when possible.'),
+      FeedAnimalType(id: 'FA4', name: 'Sheep', emoji: '🐑', bodyWeightKg: 45, dailyFeedKg: 4.5, greenFodderKg: 2.5, dryFodderKg: 1, concentrateKg: 1, targetProtein: 12, targetFiber: 24, targetEnergy: 52, tip: 'Sheep do well on good quality hay and pasture grazing.'),
+      FeedAnimalType(id: 'FA5', name: 'Horse', emoji: '🐴', bodyWeightKg: 450, dailyFeedKg: 12, greenFodderKg: 5, dryFodderKg: 5, concentrateKg: 2, targetProtein: 10, targetFiber: 28, targetEnergy: 55, tip: 'Horses need high-fiber diet. Feed little and often.'),
+      FeedAnimalType(id: 'FA6', name: 'Pig', emoji: '🐷', bodyWeightKg: 90, dailyFeedKg: 3, greenFodderKg: 0.5, dryFodderKg: 0, concentrateKg: 2.5, targetProtein: 16, targetFiber: 8, targetEnergy: 72, tip: 'Pigs grow well on grain-based concentrate with kitchen waste supplement.'),
+    ]);
+
+    // FAQ Items
+    _faqItems.addAll([
+      FaqItem(id: 'FAQ1', question: 'How do I add a new animal?', answer: 'Go to the Animals tab, tap the + button, fill in the details and tap Save.', category: 'Animals', sortOrder: 1, createdAt: DateTime(2025, 6, 1)),
+      FaqItem(id: 'FAQ2', question: 'How does the feed calculator work?', answer: 'Select your animal type, choose feed ingredients and quantities. The calculator shows nutritional analysis and cost breakdown. AI Mix suggests optimal combinations.', category: 'Finance', sortOrder: 2, createdAt: DateTime(2025, 6, 1)),
+      FaqItem(id: 'FAQ3', question: 'How do I book a vet consultation?', answer: 'Go to Health > Vet Consult, choose a vet, select a time slot and confirm booking. Payment is processed after the consultation.', category: 'Health', sortOrder: 3, createdAt: DateTime(2025, 6, 5)),
+      FaqItem(id: 'FAQ4', question: 'What subscription plans are available?', answer: 'We offer Free, Starter (₹499/mo), Pro (₹999/mo), and Business (₹2499/mo) plans. Each tier unlocks more animals, features, and vet consults.', category: 'Subscription', sortOrder: 4, createdAt: DateTime(2025, 6, 5)),
+      FaqItem(id: 'FAQ5', question: 'How do I track milk production?', answer: 'Go to Milk Log from the dashboard. Tap + to record daily morning/evening yields per animal. View trends in the analytics section.', category: 'Animals', sortOrder: 5, createdAt: DateTime(2025, 6, 10)),
+      FaqItem(id: 'FAQ6', question: 'How do I place a shop order?', answer: 'Browse products in the Shop tab, add items to cart, proceed to checkout, select delivery address and payment method.', category: 'Shop', sortOrder: 6, createdAt: DateTime(2025, 6, 10)),
+      FaqItem(id: 'FAQ7', question: 'What is the vaccination schedule?', answer: 'Go to Health > Vaccinations for your animal\u2019s schedule. Upcoming vaccines are shown on the dashboard. We send reminders before due dates.', category: 'Health', sortOrder: 7, createdAt: DateTime(2025, 6, 15)),
+      FaqItem(id: 'FAQ8', question: 'How do I export my farm data?', answer: 'Go to More > Data Export. Choose what data to include (animals, health, finance) and tap Export. A CSV/PDF file will be generated.', category: 'General', sortOrder: 8, createdAt: DateTime(2025, 6, 15)),
     ]);
   }
 
@@ -649,6 +774,78 @@ class AdminProvider extends ChangeNotifier {
 
   String sanitizerNameById(String id) => _sanitizers.where((s) => s.id == id).firstOrNull?.name ?? id;
   String areaNameById(String id) => _sanitizationAreas.where((a) => a.id == id).firstOrNull?.name ?? id;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Feed Formula Config
+  // ═══════════════════════════════════════════════════════════════════════════
+  List<FeedIngredient> get feedIngredients => List.unmodifiable(_feedIngredients);
+  List<FeedAnimalType> get feedAnimalTypes => List.unmodifiable(_feedAnimalTypes);
+
+  int get activeFeedIngredients => _feedIngredients.where((i) => i.isActive).length;
+  int get activeFeedAnimalTypes => _feedAnimalTypes.where((a) => a.isActive).length;
+
+  // Ingredients
+  void addFeedIngredient(FeedIngredient item) { _feedIngredients.add(item); notifyListeners(); }
+  void updateFeedIngredient(String id, {String? name, String? emoji, double? pricePerKg, double? protein, double? fiber, double? energy, double? carbohydrate, double? fat, double? moisture, double? ash, bool? isActive}) {
+    final idx = _feedIngredients.indexWhere((i) => i.id == id);
+    if (idx == -1) return;
+    if (name != null) _feedIngredients[idx].name = name;
+    if (emoji != null) _feedIngredients[idx].emoji = emoji;
+    if (pricePerKg != null) _feedIngredients[idx].pricePerKg = pricePerKg;
+    if (protein != null) _feedIngredients[idx].protein = protein;
+    if (fiber != null) _feedIngredients[idx].fiber = fiber;
+    if (energy != null) _feedIngredients[idx].energy = energy;
+    if (carbohydrate != null) _feedIngredients[idx].carbohydrate = carbohydrate;
+    if (fat != null) _feedIngredients[idx].fat = fat;
+    if (moisture != null) _feedIngredients[idx].moisture = moisture;
+    if (ash != null) _feedIngredients[idx].ash = ash;
+    if (isActive != null) _feedIngredients[idx].isActive = isActive;
+    notifyListeners();
+  }
+  void deleteFeedIngredient(String id) { _feedIngredients.removeWhere((i) => i.id == id); notifyListeners(); }
+
+  // Animal Types
+  void addFeedAnimalType(FeedAnimalType item) { _feedAnimalTypes.add(item); notifyListeners(); }
+  void updateFeedAnimalType(String id, {String? name, String? emoji, double? bodyWeightKg, double? dailyFeedKg, double? greenFodderKg, double? dryFodderKg, double? concentrateKg, double? targetProtein, double? targetFiber, double? targetEnergy, String? tip, bool? isActive}) {
+    final idx = _feedAnimalTypes.indexWhere((a) => a.id == id);
+    if (idx == -1) return;
+    if (name != null) _feedAnimalTypes[idx].name = name;
+    if (emoji != null) _feedAnimalTypes[idx].emoji = emoji;
+    if (bodyWeightKg != null) _feedAnimalTypes[idx].bodyWeightKg = bodyWeightKg;
+    if (dailyFeedKg != null) _feedAnimalTypes[idx].dailyFeedKg = dailyFeedKg;
+    if (greenFodderKg != null) _feedAnimalTypes[idx].greenFodderKg = greenFodderKg;
+    if (dryFodderKg != null) _feedAnimalTypes[idx].dryFodderKg = dryFodderKg;
+    if (concentrateKg != null) _feedAnimalTypes[idx].concentrateKg = concentrateKg;
+    if (targetProtein != null) _feedAnimalTypes[idx].targetProtein = targetProtein;
+    if (targetFiber != null) _feedAnimalTypes[idx].targetFiber = targetFiber;
+    if (targetEnergy != null) _feedAnimalTypes[idx].targetEnergy = targetEnergy;
+    if (tip != null) _feedAnimalTypes[idx].tip = tip;
+    if (isActive != null) _feedAnimalTypes[idx].isActive = isActive;
+    notifyListeners();
+  }
+  void deleteFeedAnimalType(String id) { _feedAnimalTypes.removeWhere((a) => a.id == id); notifyListeners(); }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // FAQ / Content Management
+  // ═══════════════════════════════════════════════════════════════════════════
+  List<FaqItem> get faqItems => List.unmodifiable(_faqItems);
+
+  List<String> get faqCategories => _faqItems.map((f) => f.category).toSet().toList()..sort();
+  int get publishedFaqCount => _faqItems.where((f) => f.isPublished).length;
+
+  void addFaq(FaqItem item) { _faqItems.add(item); notifyListeners(); }
+  void updateFaq(String id, {String? question, String? answer, String? category, int? sortOrder, bool? isPublished}) {
+    final idx = _faqItems.indexWhere((f) => f.id == id);
+    if (idx == -1) return;
+    if (question != null) _faqItems[idx].question = question;
+    if (answer != null) _faqItems[idx].answer = answer;
+    if (category != null) _faqItems[idx].category = category;
+    if (sortOrder != null) _faqItems[idx].sortOrder = sortOrder;
+    if (isPublished != null) _faqItems[idx].isPublished = isPublished;
+    _faqItems[idx].updatedAt = DateTime.now();
+    notifyListeners();
+  }
+  void deleteFaq(String id) { _faqItems.removeWhere((f) => f.id == id); notifyListeners(); }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // Dashboard Stats (computed from all data)

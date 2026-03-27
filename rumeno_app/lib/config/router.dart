@@ -83,6 +83,8 @@ import '../screens/admin/more/admin_reports_screen.dart';
 import '../screens/admin/more/admin_settings_screen.dart';
 import '../screens/admin/more/admin_vendors_screen.dart';
 import '../screens/admin/more/admin_marketplace_screen.dart';
+import '../screens/admin/more/admin_feed_config_screen.dart';
+import '../screens/admin/more/admin_faq_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _farmerShellKey = GlobalKey<NavigatorState>();
@@ -470,6 +472,16 @@ GoRouter createRouter(AuthProvider authProvider) {
                 path: 'groups',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (_, _) => const AdminGroupsScreen(),
+              ),
+              GoRoute(
+                path: 'feed-config',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminFeedConfigScreen(),
+              ),
+              GoRoute(
+                path: 'faq',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (_, _) => const AdminFaqScreen(),
               ),
             ],
           ),

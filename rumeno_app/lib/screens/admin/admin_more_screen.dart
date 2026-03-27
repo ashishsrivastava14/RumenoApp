@@ -161,6 +161,20 @@ class AdminMoreScreen extends StatelessWidget {
                       subtitle: 'Configure products & categories',
                       onTap: () => context.go('/admin/more/marketplace'),
                     ),
+                    _MenuTile(
+                      emoji: '🌾',
+                      color: const Color(0xFF33691E),
+                      label: 'Feed Formula Config',
+                      subtitle: 'Ingredients & animal types',
+                      onTap: () => context.go('/admin/more/feed-config'),
+                    ),
+                    _MenuTile(
+                      emoji: '❓',
+                      color: const Color(0xFF4527A0),
+                      label: 'FAQ & Content',
+                      subtitle: 'Manage help articles & FAQs',
+                      onTap: () => context.go('/admin/more/faq'),
+                    ),
                     // _MenuTile(
                     //   emoji: '�',
                     //   color: const Color(0xFF00695C),
