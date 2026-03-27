@@ -9,7 +9,8 @@ import '../../providers/auth_provider.dart';
 
 class OtpScreen extends StatefulWidget {
   final String? redirectTo;
-  const OtpScreen({super.key, this.redirectTo});
+  final String phone;
+  const OtpScreen({super.key, this.redirectTo, required this.phone});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -56,34 +57,40 @@ class _OtpScreenState extends State<OtpScreen> {
       Future.delayed(const Duration(seconds: 1), () {
         if (!mounted) return;
         final auth = context.read<AuthProvider>();
-        final role = auth.selectedRole ?? UserRole.farmer;
-        auth.login('9876543210', role);
+        final roles = auth.login(widget.phone);
 
-        // If there's a redirect path, navigate back to it
+        // If there's a redirect path, navigate back to it (e.g. shop checkout)
         if (widget.redirectTo != null) {
           context.go(widget.redirectTo!);
           return;
         }
 
-        switch (role) {
-          case UserRole.farmer:
-            context.go('/farmer/dashboard');
-            break;
-          case UserRole.vet:
-            context.go('/vet/dashboard');
-            break;
-          case UserRole.admin:
-            context.go('/admin/dashboard');
-            break;
-          case UserRole.farmProducts:
-            context.go('/shop');
-            break;
+        // Single role → go straight to that dashboard
+        if (roles.length == 1) {
+          _navigateToDashboard(roles.first);
+        } else {
+          // Multiple roles → show the role picker
+          context.go('/role-selection');
         }
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context).otpInvalidError), backgroundColor: Colors.red),
       );
+    }
+  }
+
+  void _navigateToDashboard(UserRole role) {
+    switch (role) {
+      case UserRole.farmer:
+        context.go('/farmer/dashboard');
+        break;
+      case UserRole.vet:
+        context.go('/vet/dashboard');
+        break;
+      case UserRole.admin:
+        context.go('/admin/dashboard');
+        break;
     }
   }
 

@@ -9,6 +9,7 @@ import '../../mock/mock_users.dart';
 import '../../models/models.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/common/marketplace_button.dart';
+import '../../widgets/role_switcher.dart';
 
 class VetDashboardScreen extends StatelessWidget {
   const VetDashboardScreen({super.key});
@@ -44,6 +45,7 @@ class VetDashboardScreen extends StatelessWidget {
               ),
             ),
             actions: const [
+              RoleSwitcher(),
               FarmButton(),
               MarketplaceButton(),
               SizedBox(width: 8),

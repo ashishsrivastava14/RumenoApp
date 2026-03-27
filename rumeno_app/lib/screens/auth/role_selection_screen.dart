@@ -6,6 +6,9 @@ import '../../l10n/app_localizations.dart';
 import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
 
+/// Post-login role picker.
+/// Shown only when the logged-in user has multiple roles.
+/// If the user is NOT logged in, redirects to /login.
 class RoleSelectionScreen extends StatefulWidget {
   const RoleSelectionScreen({super.key});
 
@@ -16,39 +19,32 @@ class RoleSelectionScreen extends StatefulWidget {
 class _RoleSelectionScreenState extends State<RoleSelectionScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  late List<Animation<double>> _cardAnimations;
   late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: const Interval(0.0, 0.3, curve: Curves.easeOut),
-      ),
-    );
-
-    _cardAnimations = List.generate(
-      4,
-      (index) => Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(
-          parent: _animationController,
-          curve: Interval(
-            0.2 + (index * 0.1),
-            0.5 + (index * 0.1),
-            curve: Curves.easeOutCubic,
-          ),
-        ),
+        curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
       ),
     );
 
     _animationController.forward();
+
+    // If not authenticated, redirect to login
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth = context.read<AuthProvider>();
+      if (!auth.isAuthenticated) {
+        context.go('/login');
+      }
+    });
   }
 
   @override
@@ -57,8 +53,28 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
     super.dispose();
   }
 
+  void _selectRole(UserRole role) {
+    final auth = context.read<AuthProvider>();
+    auth.selectRole(role);
+    switch (role) {
+      case UserRole.farmer:
+        context.go('/farmer/dashboard');
+        break;
+      case UserRole.vet:
+        context.go('/vet/dashboard');
+        break;
+      case UserRole.admin:
+        context.go('/admin/dashboard');
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final roles = auth.roles;
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -75,7 +91,6 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
         ),
         child: Stack(
           children: [
-            // Animated background pattern
             Positioned.fill(
               child: Opacity(
                 opacity: 0.08,
@@ -120,7 +135,6 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                 ),
               ),
             ),
-            // Main content
             SafeArea(
               child: AnimatedBuilder(
                 animation: _animationController,
@@ -132,125 +146,66 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                       child: Column(
                         children: [
                           const SizedBox(height: 20),
-                          // Logo with shadow
-                          Transform.scale(
-                            scale: 0.8 + (_fadeAnimation.value * 0.2),
-                            child: Container(
-                              width: 220,
-                              height: 220,
-                              decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: RumenoTheme.primaryGreen.withValues(alpha: 0.2),
-                                    blurRadius: 30,
-                                    offset: const Offset(0, 15),
-                                  ),
-                                ],
-                              ),
-                              child: Image.asset(
-                                'assets/images/Rumeno_logo-rb.png',
-                                width: 220,
-                                height: 220,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          // Welcome text with gradient
-                          ShaderMask(
-                            shaderCallback: (bounds) => LinearGradient(
-                              colors: [
-                                RumenoTheme.primaryGreen,
-                                RumenoTheme.primaryGreen.withValues(alpha: 0.8),
+                          // Logo
+                          Container(
+                            width: 180,
+                            height: 180,
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: RumenoTheme.primaryGreen.withValues(alpha: 0.2),
+                                  blurRadius: 30,
+                                  offset: const Offset(0, 15),
+                                ),
                               ],
-                            ).createShader(bounds),
-                            child: Text(
-                              AppLocalizations.of(context).authWelcomeToRumeno,
-                              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
+                            ),
+                            child: Image.asset(
+                              'assets/images/Rumeno_logo-rb.png',
+                              width: 180,
+                              height: 180,
+                              fit: BoxFit.contain,
                             ),
                           ),
-                          const SizedBox(height: 5),
+                          const SizedBox(height: 16),
+                          // Greeting
+                          if (auth.currentUser != null)
+                            Text(
+                              'Hi, ${auth.currentUser!.name}!',
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          const SizedBox(height: 8),
                           Text(
-                            AppLocalizations.of(context).authSelectRolePrompt,
+                            l10n.authSelectRolePrompt,
                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                   color: Colors.black54,
                                   fontWeight: FontWeight.w500,
                                 ),
                           ),
-                          const SizedBox(height: 10),
-                          // Animated Role Cards
-                          _buildAnimatedCard(
-                            index: 0,
-                            emoji: '🐄',
-                            title: AppLocalizations.of(context).authRoleFarmOwner,
-                            subtitle: AppLocalizations.of(context).authRoleFarmOwnerSubtitle,
-                            gradient: LinearGradient(
-                              colors: [
-                                RumenoTheme.primaryGreen.withValues(alpha: 0.1),
-                                RumenoTheme.primaryGreen.withValues(alpha: 0.05),
-                              ],
+                          const SizedBox(height: 32),
+                          // Role cards – only the roles this user has
+                          ...roles.map((role) => Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: _RoleCard(
+                              emoji: _emojiFor(role),
+                              title: _titleFor(role, l10n),
+                              subtitle: _subtitleFor(role, l10n),
+                              gradient: _gradientFor(role),
+                              onTap: () => _selectRole(role),
                             ),
-                            onTap: () {
-                              context.read<AuthProvider>().selectRole(UserRole.farmer);
-                              context.go('/login');
-                            },
-                          ),
+                          )),
                           const SizedBox(height: 16),
-                          _buildAnimatedCard(
-                            index: 1,
-                            emoji: '🩺',
-                            title: AppLocalizations.of(context).authRoleVet,
-                            subtitle: AppLocalizations.of(context).authRoleVetSubtitle,
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.blue.withValues(alpha: 0.1),
-                                Colors.blue.withValues(alpha: 0.05),
-                              ],
-                            ),
-                            onTap: () {
-                              context.read<AuthProvider>().selectRole(UserRole.vet);
-                              context.go('/login');
+                          // Logout link
+                          TextButton.icon(
+                            onPressed: () {
+                              auth.logout();
+                              context.go('/shop');
                             },
+                            icon: const Icon(Icons.logout, size: 18),
+                            label: const Text('Sign Out'),
+                            style: TextButton.styleFrom(foregroundColor: Colors.black54),
                           ),
-                          const SizedBox(height: 16),
-                          _buildAnimatedCard(
-                            index: 2,
-                            emoji: '🔧',
-                            title: AppLocalizations.of(context).authRoleSuperAdmin,
-                            subtitle: AppLocalizations.of(context).authRoleSuperAdminSubtitle,
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.orange.withValues(alpha: 0.1),
-                                Colors.orange.withValues(alpha: 0.05),
-                              ],
-                            ),
-                            onTap: () {
-                              context.read<AuthProvider>().selectRole(UserRole.admin);
-                              context.go('/login');
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          _buildAnimatedCard(
-                            index: 3,
-                            emoji: '🛒',
-                            title: AppLocalizations.of(context).authRoleFarmProducts,
-                            subtitle: AppLocalizations.of(context).authRoleFarmProductsSubtitle,
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.purple.withValues(alpha: 0.1),
-                                Colors.purple.withValues(alpha: 0.05),
-                              ],
-                            ),
-                            onTap: () {
-                              context.read<AuthProvider>()
-                                  .selectRole(UserRole.farmProducts);
-                              context.go('/login');
-                            },
-                          ),
-                          const SizedBox(height: 24),
                         ],
                       ),
                     ),
@@ -264,38 +219,60 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
     );
   }
 
-  Widget _buildAnimatedCard({
-    required int index,
-    required String emoji,
-    required String title,
-    required String subtitle,
-    required Gradient gradient,
-    required VoidCallback onTap,
-  }) {
-    return Transform.translate(
-      offset: Offset(0, 50 * (1 - _cardAnimations[index].value)),
-      child: Opacity(
-        opacity: _cardAnimations[index].value,
-        child: _ModernRoleCard(
-          emoji: emoji,
-          title: title,
-          subtitle: subtitle,
-          gradient: gradient,
-          onTap: onTap,
-        ),
-      ),
-    );
+  String _emojiFor(UserRole role) {
+    switch (role) {
+      case UserRole.farmer: return '🐄';
+      case UserRole.vet:    return '🩺';
+      case UserRole.admin:  return '🔧';
+    }
+  }
+
+  String _titleFor(UserRole role, AppLocalizations l10n) {
+    switch (role) {
+      case UserRole.farmer: return l10n.authRoleFarmOwner;
+      case UserRole.vet:    return l10n.authRoleVet;
+      case UserRole.admin:  return l10n.authRoleSuperAdmin;
+    }
+  }
+
+  String _subtitleFor(UserRole role, AppLocalizations l10n) {
+    switch (role) {
+      case UserRole.farmer: return l10n.authRoleFarmOwnerSubtitle;
+      case UserRole.vet:    return l10n.authRoleVetSubtitle;
+      case UserRole.admin:  return l10n.authRoleSuperAdminSubtitle;
+    }
+  }
+
+  LinearGradient _gradientFor(UserRole role) {
+    switch (role) {
+      case UserRole.farmer:
+        return LinearGradient(colors: [
+          RumenoTheme.primaryGreen.withValues(alpha: 0.1),
+          RumenoTheme.primaryGreen.withValues(alpha: 0.05),
+        ]);
+      case UserRole.vet:
+        return LinearGradient(colors: [
+          Colors.blue.withValues(alpha: 0.1),
+          Colors.blue.withValues(alpha: 0.05),
+        ]);
+      case UserRole.admin:
+        return LinearGradient(colors: [
+          Colors.orange.withValues(alpha: 0.1),
+          Colors.orange.withValues(alpha: 0.05),
+        ]);
+    }
   }
 }
 
-class _ModernRoleCard extends StatefulWidget {
+/// A tappable role card with press animation.
+class _RoleCard extends StatefulWidget {
   final String emoji;
   final String title;
   final String subtitle;
   final Gradient gradient;
   final VoidCallback onTap;
 
-  const _ModernRoleCard({
+  const _RoleCard({
     required this.emoji,
     required this.title,
     required this.subtitle,
@@ -304,10 +281,10 @@ class _ModernRoleCard extends StatefulWidget {
   });
 
   @override
-  State<_ModernRoleCard> createState() => _ModernRoleCardState();
+  State<_RoleCard> createState() => _RoleCardState();
 }
 
-class _ModernRoleCardState extends State<_ModernRoleCard>
+class _RoleCardState extends State<_RoleCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
@@ -372,9 +349,7 @@ class _ModernRoleCardState extends State<_ModernRoleCard>
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),
                 child: Container(
-                  decoration: BoxDecoration(
-                    gradient: widget.gradient,
-                  ),
+                  decoration: BoxDecoration(gradient: widget.gradient),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.9),
@@ -387,7 +362,6 @@ class _ModernRoleCardState extends State<_ModernRoleCard>
                     padding: const EdgeInsets.all(24),
                     child: Row(
                       children: [
-                        // Emoji container with gradient background
                         Container(
                           width: 64,
                           height: 64,
@@ -403,10 +377,7 @@ class _ModernRoleCardState extends State<_ModernRoleCard>
                             ],
                           ),
                           child: Center(
-                            child: Text(
-                              widget.emoji,
-                              style: const TextStyle(fontSize: 32),
-                            ),
+                            child: Text(widget.emoji, style: const TextStyle(fontSize: 32)),
                           ),
                         ),
                         const SizedBox(width: 20),
@@ -433,13 +404,10 @@ class _ModernRoleCardState extends State<_ModernRoleCard>
                           ),
                         ),
                         const SizedBox(width: 12),
-                        // Animated arrow
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           transform: Matrix4.translationValues(
-                            _isPressed ? 4 : 0,
-                            0,
-                            0,
+                            _isPressed ? 4 : 0, 0, 0,
                           ),
                           child: Container(
                             width: 40,

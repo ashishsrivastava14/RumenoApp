@@ -8,6 +8,7 @@ import '../../providers/admin_provider.dart';
 import '../../providers/ecommerce_provider.dart';
 import '../../providers/group_provider.dart';
 import '../../models/models.dart';
+import '../../widgets/role_switcher.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -97,6 +98,8 @@ class AdminDashboardScreen extends StatelessWidget {
                             ],
                           ),
                         ),
+                        const RoleSwitcher(),
+                        const SizedBox(width: 8),
                         // Notification bell
                         Container(
                           padding: const EdgeInsets.all(8),

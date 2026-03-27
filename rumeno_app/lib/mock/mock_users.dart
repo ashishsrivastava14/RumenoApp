@@ -1,33 +1,54 @@
 import '../models/models.dart';
 
+/// Mock user database keyed by phone number.
+/// A single phone number can have multiple roles.
+const mockUsersByPhone = <String, AppUser>{
+  '9876543210': AppUser(
+    id: 'U001',
+    name: 'John Smith',
+    phone: '9876543210',
+    roles: [UserRole.farmer, UserRole.admin, UserRole.vet],
+    farmName: 'Smith Dairy Farm',
+  ),
+  '9876543211': AppUser(
+    id: 'U002',
+    name: 'Dr. Emily Thompson',
+    phone: '9876543211',
+    roles: [UserRole.vet],
+    specialization: 'Large Animal Medicine',
+    licenseNumber: 'VET-MH-2019-0456',
+    referralCode: 'DREMILY20',
+  ),
+  '9876543200': AppUser(
+    id: 'U003',
+    name: 'System Admin',
+    phone: '9876543200',
+    roles: [UserRole.admin],
+  ),
+};
+
+// Legacy constants kept for backward-compat (single-role views)
 const mockFarmerUser = AppUser(
-  id: 'F001',
+  id: 'U001',
   name: 'John Smith',
   phone: '9876543210',
-  role: UserRole.farmer,
+  roles: [UserRole.farmer, UserRole.admin],
   farmName: 'Smith Dairy Farm',
 );
 
 const mockVetUser = AppUser(
-  id: 'V001',
+  id: 'U002',
   name: 'Dr. Emily Thompson',
   phone: '9876543211',
-  role: UserRole.vet,
+  roles: [UserRole.vet],
   specialization: 'Large Animal Medicine',
   licenseNumber: 'VET-MH-2019-0456',
   referralCode: 'DREMILY20',
 );
 
 const mockAdminUser = AppUser(
-  id: 'A001',
+  id: 'U003',
   name: 'System Admin',
   phone: '9876543200',
-  role: UserRole.admin,
-);
-
-const mockFarmProductsUser = AppUser(
-  id: 'FP001',
-  name: 'Product Buyer',
-  phone: '9876543212',
-  role: UserRole.farmProducts,
+  roles: [UserRole.admin],
 );

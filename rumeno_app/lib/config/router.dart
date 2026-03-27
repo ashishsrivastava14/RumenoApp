@@ -112,7 +112,8 @@ GoRouter createRouter(AuthProvider authProvider) {
         path: '/otp',
         builder: (_, state) {
           final redirect = state.uri.queryParameters['redirect'];
-          return OtpScreen(redirectTo: redirect);
+          final phone = state.uri.queryParameters['phone'] ?? '9876543210';
+          return OtpScreen(redirectTo: redirect, phone: phone);
         },
       ),
 

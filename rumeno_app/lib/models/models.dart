@@ -1,10 +1,10 @@
-enum UserRole { farmer, vet, admin, farmProducts }
+enum UserRole { farmer, vet, admin }
 
 class AppUser {
   final String id;
   final String name;
   final String phone;
-  final UserRole role;
+  final List<UserRole> roles;
   final String? farmName;
   final String? specialization;
   final String? licenseNumber;
@@ -15,13 +15,16 @@ class AppUser {
     required this.id,
     required this.name,
     required this.phone,
-    required this.role,
+    required this.roles,
     this.farmName,
     this.specialization,
     this.licenseNumber,
     this.referralCode,
     this.avatarUrl,
   });
+
+  /// Convenience: check if user has a specific role
+  bool hasRole(UserRole role) => roles.contains(role);
 }
 
 enum Species { cow, buffalo, goat, sheep, pig, horse }

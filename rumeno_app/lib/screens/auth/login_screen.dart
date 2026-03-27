@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../l10n/app_localizations.dart';
-import '../../models/models.dart';
-import '../../providers/auth_provider.dart';
 
+/// Centralized phone-first login screen.
+/// No role pre-selection — the user just enters their phone number.
 class LoginScreen extends StatefulWidget {
   final String? redirectTo;
   const LoginScreen({super.key, this.redirectTo});
@@ -16,51 +15,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _phoneController = TextEditingController(text: '9876543210');
-  bool _otpSent = false;
-
-  String _roleName(UserRole? role, AppLocalizations l10n) {
-    switch (role) {
-      case UserRole.farmer:
-        return l10n.authRoleFarmOwner;
-      case UserRole.vet:
-        return l10n.authRoleVet;
-      case UserRole.admin:
-        return l10n.authRoleSuperAdmin;
-      case UserRole.farmProducts:
-        return l10n.authRoleFarmProducts;
-      case null:
-        return '';
-    }
-  }
-
-  String _roleEmoji(UserRole? role) {
-    switch (role) {
-      case UserRole.farmer:
-        return '🐄';
-      case UserRole.vet:
-        return '🩺';
-      case UserRole.admin:
-        return '🔧';
-      case UserRole.farmProducts:
-        return '🛒';
-      case null:
-        return '';
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Auto-select farmProducts role when coming from shop
-    if (widget.redirectTo != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final auth = context.read<AuthProvider>();
-        if (auth.selectedRole == null) {
-          auth.selectRole(UserRole.farmProducts);
-        }
-      });
-    }
-  }
 
   @override
   void dispose() {
@@ -68,9 +22,28 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  void _sendOtp() {
+    final phone = _phoneController.text.trim();
+    if (phone.length != 10) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context).loginOtpSentSnackbar),
+        backgroundColor: RumenoTheme.primaryGreen,
+      ),
+    );
+
+    // Pass phone & optional redirect to OTP screen
+    final query = <String, String>{'phone': phone};
+    if (widget.redirectTo != null) {
+      query['redirect'] = widget.redirectTo!;
+    }
+    final uri = Uri(path: '/otp', queryParameters: query);
+    context.go(uri.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
-    final role = context.watch<AuthProvider>().selectedRole;
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -88,7 +61,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         child: Stack(
           children: [
-            // Animal background image
             Positioned.fill(
               child: Opacity(
                 opacity: 0.08,
@@ -98,11 +70,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            // Main content
             SafeArea(
               child: Column(
                 children: [
-                  // Custom App Bar
+                  // App bar
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -113,14 +84,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (widget.redirectTo != null) {
                               context.go(widget.redirectTo!);
                             } else {
-                              context.go('/role-selection');
+                              context.go('/shop');
                             }
                           },
                         ),
                       ],
                     ),
                   ),
-                  // Scrollable content
                   Expanded(
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.all(24),
@@ -128,8 +98,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           // Logo
                           Container(
-                            width: 240,
-                            height: 240,
+                            width: 200,
+                            height: 200,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(60),
                               boxShadow: [
@@ -144,38 +114,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(60),
                               child: Image.asset(
                                 'assets/images/Rumeno_logo-rb.png',
-                                width: 240,
-                                height: 240,
+                                width: 200,
+                                height: 200,
                                 fit: BoxFit.contain,
                               ),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          // Role badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: RumenoTheme.primaryGreen.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: RumenoTheme.primaryGreen.withValues(alpha: 0.3),
-                                width: 1.5,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(_roleEmoji(role), style: const TextStyle(fontSize: 20)),
-                                const SizedBox(width: 10),
-                                Text(
-                                  _roleName(role, l10n),
-                                  style: TextStyle(
-                                    color: RumenoTheme.primaryGreen,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
                           const SizedBox(height: 32),
@@ -211,59 +153,75 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                Text(
+                                  l10n.loginPhoneLabel,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
                                 TextField(
                                   controller: _phoneController,
                                   keyboardType: TextInputType.phone,
                                   maxLength: 10,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 1.5,
+                                  ),
                                   decoration: InputDecoration(
-                                    labelText: l10n.loginPhoneLabel,
                                     prefixText: l10n.loginPhonePrefix,
+                                    prefixStyle: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.grey[600],
+                                    ),
                                     prefixIcon: Icon(Icons.phone_android, color: RumenoTheme.primaryGreen),
                                     counterText: '',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                      borderSide: BorderSide(color: Colors.grey[300]!),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                      borderSide: BorderSide(
+                                        color: RumenoTheme.primaryGreen,
+                                        width: 2,
+                                      ),
+                                    ),
                                     filled: true,
-                                    fillColor: RumenoTheme.backgroundCream.withValues(alpha: 0.5),
+                                    fillColor: Colors.grey[50],
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 16,
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(height: 20),
-                                if (!_otpSent)
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: 50,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        if (_phoneController.text.length == 10) {
-                                          setState(() => _otpSent = true);
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text(l10n.loginOtpSentSnackbar)),
-                                          );
-                                        }
-                                      },
-                                      child: Text(l10n.loginSendOtpButton, style: const TextStyle(fontSize: 16)),
+                                const SizedBox(height: 24),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 54,
+                                  child: ElevatedButton(
+                                    onPressed: _sendOtp,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: RumenoTheme.primaryGreen,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                      elevation: 2,
+                                    ),
+                                    child: Text(
+                                      l10n.loginSendOtpButton,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                if (_otpSent) ...[
-                                  Text(
-                                    l10n.loginOtpPrompt(_phoneController.text),
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: 50,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        if (widget.redirectTo != null) {
-                                          context.go('/otp?redirect=${Uri.encodeComponent(widget.redirectTo!)}');
-                                        } else {
-                                          context.go('/otp');
-                                        }
-                                      },
-                                      child: Text(l10n.loginEnterOtpButton, style: const TextStyle(fontSize: 16)),
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ],
                             ),
                           ),

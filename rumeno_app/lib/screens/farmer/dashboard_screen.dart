@@ -11,7 +11,7 @@ import '../../providers/auth_provider.dart';
 import 'animals/animal_qr_scanner_screen.dart';
 import '../../widgets/common/marketplace_button.dart';
 import '../../l10n/app_localizations.dart';
-// VeterinarianButton is defined in marketplace_button.dart
+import '../../widgets/role_switcher.dart';
 
 // Helper function to show info dialog
 void _showInfoDialog(BuildContext context, String title, String description) {
@@ -540,6 +540,7 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
                       ],
                     ),
                   ),
+                  const RoleSwitcher(),
                   _NotifBell(count: 5),
                   const VeterinarianButton(),
                   const MarketplaceButton(),

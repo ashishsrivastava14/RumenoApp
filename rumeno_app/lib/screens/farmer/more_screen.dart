@@ -266,7 +266,7 @@ class MoreScreen extends StatelessWidget {
             onPressed: () {
               Navigator.pop(ctx);
               context.read<AuthProvider>().logout();
-              context.go('/role-selection');
+              context.go('/shop');
             },
             child: Text(l10n.logoutDialogConfirm, style: const TextStyle(fontSize: 16)),
           ),
