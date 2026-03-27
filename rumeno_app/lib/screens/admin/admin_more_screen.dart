@@ -161,13 +161,13 @@ class AdminMoreScreen extends StatelessWidget {
                       subtitle: 'Configure products & categories',
                       onTap: () => context.go('/admin/more/marketplace'),
                     ),
-                    _MenuTile(
-                      emoji: '�',
-                      color: const Color(0xFF00695C),
-                      label: 'Sanitization Protocols',
-                      subtitle: 'Sanitizers, areas & schedules',
-                      onTap: () => context.go('/admin/farm/sanitization-config'),
-                    ),
+                    // _MenuTile(
+                    //   emoji: '�',
+                    //   color: const Color(0xFF00695C),
+                    //   label: 'Sanitization Protocols',
+                    //   subtitle: 'Sanitizers, areas & schedules',
+                    //   onTap: () => context.go('/admin/farm/sanitization-config'),
+                    // ),
                     _MenuTile(
                       emoji: '�🤝',
                       color: const Color(0xFFAD1457),
