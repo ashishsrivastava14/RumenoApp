@@ -17,6 +17,12 @@ class _AdminGroupsScreenState extends State<AdminGroupsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tab;
   Species? _speciesFilter;
+  String? _selectedFarmerId;
+
+  Farmer? get _selectedFarmer => _selectedFarmerId == null
+      ? null
+      : mockFarmers.firstWhere((f) => f.id == _selectedFarmerId,
+          orElse: () => mockFarmers.first);
 
   @override
   void initState() {
@@ -32,13 +38,18 @@ class _AdminGroupsScreenState extends State<AdminGroupsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final selectedFarmer = _selectedFarmer;
+    final subtitle = selectedFarmer != null
+        ? '${selectedFarmer.farmName}'
+        : 'All farmer animal groups';
+
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
       body: NestedScrollView(
         headerSliverBuilder: (context, _) => [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 192,
+            expandedHeight: 260,
             leading: IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(6),
@@ -71,18 +82,73 @@ class _AdminGroupsScreenState extends State<AdminGroupsScreen>
                         const SizedBox(width: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text('Group Management',
+                          children: [
+                            const Text('Group Management',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold)),
-                            Text('All farmer animal groups',
-                                style: TextStyle(
+                            Text(subtitle,
+                                style: const TextStyle(
                                     color: Colors.white70, fontSize: 13)),
                           ],
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 14),
+                    // ── Farmer Filter Dropdown ──
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String?>(
+                          value: _selectedFarmerId,
+                          isExpanded: true,
+                          icon: const Icon(Icons.filter_list_rounded, color: Colors.white, size: 22),
+                          dropdownColor: const Color(0xFF00695C),
+                          style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                          hint: const Row(
+                            children: [
+                              Icon(Icons.agriculture_rounded, color: Colors.white70, size: 20),
+                              SizedBox(width: 8),
+                              Text('All Farmers', style: TextStyle(color: Colors.white70, fontSize: 15)),
+                            ],
+                          ),
+                          items: [
+                            const DropdownMenuItem<String?>(
+                              value: null,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.select_all_rounded, color: Colors.white70, size: 20),
+                                  SizedBox(width: 8),
+                                  Text('All Farmers', style: TextStyle(color: Colors.white)),
+                                ],
+                              ),
+                            ),
+                            ...mockFarmers.map((f) => DropdownMenuItem<String?>(
+                                  value: f.id,
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.agriculture_rounded, color: Colors.white70, size: 20),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          '${f.farmName} (${f.name})',
+                                          style: const TextStyle(color: Colors.white),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ],
+                          onChanged: (v) => setState(() => _selectedFarmerId = v),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -113,6 +179,7 @@ class _AdminGroupsScreenState extends State<AdminGroupsScreen>
             _GroupsListTab(
               speciesFilter: _speciesFilter,
               onFilterChanged: (s) => setState(() => _speciesFilter = s),
+              farmerIdFilter: _selectedFarmerId,
             ),
             const _AlertsTab(),
             const _GroupStatsTab(),
@@ -127,16 +194,22 @@ class _AdminGroupsScreenState extends State<AdminGroupsScreen>
 class _GroupsListTab extends StatelessWidget {
   final Species? speciesFilter;
   final ValueChanged<Species?> onFilterChanged;
+  final String? farmerIdFilter;
 
   const _GroupsListTab(
-      {required this.speciesFilter, required this.onFilterChanged});
+      {required this.speciesFilter,
+      required this.onFilterChanged,
+      this.farmerIdFilter});
 
   @override
   Widget build(BuildContext context) {
     final gp = context.watch<GroupProvider>();
-    final groups = speciesFilter != null
-        ? gp.groups.where((g) => g.species == speciesFilter).toList()
+    var groups = farmerIdFilter != null
+        ? gp.groups.where((g) => g.farmerId == farmerIdFilter).toList()
         : gp.groups;
+    if (speciesFilter != null) {
+      groups = groups.where((g) => g.species == speciesFilter).toList();
+    }
 
     // Group by farmer
     final byFarmer = <String, List<AnimalGroup>>{};

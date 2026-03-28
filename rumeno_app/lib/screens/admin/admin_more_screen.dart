@@ -134,14 +134,14 @@ class AdminMoreScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   _menuSection(context, [
                     _MenuTile(
-                      emoji: '�',
+                      emoji: '🐾',
                       color: const Color(0xFF00695C),
                       label: 'Animal Groups',
                       subtitle: 'View & manage all farmer groups',
                       onTap: () => context.go('/admin/more/groups'),
                     ),
                     _MenuTile(
-                      emoji: '�💰',
+                      emoji: '💳',
                       color: const Color(0xFF00695C),
                       label: 'Payments & Billing',
                       subtitle: 'View transactions & invoices',
