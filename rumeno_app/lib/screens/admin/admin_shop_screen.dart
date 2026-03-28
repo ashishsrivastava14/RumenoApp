@@ -1510,8 +1510,6 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
                         ),
                         child: Row(
                           children: [
-                            const Text('🇬🇧', style: TextStyle(fontSize: 16)),
-                            const SizedBox(width: 6),
                             const Text('English (Primary)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                             const Spacer(),
                             Icon(Icons.info_outline_rounded, size: 14, color: Colors.grey[500]),
@@ -1942,8 +1940,6 @@ class _LangTranslationSectionState extends State<_LangTranslationSection> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               child: Row(
                 children: [
-                  Text(widget.flag, style: const TextStyle(fontSize: 20)),
-                  const SizedBox(width: 10),
                   Text(widget.language,
                       style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   const SizedBox(width: 8),
