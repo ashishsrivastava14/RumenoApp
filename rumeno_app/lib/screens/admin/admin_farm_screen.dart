@@ -290,17 +290,7 @@ class _AnimalsTabState extends State<_AnimalsTab> {
                   ],
                 ),
               ),
-              ElevatedButton.icon(
-                onPressed: () => _showAddAnimalDialog(context),
-                icon: const Icon(Icons.add_rounded, size: 22, color: Colors.white),
-                label: const Text('Add Animal',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: RumenoTheme.primaryGreen,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-              ),
+
             ],
           ),
         ),
