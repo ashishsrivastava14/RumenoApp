@@ -78,19 +78,6 @@ class AdminSettingsScreen extends StatelessWidget {
           ]),
           const SizedBox(height: 16),
 
-          _section(context, 'Data', [
-            _settingTile('Backup Database', icon: Icons.backup_rounded, onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Backup initiated...'), backgroundColor: Colors.green));
-            }),
-            _settingTile('Export All Data', icon: Icons.download_rounded, onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Exporting data...')));
-            }),
-            _settingTile('Clear Cache', icon: Icons.delete_sweep_rounded, onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cache cleared!')));
-            }),
-          ]),
-          const SizedBox(height: 16),
-
           _section(context, 'AI Feed Mix Limits', [
             _aiLimitTile(context, 'Free', '🌱', s.aiMixLimitFree, (v) {
               context.read<AdminProvider>().updateSettings(aiMixLimitFree: v);
