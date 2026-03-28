@@ -124,7 +124,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               children: [
                 Text('📋', style: TextStyle(fontSize: 22)),
                 SizedBox(width: 8),
-                Text('All Plans', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Text('All Plans', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black)),
               ],
             ),
             const SizedBox(height: 14),
@@ -167,15 +167,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               children: [
                                 Text(
                                   p['name'] as String,
-                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color),
+                                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                                 ),
                                 Row(
                                   children: [
                                     Text(
                                       p['price'] as String,
-                                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: RumenoTheme.textDark),
+                                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
                                     ),
-                                    Text(p['period'] as String, style: const TextStyle(color: RumenoTheme.textGrey)),
+                                    Text(p['period'] as String, style: const TextStyle(color: Colors.black)),
                                   ],
                                 ),
                               ],
@@ -193,7 +193,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 const Text('🐄', style: TextStyle(fontSize: 18)),
                                 Text(
                                   p['animals'] as String,
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color),
+                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
                                 ),
                               ],
                             ),
@@ -213,7 +213,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               Text(featureIcons[i], style: const TextStyle(fontSize: 18)),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: Text(features[i], style: const TextStyle(fontSize: 14)),
+                                child: Text(features[i], style: const TextStyle(fontSize: 14, color: Colors.black)),
                               ),
                               Icon(Icons.check_circle_rounded, color: color, size: 18),
                             ],
