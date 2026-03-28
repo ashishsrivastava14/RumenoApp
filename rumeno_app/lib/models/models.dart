@@ -864,6 +864,10 @@ class Product {
   final List<String> tags;
   final List<ProductAnimal> targetAnimals;
   final String? hsnCode;
+  /// Translated product names keyed by locale code (e.g. 'hi', 'ur')
+  final Map<String, String> nameTranslations;
+  /// Translated product descriptions keyed by locale code (e.g. 'hi', 'ur')
+  final Map<String, String> descriptionTranslations;
 
   const Product({
     required this.id,
@@ -888,6 +892,8 @@ class Product {
     this.tags = const <String>[],
     this.targetAnimals = const <ProductAnimal>[],
     this.hsnCode,
+    this.nameTranslations = const <String, String>{},
+    this.descriptionTranslations = const <String, String>{},
   });
 
   bool get inStock => stockQuantity > 0;
@@ -931,6 +937,8 @@ class Product {
     List<String>? tags,
     List<ProductAnimal>? targetAnimals,
     String? hsnCode,
+    Map<String, String>? nameTranslations,
+    Map<String, String>? descriptionTranslations,
   }) {
     return Product(
       id: id,
@@ -955,6 +963,8 @@ class Product {
       tags: tags ?? this.tags,
       targetAnimals: targetAnimals ?? this.targetAnimals,
       hsnCode: hsnCode ?? this.hsnCode,
+      nameTranslations: nameTranslations ?? this.nameTranslations,
+      descriptionTranslations: descriptionTranslations ?? this.descriptionTranslations,
     );
   }
 }

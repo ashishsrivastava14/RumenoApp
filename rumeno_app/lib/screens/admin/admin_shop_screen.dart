@@ -582,6 +582,8 @@ class _ProductsTabState extends State<_ProductsTab> {
               isApproved: product.isApproved,
               tags: product.tags,
               targetAnimals: product.targetAnimals,
+              nameTranslations: product.nameTranslations,
+              descriptionTranslations: product.descriptionTranslations,
             );
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('✅ ${product.name} updated!'), backgroundColor: RumenoTheme.successGreen),
@@ -1400,6 +1402,12 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
   late final TextEditingController _weightCtrl;
   late final TextEditingController _hsnCtrl;
 
+  // Translation controllers  (hi = Hindi, ur = Urdu)
+  late final TextEditingController _nameHiCtrl;
+  late final TextEditingController _descHiCtrl;
+  late final TextEditingController _nameUrCtrl;
+  late final TextEditingController _descUrCtrl;
+
   late ProductCategory _category;
   late bool _isFeatured;
   late bool _isApproved;
@@ -1419,6 +1427,10 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
     _unitCtrl = TextEditingController(text: p?.unit ?? 'piece');
     _weightCtrl = TextEditingController(text: p?.weightKg?.toString() ?? '');
     _hsnCtrl = TextEditingController(text: p?.hsnCode ?? '');
+    _nameHiCtrl = TextEditingController(text: p?.nameTranslations['hi'] ?? '');
+    _descHiCtrl = TextEditingController(text: p?.descriptionTranslations['hi'] ?? '');
+    _nameUrCtrl = TextEditingController(text: p?.nameTranslations['ur'] ?? '');
+    _descUrCtrl = TextEditingController(text: p?.descriptionTranslations['ur'] ?? '');
     _category = p?.category ?? ProductCategory.supplements;
     _isFeatured = p?.isFeatured ?? false;
     _isApproved = p?.isApproved ?? true;
@@ -1435,6 +1447,10 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
     _unitCtrl.dispose();
     _weightCtrl.dispose();
     _hsnCtrl.dispose();
+    _nameHiCtrl.dispose();
+    _descHiCtrl.dispose();
+    _nameUrCtrl.dispose();
+    _descUrCtrl.dispose();
     super.dispose();
   }
 
@@ -1484,19 +1500,95 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
                     children: [
                       // ── Section: Basic Info ──
                       _SectionTitle(emoji: '📝', title: 'Basic Information'),
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1976D2).withValues(alpha: 0.06),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFF1976D2).withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Text('🇬🇧', style: TextStyle(fontSize: 16)),
+                            const SizedBox(width: 6),
+                            const Text('English (Primary)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                            const Spacer(),
+                            Icon(Icons.info_outline_rounded, size: 14, color: Colors.grey[500]),
+                            const SizedBox(width: 4),
+                            Text('Enter content in English first', style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: _nameCtrl,
-                        decoration: _inputDecor('Product Name', Icons.shopping_bag_rounded),
+                        decoration: _inputDecor('Product Name (English)', Icons.shopping_bag_rounded),
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'Name is required' : null,
                         textCapitalization: TextCapitalization.words,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _descCtrl,
-                        decoration: _inputDecor('Description', Icons.description_rounded),
+                        decoration: _inputDecor('Description (English)', Icons.description_rounded),
                         maxLines: 3,
                         textCapitalization: TextCapitalization.sentences,
+                      ),
+                      const SizedBox(height: 20),
+
+                      // ── Section: Translations ──
+                      _SectionTitle(emoji: '🌐', title: 'Translations'),
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.amber.shade300),
+                        ),
+                        child: Row(
+                          children: [
+                            const Text('🤖', style: TextStyle(fontSize: 16)),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('AI Auto-Translation Coming Soon',
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.amber)),
+                                  Text('You can manually enter translations below. In future, AI will auto-fill these from English.',
+                                      style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Hindi translations
+                      _LangTranslationSection(
+                        flag: '🇮🇳',
+                        language: 'Hindi',
+                        localeCode: 'hi',
+                        nameCtrl: _nameHiCtrl,
+                        descCtrl: _descHiCtrl,
+                        nameDecor: _inputDecor('Product Name (Hindi)', Icons.shopping_bag_outlined),
+                        descDecor: _inputDecor('Description (Hindi)', Icons.description_outlined),
+                        textDirection: TextDirection.ltr,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Urdu translations
+                      _LangTranslationSection(
+                        flag: '🇵🇰',
+                        language: 'Urdu',
+                        localeCode: 'ur',
+                        nameCtrl: _nameUrCtrl,
+                        descCtrl: _descUrCtrl,
+                        nameDecor: _inputDecor('Product Name (Urdu)', Icons.shopping_bag_outlined),
+                        descDecor: _inputDecor('Description (Urdu)', Icons.description_outlined),
+                        textDirection: TextDirection.rtl,
                       ),
                       const SizedBox(height: 20),
 
@@ -1725,6 +1817,15 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
   void _save() {
     if (!_formKey.currentState!.validate()) return;
 
+    final nameTranslations = <String, String>{
+      if (_nameHiCtrl.text.trim().isNotEmpty) 'hi': _nameHiCtrl.text.trim(),
+      if (_nameUrCtrl.text.trim().isNotEmpty) 'ur': _nameUrCtrl.text.trim(),
+    };
+    final descriptionTranslations = <String, String>{
+      if (_descHiCtrl.text.trim().isNotEmpty) 'hi': _descHiCtrl.text.trim(),
+      if (_descUrCtrl.text.trim().isNotEmpty) 'ur': _descUrCtrl.text.trim(),
+    };
+
     final product = Product(
       id: widget.product?.id ?? 'P${DateTime.now().millisecondsSinceEpoch}',
       name: _nameCtrl.text.trim(),
@@ -1745,6 +1846,8 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
       targetAnimals: _targetAnimals.toList(),
       isFeatured: _isFeatured,
       isApproved: _isApproved,
+      nameTranslations: nameTranslations,
+      descriptionTranslations: descriptionTranslations,
     );
 
     widget.onSave(product);
@@ -1782,6 +1885,112 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
       case ProductAnimal.pig: return '🐷';
       case ProductAnimal.horse: return '🐴';
     }
+  }
+}
+
+class _LangTranslationSection extends StatefulWidget {
+  final String flag;
+  final String language;
+  final String localeCode;
+  final TextEditingController nameCtrl;
+  final TextEditingController descCtrl;
+  final InputDecoration nameDecor;
+  final InputDecoration descDecor;
+  final TextDirection textDirection;
+
+  const _LangTranslationSection({
+    required this.flag,
+    required this.language,
+    required this.localeCode,
+    required this.nameCtrl,
+    required this.descCtrl,
+    required this.nameDecor,
+    required this.descDecor,
+    required this.textDirection,
+  });
+
+  @override
+  State<_LangTranslationSection> createState() => _LangTranslationSectionState();
+}
+
+class _LangTranslationSectionState extends State<_LangTranslationSection> {
+  bool _expanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-expand if there is already content saved
+    _expanded = widget.nameCtrl.text.isNotEmpty || widget.descCtrl.text.isNotEmpty;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => setState(() => _expanded = !_expanded),
+            borderRadius: _expanded
+                ? const BorderRadius.vertical(top: Radius.circular(12))
+                : BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                children: [
+                  Text(widget.flag, style: const TextStyle(fontSize: 20)),
+                  const SizedBox(width: 10),
+                  Text(widget.language,
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  const SizedBox(width: 8),
+                  if (widget.nameCtrl.text.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text('Filled', style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold)),
+                    ),
+                  const Spacer(),
+                  Icon(_expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                      color: Colors.grey[500]),
+                ],
+              ),
+            ),
+          ),
+          if (_expanded) ...[
+            Divider(height: 1, color: Colors.grey.shade200),
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Directionality(
+                textDirection: widget.textDirection,
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: widget.nameCtrl,
+                      decoration: widget.nameDecor,
+                      textCapitalization: TextCapitalization.words,
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: widget.descCtrl,
+                      decoration: widget.descDecor,
+                      maxLines: 3,
+                      textCapitalization: TextCapitalization.sentences,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
   }
 }
 

@@ -369,6 +369,8 @@ class EcommerceProvider extends ChangeNotifier {
     bool? isApproved,
     List<String>? tags,
     List<ProductAnimal>? targetAnimals,
+    Map<String, String>? nameTranslations,
+    Map<String, String>? descriptionTranslations,
   }) {
     final idx = _allProducts.indexWhere((p) => p.id == id);
     if (idx == -1) return;
@@ -387,6 +389,8 @@ class EcommerceProvider extends ChangeNotifier {
       isApproved: isApproved,
       tags: tags,
       targetAnimals: targetAnimals,
+      nameTranslations: nameTranslations,
+      descriptionTranslations: descriptionTranslations,
     );
     notifyListeners();
   }
