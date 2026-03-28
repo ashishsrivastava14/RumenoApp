@@ -183,13 +183,7 @@ class AdminMoreScreen extends StatelessWidget {
                     //   subtitle: 'Sanitizers, areas & schedules',
                     //   onTap: () => context.go('/admin/farm/sanitization-config'),
                     // ),
-                    _MenuTile(
-                      emoji: '�🤝',
-                      color: const Color(0xFFAD1457),
-                      label: 'Vet Partners',
-                      subtitle: 'Manage vet partnerships',
-                      onTap: () => context.go('/admin/more/partners'),
-                    ),
+
                   ]),
                   const SizedBox(height: 20),
 
