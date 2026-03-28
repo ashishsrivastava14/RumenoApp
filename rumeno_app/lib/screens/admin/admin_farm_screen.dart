@@ -813,25 +813,6 @@ class _HealthTabState extends State<_HealthTab> {
             ),
           const SizedBox(height: 20),
 
-          // ─── Quick Actions ───
-          const Text('⚡ Quick Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          const SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.0,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            children: [
-              _QuickActionCard(emoji: '💉', icon: Icons.vaccines_rounded, color: RumenoTheme.primaryGreen, label: 'Health Config', onTap: () => context.push('/admin/farm/health-config')),
-              _QuickActionCard(emoji: '🐛', icon: Icons.pest_control_rounded, color: Colors.teal, label: 'Dewormings', onTap: () => _showDewormingSheet(context)),
-              _QuickActionCard(emoji: '🤰', icon: Icons.child_friendly_rounded, color: Colors.pink, label: 'Breeding', onTap: () => _showBreedingSheet(context)),
-              _QuickActionCard(emoji: '🔬', icon: Icons.science_rounded, color: Colors.purple, label: 'Lab Reports', onTap: () => _showLabReportSheet(context)),
-            ],
-          ),
-          const SizedBox(height: 24),
-
           // ─── Vaccination Records ───
           Row(children: [
             const Icon(Icons.vaccines_rounded, size: 22, color: RumenoTheme.primaryGreen),
