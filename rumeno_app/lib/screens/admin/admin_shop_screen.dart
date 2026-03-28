@@ -1399,7 +1399,6 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
   late final TextEditingController _unitCtrl;
   late final TextEditingController _weightCtrl;
   late final TextEditingController _hsnCtrl;
-  late final TextEditingController _tagsCtrl;
 
   late ProductCategory _category;
   late bool _isFeatured;
@@ -1420,7 +1419,6 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
     _unitCtrl = TextEditingController(text: p?.unit ?? 'piece');
     _weightCtrl = TextEditingController(text: p?.weightKg?.toString() ?? '');
     _hsnCtrl = TextEditingController(text: p?.hsnCode ?? '');
-    _tagsCtrl = TextEditingController(text: p?.tags.join(', ') ?? '');
     _category = p?.category ?? ProductCategory.supplements;
     _isFeatured = p?.isFeatured ?? false;
     _isApproved = p?.isApproved ?? true;
@@ -1437,7 +1435,6 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
     _unitCtrl.dispose();
     _weightCtrl.dispose();
     _hsnCtrl.dispose();
-    _tagsCtrl.dispose();
     super.dispose();
   }
 
@@ -1666,15 +1663,6 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
                       ),
                       const SizedBox(height: 20),
 
-                      // ── Section: Tags ──
-                      _SectionTitle(emoji: '🏷️', title: 'Tags (comma separated)'),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: _tagsCtrl,
-                        decoration: _inputDecor('e.g. organic, high-protein, dairy', Icons.label_rounded),
-                      ),
-                      const SizedBox(height: 20),
-
                       // ── Section: Visibility toggles ──
                       _SectionTitle(emoji: '👁️', title: 'Visibility'),
                       const SizedBox(height: 10),
@@ -1737,12 +1725,6 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
   void _save() {
     if (!_formKey.currentState!.validate()) return;
 
-    final tags = _tagsCtrl.text
-        .split(',')
-        .map((t) => t.trim())
-        .where((t) => t.isNotEmpty)
-        .toList();
-
     final product = Product(
       id: widget.product?.id ?? 'P${DateTime.now().millisecondsSinceEpoch}',
       name: _nameCtrl.text.trim(),
@@ -1759,7 +1741,7 @@ class _AddEditProductSheetState extends State<_AddEditProductSheet> {
       weightKg: double.tryParse(_weightCtrl.text),
       hsnCode: _hsnCtrl.text.trim().isEmpty ? null : _hsnCtrl.text.trim(),
       createdAt: widget.product?.createdAt ?? DateTime.now(),
-      tags: tags,
+      tags: const [],
       targetAnimals: _targetAnimals.toList(),
       isFeatured: _isFeatured,
       isApproved: _isApproved,
