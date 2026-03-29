@@ -186,6 +186,14 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
               ),
             ),
 
+            // ── Scan Animal QR ──────────────────────────────────
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: _ScanAnimalButton(),
+              ),
+            ),
+
             // ── Gradient Stat Cards ──────────────────────────────
             const SliverToBoxAdapter(child: _StatsRow()),
 
@@ -1031,8 +1039,6 @@ class _QuickActionsSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          _ScanAnimalButton(),
         ],
       ),
     );
