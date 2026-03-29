@@ -494,7 +494,7 @@ class _BigCategoryTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: color),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 1),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
