@@ -2897,7 +2897,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your vendor registration has been submitted for review. Our team will verify your documents and approve your account within 2-3 business days. You will be notified via email.';
 
   @override
-  String get navHome => 'Home';
+  String get navHome => 'Farm';
 
   @override
   String get navAnimals => 'Animals';
@@ -2924,7 +2924,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navVetEarnings => 'Earnings';
 
   @override
-  String get navShopHome => 'Home';
+  String get navShopHome => 'Shop';
 
   @override
   String get navShopSearch => 'Search';

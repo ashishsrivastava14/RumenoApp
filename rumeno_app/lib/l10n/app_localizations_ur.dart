@@ -2902,7 +2902,7 @@ class AppLocalizationsUr extends AppLocalizations {
       'آپ کی فروخت کنندہ رجسٹریشن جائزے کے لیے جمع ہو گئی ہے۔ ہماری ٹیم آپ کی دستاویزات کی تصدیق کرے گی اور 2-3 کاروباری دنوں میں آپ کے اکاؤنٹ کو منظور کرے گی۔ آپ کو ای میل کے ذریعے مطلع کیا جائے گا۔';
 
   @override
-  String get navHome => 'ہوم';
+  String get navHome => 'فارم';
 
   @override
   String get navAnimals => 'جانور';
@@ -2929,7 +2929,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get navVetEarnings => 'آمدنی';
 
   @override
-  String get navShopHome => 'ہوم';
+  String get navShopHome => 'شاپ';
 
   @override
   String get navShopSearch => 'تلاش';

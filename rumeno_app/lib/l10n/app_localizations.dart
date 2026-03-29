@@ -5626,10 +5626,10 @@ abstract class AppLocalizations {
   /// **'Your vendor registration has been submitted for review. Our team will verify your documents and approve your account within 2-3 business days. You will be notified via email.'**
   String get vendorRegisterSuccessMessage;
 
-  /// Farmer bottom nav – Home tab
+  /// Farmer bottom nav – Farm tab
   ///
   /// In en, this message translates to:
-  /// **'Home'**
+  /// **'Farm'**
   String get navHome;
 
   /// No description provided for @navAnimals.
@@ -5680,10 +5680,10 @@ abstract class AppLocalizations {
   /// **'Earnings'**
   String get navVetEarnings;
 
-  /// Shop bottom nav – Home tab
+  /// Shop bottom nav – Shop tab
   ///
   /// In en, this message translates to:
-  /// **'Home'**
+  /// **'Shop'**
   String get navShopHome;
 
   /// No description provided for @navShopSearch.

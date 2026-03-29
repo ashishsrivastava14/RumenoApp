@@ -2199,9 +2199,9 @@
   "@vendorRegisterSuccessTitle": {},
   "vendorRegisterSuccessMessage": "Your vendor registration has been submitted for review. Our team will verify your documents and approve your account within 2-3 business days. You will be notified via email.",
   "@vendorRegisterSuccessMessage": {},
-  "navHome": "Home",
+  "navHome": "Farm",
   "@navHome": {
-    "description": "Farmer bottom nav – Home tab"
+    "description": "Farmer bottom nav – Farm tab"
   },
   "navAnimals": "Animals",
   "@navAnimals": {},
@@ -2221,9 +2221,9 @@
   "@navVetHealth": {},
   "navVetEarnings": "Earnings",
   "@navVetEarnings": {},
-  "navShopHome": "Home",
+  "navShopHome": "Shop",
   "@navShopHome": {
-    "description": "Shop bottom nav – Home tab"
+    "description": "Shop bottom nav – Shop tab"
   },
   "navShopSearch": "Search",
   "@navShopSearch": {},

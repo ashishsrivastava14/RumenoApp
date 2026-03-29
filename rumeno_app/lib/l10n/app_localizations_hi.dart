@@ -2904,7 +2904,7 @@ class AppLocalizationsHi extends AppLocalizations {
       'आपका विक्रेता पंजीकरण समीक्षा के लिए जमा हो गया है। हमारी टीम आपके दस्तावेज़ सत्यापित करेगी और 2-3 कार्य दिवसों में आपके खाते को मंज़ूरी देगी। आपको ईमेल द्वारा सूचित किया जाएगा।';
 
   @override
-  String get navHome => 'होम';
+  String get navHome => 'फार्म';
 
   @override
   String get navAnimals => 'पशु';
@@ -2931,7 +2931,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get navVetEarnings => 'आमदनी';
 
   @override
-  String get navShopHome => 'होम';
+  String get navShopHome => 'शॉप';
 
   @override
   String get navShopSearch => 'खोजें';
