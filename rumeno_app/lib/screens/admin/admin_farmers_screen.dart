@@ -46,6 +46,7 @@ class _AdminFarmersScreenState extends State<AdminFarmersScreen> {
           farmName: farmer.farmName,
           address: farmer.address,
           state: farmer.state,
+          country: farmer.country,
           gpsLocation: farmer.gpsLocation,
           plan: farmer.plan,
           joinedDate: farmer.joinedDate,

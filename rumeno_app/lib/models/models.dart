@@ -351,6 +351,7 @@ class Farmer {
   final String farmName;
   final String address;
   final String state;
+  final String country;
   final String? gpsLocation;
   final SubscriptionPlan plan;
   final DateTime joinedDate;
@@ -366,6 +367,7 @@ class Farmer {
     required this.farmName,
     required this.address,
     required this.state,
+    this.country = 'India',
     this.gpsLocation,
     required this.plan,
     required this.joinedDate,

@@ -21,6 +21,13 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tab;
   String? _selectedFarmerId;
+  String _searchQuery = '';
+  String? _selectedState;
+  String? _selectedCountry;
+  DateTimeRange? _dateRange;
+  bool? _activeFilter;
+  String _phoneFilter = '';
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -30,16 +37,71 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
 
   @override
   void dispose() {
+    _searchController.dispose();
     _tab.dispose();
     super.dispose();
   }
 
-  /// Returns the set of animal IDs belonging to the selected farmer.
-  /// Returns null when no filter is active (show all).
+  List<String> get _availableStates {
+    final farmers = _selectedCountry != null
+        ? mockFarmers.where((f) => f.country == _selectedCountry)
+        : mockFarmers;
+    final states = farmers.map((f) => f.state).toSet().toList()..sort();
+    return states;
+  }
+
+  List<String> get _availableCountries {
+    final countries = mockFarmers.map((f) => f.country).toSet().toList()..sort();
+    return countries;
+  }
+
+  List<Farmer> get _filteredFarmersList {
+    return mockFarmers.where((f) {
+      if (_searchQuery.isNotEmpty) {
+        final q = _searchQuery.toLowerCase();
+        if (!f.name.toLowerCase().contains(q) &&
+            !f.phone.contains(q) &&
+            !f.farmName.toLowerCase().contains(q) &&
+            !f.address.toLowerCase().contains(q)) {
+          return false;
+        }
+      }
+      if (_selectedCountry != null && f.country != _selectedCountry) return false;
+      if (_selectedState != null && f.state != _selectedState) return false;
+      if (_dateRange != null) {
+        if (f.joinedDate.isBefore(_dateRange!.start) ||
+            f.joinedDate.isAfter(_dateRange!.end.add(const Duration(days: 1)))) {
+          return false;
+        }
+      }
+      if (_activeFilter != null && f.isActive != _activeFilter) return false;
+      if (_phoneFilter.isNotEmpty && !f.phone.contains(_phoneFilter)) return false;
+      return true;
+    }).toList();
+  }
+
+  int get _activeFilterCount {
+    int count = 0;
+    if (_selectedCountry != null) count++;
+    if (_selectedState != null) count++;
+    if (_dateRange != null) count++;
+    if (_activeFilter != null) count++;
+    if (_phoneFilter.isNotEmpty) count++;
+    return count;
+  }
+
+  Set<String>? get _effectiveFarmerIds {
+    if (_selectedFarmerId != null) return {_selectedFarmerId!};
+    final filtered = _filteredFarmersList;
+    if (filtered.length == mockFarmers.length) return null;
+    return filtered.map((f) => f.id).toSet();
+  }
+
   Set<String>? get _filteredAnimalIds {
-    if (_selectedFarmerId == null) return null;
+    final farmerIds = _effectiveFarmerIds;
+    if (farmerIds == null) return null;
     return mockAnimals
-        .where((a) => a.farmerId == _selectedFarmerId)
+        .where((a) => farmerIds.contains(a.farmerId))
         .map((a) => a.id)
         .toSet();
   }
@@ -50,12 +112,309 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
           : mockFarmers.firstWhere((f) => f.id == _selectedFarmerId,
               orElse: () => mockFarmers.first);
 
+  void _clearAllFilters() {
+    setState(() {
+      _searchQuery = '';
+      _searchController.clear();
+      _selectedState = null;
+      _selectedCountry = null;
+      _dateRange = null;
+      _activeFilter = null;
+      _phoneFilter = '';
+      _selectedFarmerId = null;
+    });
+  }
+
+  void _showFilterSheet() {
+    String? tempState = _selectedState;
+    String? tempCountry = _selectedCountry;
+    DateTimeRange? tempDateRange = _dateRange;
+    bool? tempActive = _activeFilter;
+    String tempPhone = _phoneFilter;
+    final phoneCtrl = TextEditingController(text: _phoneFilter);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) {
+          return Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(ctx).size.height * 0.85,
+            ),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: SingleChildScrollView(
+              child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Filter Farms', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    TextButton.icon(
+                      onPressed: () {
+                        setSheetState(() {
+                          tempState = null;
+                          tempCountry = null;
+                          tempDateRange = null;
+                          tempActive = null;
+                          tempPhone = '';
+                          phoneCtrl.clear();
+                        });
+                      },
+                      icon: const Icon(Icons.clear_all_rounded, size: 20),
+                      label: const Text('Clear All'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Country
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Country', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700])),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String?>(
+                      value: tempCountry,
+                      isExpanded: true,
+                      hint: const Text('All Countries'),
+                      items: [
+                        const DropdownMenuItem<String?>(value: null, child: Text('All Countries')),
+                        ..._availableCountries.map((c) => DropdownMenuItem(value: c, child: Text(c))),
+                      ],
+                      onChanged: (v) {
+                        setSheetState(() {
+                          tempCountry = v;
+                          if (tempState != null) {
+                            final statesForCountry = v != null
+                                ? mockFarmers.where((f) => f.country == v).map((f) => f.state).toSet()
+                                : mockFarmers.map((f) => f.state).toSet();
+                            if (!statesForCountry.contains(tempState)) {
+                              tempState = null;
+                            }
+                          }
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // State / Location
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('State', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700])),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String?>(
+                      value: tempState,
+                      isExpanded: true,
+                      hint: const Text('All States'),
+                      items: [
+                        const DropdownMenuItem<String?>(value: null, child: Text('All States')),
+                        ...(() {
+                          final farmers = tempCountry != null
+                              ? mockFarmers.where((f) => f.country == tempCountry)
+                              : mockFarmers;
+                          final states = farmers.map((f) => f.state).toSet().toList()..sort();
+                          return states.map((s) => DropdownMenuItem(value: s, child: Text(s)));
+                        })(),
+                      ],
+                      onChanged: (v) => setSheetState(() => tempState = v),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Date Range
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Joined Date Range', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700])),
+                ),
+                const SizedBox(height: 8),
+                InkWell(
+                  onTap: () async {
+                    final picked = await showDateRangePicker(
+                      context: ctx,
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime.now(),
+                      initialDateRange: tempDateRange,
+                      builder: (context, child) => Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: ColorScheme.light(primary: RumenoTheme.primaryGreen),
+                        ),
+                        child: child!,
+                      ),
+                    );
+                    if (picked != null) setSheetState(() => tempDateRange = picked);
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.calendar_month_rounded, color: tempDateRange != null ? RumenoTheme.primaryGreen : Colors.grey, size: 20),
+                        const SizedBox(width: 10),
+                        Text(
+                          tempDateRange != null
+                              ? '${tempDateRange!.start.day}/${tempDateRange!.start.month}/${tempDateRange!.start.year} – ${tempDateRange!.end.day}/${tempDateRange!.end.month}/${tempDateRange!.end.year}'
+                              : 'Select date range',
+                          style: TextStyle(fontSize: 15, color: tempDateRange != null ? Colors.black87 : Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Phone Number
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Phone Number', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700])),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: TextField(
+                    controller: phoneCtrl,
+                    keyboardType: TextInputType.phone,
+                    decoration: const InputDecoration(
+                      hintText: 'e.g. 9876543210',
+                      prefixIcon: Icon(Icons.phone_rounded, size: 20, color: Colors.grey),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onChanged: (v) => tempPhone = v,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Active Status
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Status', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700])),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    _FilterChipOption(
+                      label: 'All',
+                      selected: tempActive == null,
+                      onTap: () => setSheetState(() => tempActive = null),
+                    ),
+                    const SizedBox(width: 8),
+                    _FilterChipOption(
+                      label: 'Active',
+                      selected: tempActive == true,
+                      onTap: () => setSheetState(() => tempActive = true),
+                      activeColor: RumenoTheme.successGreen,
+                    ),
+                    const SizedBox(width: 8),
+                    _FilterChipOption(
+                      label: 'Inactive',
+                      selected: tempActive == false,
+                      onTap: () => setSheetState(() => tempActive = false),
+                      activeColor: RumenoTheme.errorRed,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _selectedState = tempState;
+                        _selectedCountry = tempCountry;
+                        _dateRange = tempDateRange;
+                        _activeFilter = tempActive;
+                        _phoneFilter = tempPhone;
+                        if (_selectedFarmerId != null) {
+                          final filtered = _filteredFarmersList;
+                          if (!filtered.any((f) => f.id == _selectedFarmerId)) {
+                            _selectedFarmerId = null;
+                          }
+                        }
+                      });
+                      Navigator.pop(ctx);
+                    },
+                    icon: const Icon(Icons.check_rounded, color: Colors.white),
+                    label: const Text('Apply Filters', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: RumenoTheme.primaryGreen,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, VoidCallback onRemove) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.25),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: onRemove,
+            child: const Icon(Icons.close_rounded, color: Colors.white70, size: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final selectedFarmer = _selectedFarmer;
+    final filteredFarmers = _filteredFarmersList;
     final subtitle = selectedFarmer != null
-        ? '${selectedFarmer.farmName}'
-        : 'All Farms & Animals';
+        ? selectedFarmer.farmName
+        : filteredFarmers.length < mockFarmers.length
+            ? '${filteredFarmers.length} of ${mockFarmers.length} Farms'
+            : 'All Farms & Animals';
 
     return Scaffold(
       backgroundColor: RumenoTheme.backgroundCream,
@@ -63,7 +422,7 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
         headerSliverBuilder: (context, _) => [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 300,
+            expandedHeight: _activeFilterCount > 0 || _searchQuery.isNotEmpty ? 360 : 320,
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
@@ -74,69 +433,146 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
                     colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
                   ),
                 ),
-                padding: const EdgeInsets.fromLTRB(20, 56, 20, 80),
+                padding: const EdgeInsets.fromLTRB(16, 48, 16, 72),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Row(
                       children: [
-                        const Text('🐄', style: TextStyle(fontSize: 36)),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Farm Management',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold)),
-                            Text(subtitle,
-                                style: const TextStyle(
-                                    color: Colors.white70, fontSize: 14)),
-                          ],
+                        const Text('🐄', style: TextStyle(fontSize: 28)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Farm Management',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold)),
+                              Text(subtitle,
+                                  style: const TextStyle(
+                                      color: Colors.white70, fontSize: 13)),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 14),
-                    // ── Farm Filter Dropdown ──
+                    const SizedBox(height: 8),
+                    // ── Search + Filter ──
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.18),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                            ),
+                            child: TextField(
+                              controller: _searchController,
+                              style: const TextStyle(color: Colors.white, fontSize: 14),
+                              decoration: const InputDecoration(
+                                hintText: 'Search name, phone, farm...',
+                                hintStyle: TextStyle(color: Colors.white54, fontSize: 14),
+                                prefixIcon: Icon(Icons.search_rounded, color: Colors.white70, size: 20),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              onChanged: (v) => setState(() {
+                                _searchQuery = v;
+                                if (_selectedFarmerId != null &&
+                                    !_filteredFarmersList.any((f) => f.id == _selectedFarmerId)) {
+                                  _selectedFarmerId = null;
+                                }
+                              }),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: _showFilterSheet,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: _activeFilterCount > 0
+                                  ? Colors.white.withValues(alpha: 0.35)
+                                  : Colors.white.withValues(alpha: 0.18),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                            ),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                const Icon(Icons.tune_rounded, color: Colors.white, size: 22),
+                                if (_activeFilterCount > 0)
+                                  Positioned(
+                                    top: 4,
+                                    right: 4,
+                                    child: Container(
+                                      width: 18,
+                                      height: 18,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.orangeAccent,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: Text('$_activeFilterCount',
+                                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    // ── Farm Dropdown (filtered) ──
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                      height: 44,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String?>(
                           value: _selectedFarmerId,
                           isExpanded: true,
-                          icon: const Icon(Icons.filter_list_rounded, color: Colors.white, size: 22),
+                          icon: const Icon(Icons.agriculture_rounded, color: Colors.white, size: 20),
                           dropdownColor: const Color(0xFF2E7D32),
-                          style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
-                          hint: const Row(
+                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                          hint: Row(
                             children: [
-                              Icon(Icons.agriculture_rounded, color: Colors.white70, size: 20),
-                              SizedBox(width: 8),
-                              Text('All Farms', style: TextStyle(color: Colors.white70, fontSize: 15)),
+                              const Icon(Icons.select_all_rounded, color: Colors.white70, size: 18),
+                              const SizedBox(width: 8),
+                              Text('All Farms (${filteredFarmers.length})',
+                                  style: const TextStyle(color: Colors.white70, fontSize: 14)),
                             ],
                           ),
                           items: [
-                            const DropdownMenuItem<String?>(
+                            DropdownMenuItem<String?>(
                               value: null,
                               child: Row(
                                 children: [
-                                  Icon(Icons.select_all_rounded, color: Colors.white70, size: 20),
-                                  SizedBox(width: 8),
-                                  Text('All Farms', style: TextStyle(color: Colors.white)),
+                                  const Icon(Icons.select_all_rounded, color: Colors.white70, size: 18),
+                                  const SizedBox(width: 8),
+                                  Text('All Farms (${filteredFarmers.length})',
+                                      style: const TextStyle(color: Colors.white)),
                                 ],
                               ),
                             ),
-                            ...mockFarmers.map((f) => DropdownMenuItem<String?>(
+                            ...filteredFarmers.map((f) => DropdownMenuItem<String?>(
                                   value: f.id,
                                   child: Row(
                                     children: [
-                                      const Icon(Icons.agriculture_rounded, color: Colors.white70, size: 20),
+                                      const Icon(Icons.agriculture_rounded, color: Colors.white70, size: 18),
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
@@ -153,6 +589,52 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
                         ),
                       ),
                     ),
+                    // ── Active Filter Chips ──
+                    if (_activeFilterCount > 0 || _searchQuery.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: [
+                            if (_searchQuery.isNotEmpty)
+                              _buildFilterChip('"$_searchQuery"', () => setState(() {
+                                _searchQuery = '';
+                                _searchController.clear();
+                              })),
+                            if (_selectedCountry != null)
+                              _buildFilterChip(_selectedCountry!, () => setState(() => _selectedCountry = null)),
+                            if (_selectedState != null)
+                              _buildFilterChip(_selectedState!, () => setState(() => _selectedState = null)),
+                            if (_dateRange != null)
+                              _buildFilterChip(
+                                '${_dateRange!.start.day}/${_dateRange!.start.month}/${_dateRange!.start.year} – ${_dateRange!.end.day}/${_dateRange!.end.month}/${_dateRange!.end.year}',
+                                () => setState(() => _dateRange = null),
+                              ),
+                            if (_phoneFilter.isNotEmpty)
+                              _buildFilterChip(
+                                '📞 $_phoneFilter',
+                                () => setState(() => _phoneFilter = ''),
+                              ),
+                            if (_activeFilter != null)
+                              _buildFilterChip(
+                                _activeFilter! ? 'Active' : 'Inactive',
+                                () => setState(() => _activeFilter = null),
+                              ),
+                            GestureDetector(
+                              onTap: _clearAllFilters,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.25),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text('Clear All', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -182,13 +664,13 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
         body: TabBarView(
           controller: _tab,
           children: [
-            _AnimalsTab(farmerId: _selectedFarmerId),
-            _HealthTab(farmerId: _selectedFarmerId, animalIds: _filteredAnimalIds),
-            _BreedingTab(farmerId: _selectedFarmerId, animalIds: _filteredAnimalIds),
-            _MilkTab(farmerId: _selectedFarmerId, animalIds: _filteredAnimalIds),
-            _KidsTab(farmerId: _selectedFarmerId),
-            _FinanceTab(farmerId: _selectedFarmerId),
-            _StatsTab(farmerId: _selectedFarmerId, animalIds: _filteredAnimalIds),
+            _AnimalsTab(farmerIds: _effectiveFarmerIds),
+            _HealthTab(animalIds: _filteredAnimalIds),
+            _BreedingTab(animalIds: _filteredAnimalIds),
+            _MilkTab(farmerIds: _effectiveFarmerIds, animalIds: _filteredAnimalIds),
+            _KidsTab(farmerIds: _effectiveFarmerIds),
+            _FinanceTab(farmerIds: _effectiveFarmerIds),
+            _StatsTab(farmerIds: _effectiveFarmerIds, animalIds: _filteredAnimalIds),
           ],
         ),
       ),
@@ -198,8 +680,8 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
 
 // ─── Animals Tab ──────────────────────────────────────────────────────────────
 class _AnimalsTab extends StatefulWidget {
-  final String? farmerId;
-  const _AnimalsTab({this.farmerId});
+  final Set<String>? farmerIds;
+  const _AnimalsTab({this.farmerIds});
 
   @override
   State<_AnimalsTab> createState() => _AnimalsTabState();
@@ -211,9 +693,9 @@ class _AnimalsTabState extends State<_AnimalsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final baseAnimals = widget.farmerId == null
+    final baseAnimals = widget.farmerIds == null
         ? mockAnimals
-        : mockAnimals.where((a) => a.farmerId == widget.farmerId).toList();
+        : mockAnimals.where((a) => widget.farmerIds!.contains(a.farmerId)).toList();
 
     final filtered = baseAnimals.where((a) {
       final matchSearch =
@@ -700,9 +1182,8 @@ class _AnimalDetailSheet extends StatelessWidget {
 
 // ─── Health Tab ───────────────────────────────────────────────────────────────
 class _HealthTab extends StatefulWidget {
-  final String? farmerId;
   final Set<String>? animalIds;
-  const _HealthTab({this.farmerId, this.animalIds});
+  const _HealthTab({this.animalIds});
 
   @override
   State<_HealthTab> createState() => _HealthTabState();
@@ -1372,9 +1853,8 @@ class _TreatmentTile extends StatelessWidget {
 
 // ─── Breeding Tab ─────────────────────────────────────────────────────────────
 class _BreedingTab extends StatefulWidget {
-  final String? farmerId;
   final Set<String>? animalIds;
-  const _BreedingTab({this.farmerId, this.animalIds});
+  const _BreedingTab({this.animalIds});
 
   @override
   State<_BreedingTab> createState() => _BreedingTabState();
@@ -1537,9 +2017,9 @@ class _FilterChip extends StatelessWidget {
 
 // ─── Milk Tab ─────────────────────────────────────────────────────────────────
 class _MilkTab extends StatelessWidget {
-  final String? farmerId;
+  final Set<String>? farmerIds;
   final Set<String>? animalIds;
-  const _MilkTab({this.farmerId, this.animalIds});
+  const _MilkTab({this.farmerIds, this.animalIds});
 
   bool _matchAnimal(String animalId) =>
       animalIds == null || animalIds!.contains(animalId);
@@ -1555,7 +2035,7 @@ class _MilkTab extends StatelessWidget {
     final todayRecords = allMilkRecords.where((r) => r.date.year == today.year && r.date.month == today.month && r.date.day == today.day).toList();
     final morningTotal = todayRecords.where((r) => r.session == MilkSession.morning).fold(0.0, (s, r) => s + r.quantityLitres);
     final eveningTotal = todayRecords.where((r) => r.session == MilkSession.evening).fold(0.0, (s, r) => s + r.quantityLitres);
-    final baseAnimals = farmerId == null ? mockAnimals : mockAnimals.where((a) => a.farmerId == farmerId).toList();
+    final baseAnimals = farmerIds == null ? mockAnimals : mockAnimals.where((a) => farmerIds!.contains(a.farmerId)).toList();
     final dairyAnimals = getDairyAnimals(baseAnimals);
     final change = yesterdayTotal > 0 ? ((todayTotal - yesterdayTotal) / yesterdayTotal * 100) : 0.0;
 
@@ -1779,14 +2259,14 @@ class _MilkStatCard extends StatelessWidget {
 
 // ─── Kids Tab ─────────────────────────────────────────────────────────────────
 class _KidsTab extends StatelessWidget {
-  final String? farmerId;
-  const _KidsTab({this.farmerId});
+  final Set<String>? farmerIds;
+  const _KidsTab({this.farmerIds});
 
   @override
   Widget build(BuildContext context) {
-    final kids = farmerId == null
+    final kids = farmerIds == null
         ? mockKids
-        : mockKids.where((k) => k.farmerId == farmerId).toList();
+        : mockKids.where((k) => farmerIds!.contains(k.farmerId)).toList();
     final totalK = kids.length;
     final weaned = kids.where((k) => k.isWeaned).length;
     final coccDue = kids.where((k) => k.coccidisostatDue).length;
@@ -1989,17 +2469,17 @@ class _KidsTab extends StatelessWidget {
 
 // ─── Finance Tab ──────────────────────────────────────────────────────────────
 class _FinanceTab extends StatelessWidget {
-  final String? farmerId;
-  const _FinanceTab({this.farmerId});
+  final Set<String>? farmerIds;
+  const _FinanceTab({this.farmerIds});
 
   @override
   Widget build(BuildContext context) {
-    final expenses = farmerId == null
+    final expenses = farmerIds == null
         ? mockExpenses
-        : mockExpenses.where((e) => e.farmerId == farmerId).toList();
-    final sales = farmerId == null
+        : mockExpenses.where((e) => farmerIds!.contains(e.farmerId)).toList();
+    final sales = farmerIds == null
         ? mockSales
-        : mockSales.where((s) => s.farmerId == farmerId).toList();
+        : mockSales.where((s) => farmerIds!.contains(s.farmerId)).toList();
 
     final totalExp = expenses.fold(0.0, (s, e) => s + e.amount);
     final totalSale = sales.fold(0.0, (s, e) => s + e.amount);
@@ -2243,18 +2723,18 @@ class _FinanceSummaryItem extends StatelessWidget {
 
 // ─── Stats Tab ────────────────────────────────────────────────────────────────
 class _StatsTab extends StatelessWidget {
-  final String? farmerId;
+  final Set<String>? farmerIds;
   final Set<String>? animalIds;
-  const _StatsTab({this.farmerId, this.animalIds});
+  const _StatsTab({this.farmerIds, this.animalIds});
 
   bool _matchAnimal(String animalId) =>
       animalIds == null || animalIds!.contains(animalId);
 
   @override
   Widget build(BuildContext context) {
-    final animals = farmerId == null
+    final animals = farmerIds == null
         ? mockAnimals
-        : mockAnimals.where((a) => a.farmerId == farmerId).toList();
+        : mockAnimals.where((a) => farmerIds!.contains(a.farmerId)).toList();
     final vax = mockVaccinations.where((v) => _matchAnimal(v.animalId)).toList();
     final deworms = mockDewormingRecords.where((d) => _matchAnimal(d.animalId)).toList();
     final labs = mockLabReports.where((l) => _matchAnimal(l.animalId)).toList();
@@ -3069,5 +3549,47 @@ extension _StringCapitalize on String {
   String capitalize() {
     if (isEmpty) return this;
     return this[0].toUpperCase() + substring(1);
+  }
+}
+
+class _FilterChipOption extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final Color? activeColor;
+
+  const _FilterChipOption({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.activeColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = activeColor ?? RumenoTheme.primaryGreen;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? color.withValues(alpha: 0.12) : Colors.grey.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: selected ? color : Colors.grey.shade300,
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+            color: selected ? color : Colors.grey[600],
+          ),
+        ),
+      ),
+    );
   }
 }
