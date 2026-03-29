@@ -8,6 +8,7 @@ import '../../models/models.dart';
 import '../../providers/ecommerce_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/common/marketplace_button.dart';
+import '../../widgets/common/welcome_popup.dart';
 
 class ShopHomeScreen extends StatefulWidget {
   const ShopHomeScreen({super.key});
@@ -22,6 +23,7 @@ class _ShopHomeScreenState extends State<ShopHomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<EcommerceProvider>().resetFilters();
+      showWelcomePopupIfNeeded(context);
     });
   }
 

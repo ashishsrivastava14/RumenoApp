@@ -4977,4 +4977,32 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get saleHistorySwipeDeleteYes => 'हाँ';
+
+  @override
+  String get welcomePopupTitle => 'तीन ऐप्स एक ऐप में समेकित';
+
+  @override
+  String get welcomePopupShopping => 'खरीदारी';
+
+  @override
+  String get welcomePopupShoppingDesc =>
+      'कृषि सामग्री, दवाइयाँ और उपकरण खरीदें';
+
+  @override
+  String get welcomePopupFarm => 'फार्म प्रबंधन';
+
+  @override
+  String get welcomePopupFarmDesc =>
+      'अपने पशुओं, स्वास्थ्य रिकॉर्ड और वित्त का प्रबंधन करें';
+
+  @override
+  String get welcomePopupDoctor => 'डॉक्टर पेज';
+
+  @override
+  String get welcomePopupDoctorDesc =>
+      'विशेषज्ञ सलाह के लिए पशु चिकित्सकों से जुड़ें';
+
+  @override
+  String get welcomePopupHint =>
+      'आप स्क्रीन के ऊपर दिए गए आइकॉन पर टैप करके कभी भी पेज बदल सकते हैं। अपनी खरीदारी और प्रबंधन एक ही ऐप में रखें!';
 }

@@ -4973,4 +4973,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saleHistorySwipeDeleteYes => 'Yes';
+
+  @override
+  String get welcomePopupTitle => 'Three apps consolidated into one app';
+
+  @override
+  String get welcomePopupShopping => 'Shopping';
+
+  @override
+  String get welcomePopupShoppingDesc =>
+      'Browse & buy farm supplies, medicines, and equipment';
+
+  @override
+  String get welcomePopupFarm => 'Farm Management';
+
+  @override
+  String get welcomePopupFarmDesc =>
+      'Manage your animals, health records & finances';
+
+  @override
+  String get welcomePopupDoctor => 'Doctor Page';
+
+  @override
+  String get welcomePopupDoctorDesc =>
+      'Connect with veterinarians for expert advice';
+
+  @override
+  String get welcomePopupHint =>
+      'You can switch between pages anytime by tapping the icons at the top of the screen. Keep your shopping and management in one app!';
 }

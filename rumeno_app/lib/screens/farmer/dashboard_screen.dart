@@ -12,6 +12,7 @@ import 'animals/animal_qr_scanner_screen.dart';
 import '../../widgets/common/marketplace_button.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/role_switcher.dart';
+import '../../widgets/common/welcome_popup.dart';
 
 // Helper function to show info dialog
 void _showInfoDialog(BuildContext context, String title, String description) {
@@ -67,6 +68,14 @@ class FarmerDashboardScreen extends StatefulWidget {
 
 class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
   File? _farmLogoFile;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showWelcomePopupIfNeeded(context);
+    });
+  }
 
   static String _greeting(BuildContext context, int hour) {
     final l10n = AppLocalizations.of(context);

@@ -1133,5 +1133,14 @@
   "saleHistoryDeleteConfirm": "हटाएँ",
   "saleHistoryDeleteCancel": "रद्द",
   "saleHistorySwipeDeleteNo": "नहीं",
-  "saleHistorySwipeDeleteYes": "हाँ"
+  "saleHistorySwipeDeleteYes": "हाँ",
+
+  "welcomePopupTitle": "तीन ऐप्स एक ऐप में समेकित",
+  "welcomePopupShopping": "खरीदारी",
+  "welcomePopupShoppingDesc": "कृषि सामग्री, दवाइयाँ और उपकरण खरीदें",
+  "welcomePopupFarm": "फार्म प्रबंधन",
+  "welcomePopupFarmDesc": "अपने पशुओं, स्वास्थ्य रिकॉर्ड और वित्त का प्रबंधन करें",
+  "welcomePopupDoctor": "डॉक्टर पेज",
+  "welcomePopupDoctorDesc": "विशेषज्ञ सलाह के लिए पशु चिकित्सकों से जुड़ें",
+  "welcomePopupHint": "आप स्क्रीन के ऊपर दिए गए आइकॉन पर टैप करके कभी भी पेज बदल सकते हैं। अपनी खरीदारी और प्रबंधन एक ही ऐप में रखें!"
 }

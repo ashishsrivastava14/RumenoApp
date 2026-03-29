@@ -4977,4 +4977,31 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get saleHistorySwipeDeleteYes => 'Yes';
+
+  @override
+  String get welcomePopupTitle => 'تین ایپس ایک ایپ میں مجتمع';
+
+  @override
+  String get welcomePopupShopping => 'خریداری';
+
+  @override
+  String get welcomePopupShoppingDesc => 'زرعی سامان، دوائیں اور آلات خریدیں';
+
+  @override
+  String get welcomePopupFarm => 'فارم مینجمنٹ';
+
+  @override
+  String get welcomePopupFarmDesc =>
+      'اپنے جانوروں، صحت ریکارڈ اور مالیات کا انتظام کریں';
+
+  @override
+  String get welcomePopupDoctor => 'ڈاکٹر پیج';
+
+  @override
+  String get welcomePopupDoctorDesc =>
+      'ماہر مشورے کے لیے ویٹرنیرین سے رابطہ کریں';
+
+  @override
+  String get welcomePopupHint =>
+      'آپ اسکرین کے اوپر آئیکنز پر ٹیپ کرکے کسی بھی وقت صفحات تبدیل کر سکتے ہیں۔ اپنی خریداری اور انتظام ایک ایپ میں رکھیں!';
 }

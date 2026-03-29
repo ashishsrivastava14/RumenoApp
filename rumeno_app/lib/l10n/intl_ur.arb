@@ -1048,5 +1048,14 @@
   "vetAnimalHealthAlertsSection": "الرٹس",
   "vetAnimalHealthUpcomingEventsSection": "آنے والے واقعات",
   "vetAnimalHealthTreatmentStarted": "شروع: {date}",
-  "vetAnimalHealthWithdrawalValue": "{days} دن (دودھ/گوشت نہیں)"
+  "vetAnimalHealthWithdrawalValue": "{days} دن (دودھ/گوشت نہیں)",
+
+  "welcomePopupTitle": "تین ایپس ایک ایپ میں مجتمع",
+  "welcomePopupShopping": "خریداری",
+  "welcomePopupShoppingDesc": "زرعی سامان، دوائیں اور آلات خریدیں",
+  "welcomePopupFarm": "فارم مینجمنٹ",
+  "welcomePopupFarmDesc": "اپنے جانوروں، صحت ریکارڈ اور مالیات کا انتظام کریں",
+  "welcomePopupDoctor": "ڈاکٹر پیج",
+  "welcomePopupDoctorDesc": "ماہر مشورے کے لیے ویٹرنیرین سے رابطہ کریں",
+  "welcomePopupHint": "آپ اسکرین کے اوپر آئیکنز پر ٹیپ کرکے کسی بھی وقت صفحات تبدیل کر سکتے ہیں۔ اپنی خریداری اور انتظام ایک ایپ میں رکھیں!"
 }

@@ -3177,5 +3177,26 @@
   "saleHistorySwipeDeleteNo": "No",
   "@saleHistorySwipeDeleteNo": {},
   "saleHistorySwipeDeleteYes": "Yes",
-  "@saleHistorySwipeDeleteYes": {}
+  "@saleHistorySwipeDeleteYes": {},
+
+  "welcomePopupTitle": "Three apps consolidated into one app",
+  "@welcomePopupTitle": {
+    "description": "Title for the first-time welcome popup"
+  },
+  "welcomePopupShopping": "Shopping",
+  "@welcomePopupShopping": {},
+  "welcomePopupShoppingDesc": "Browse & buy farm supplies, medicines, and equipment",
+  "@welcomePopupShoppingDesc": {},
+  "welcomePopupFarm": "Farm Management",
+  "@welcomePopupFarm": {},
+  "welcomePopupFarmDesc": "Manage your animals, health records & finances",
+  "@welcomePopupFarmDesc": {},
+  "welcomePopupDoctor": "Doctor Page",
+  "@welcomePopupDoctor": {},
+  "welcomePopupDoctorDesc": "Connect with veterinarians for expert advice",
+  "@welcomePopupDoctorDesc": {},
+  "welcomePopupHint": "You can switch between pages anytime by tapping the icons at the top of the screen. Keep your shopping and management in one app!",
+  "@welcomePopupHint": {
+    "description": "Hint text explaining header navigation icons"
+  }
 }

@@ -9651,6 +9651,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Yes'**
   String get saleHistorySwipeDeleteYes;
+
+  /// Title for the first-time welcome popup
+  ///
+  /// In en, this message translates to:
+  /// **'Three apps consolidated into one app'**
+  String get welcomePopupTitle;
+
+  /// No description provided for @welcomePopupShopping.
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping'**
+  String get welcomePopupShopping;
+
+  /// No description provided for @welcomePopupShoppingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse & buy farm supplies, medicines, and equipment'**
+  String get welcomePopupShoppingDesc;
+
+  /// No description provided for @welcomePopupFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm Management'**
+  String get welcomePopupFarm;
+
+  /// No description provided for @welcomePopupFarmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your animals, health records & finances'**
+  String get welcomePopupFarmDesc;
+
+  /// No description provided for @welcomePopupDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Page'**
+  String get welcomePopupDoctor;
+
+  /// No description provided for @welcomePopupDoctorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect with veterinarians for expert advice'**
+  String get welcomePopupDoctorDesc;
+
+  /// Hint text explaining header navigation icons
+  ///
+  /// In en, this message translates to:
+  /// **'You can switch between pages anytime by tapping the icons at the top of the screen. Keep your shopping and management in one app!'**
+  String get welcomePopupHint;
 }
 
 class _AppLocalizationsDelegate
