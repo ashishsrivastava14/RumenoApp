@@ -24,7 +24,8 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
   String _searchQuery = '';
   String? _selectedState;
   String? _selectedCountry;
-  DateTimeRange? _dateRange;
+  DateTime? _startDate;
+  DateTime? _endDate;
   bool? _activeFilter;
   String _phoneFilter = '';
   final TextEditingController _searchController = TextEditingController();
@@ -68,12 +69,8 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
       }
       if (_selectedCountry != null && f.country != _selectedCountry) return false;
       if (_selectedState != null && f.state != _selectedState) return false;
-      if (_dateRange != null) {
-        if (f.joinedDate.isBefore(_dateRange!.start) ||
-            f.joinedDate.isAfter(_dateRange!.end.add(const Duration(days: 1)))) {
-          return false;
-        }
-      }
+      if (_startDate != null && f.joinedDate.isBefore(_startDate!)) return false;
+      if (_endDate != null && f.joinedDate.isAfter(_endDate!.add(const Duration(days: 1)))) return false;
       if (_activeFilter != null && f.isActive != _activeFilter) return false;
       if (_phoneFilter.isNotEmpty && !f.phone.contains(_phoneFilter)) return false;
       return true;
@@ -84,7 +81,8 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
     int count = 0;
     if (_selectedCountry != null) count++;
     if (_selectedState != null) count++;
-    if (_dateRange != null) count++;
+    if (_startDate != null) count++;
+    if (_endDate != null) count++;
     if (_activeFilter != null) count++;
     if (_phoneFilter.isNotEmpty) count++;
     return count;
@@ -118,7 +116,8 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
       _searchController.clear();
       _selectedState = null;
       _selectedCountry = null;
-      _dateRange = null;
+      _startDate = null;
+      _endDate = null;
       _activeFilter = null;
       _phoneFilter = '';
       _selectedFarmerId = null;
@@ -128,7 +127,8 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
   void _showFilterSheet() {
     String? tempState = _selectedState;
     String? tempCountry = _selectedCountry;
-    DateTimeRange? tempDateRange = _dateRange;
+    DateTime? tempStartDate = _startDate;
+    DateTime? tempEndDate = _endDate;
     bool? tempActive = _activeFilter;
     String tempPhone = _phoneFilter;
     final phoneCtrl = TextEditingController(text: _phoneFilter);
@@ -163,7 +163,8 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
                         setSheetState(() {
                           tempState = null;
                           tempCountry = null;
-                          tempDateRange = null;
+                          tempStartDate = null;
+                          tempEndDate = null;
                           tempActive = null;
                           tempPhone = '';
                           phoneCtrl.clear();
@@ -247,19 +248,19 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Date Range
+                // Start Date
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Joined Date Range', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700])),
+                  child: Text('Start Date', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700])),
                 ),
                 const SizedBox(height: 8),
                 InkWell(
                   onTap: () async {
-                    final picked = await showDateRangePicker(
+                    final picked = await showDatePicker(
                       context: ctx,
                       firstDate: DateTime(2020),
-                      lastDate: DateTime.now(),
-                      initialDateRange: tempDateRange,
+                      lastDate: tempEndDate ?? DateTime.now(),
+                      initialDate: tempStartDate ?? DateTime(2020),
                       builder: (context, child) => Theme(
                         data: Theme.of(context).copyWith(
                           colorScheme: ColorScheme.light(primary: RumenoTheme.primaryGreen),
@@ -267,7 +268,7 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
                         child: child!,
                       ),
                     );
-                    if (picked != null) setSheetState(() => tempDateRange = picked);
+                    if (picked != null) setSheetState(() => tempStartDate = picked);
                   },
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
@@ -279,14 +280,73 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.calendar_month_rounded, color: tempDateRange != null ? RumenoTheme.primaryGreen : Colors.grey, size: 20),
+                        Icon(Icons.calendar_month_rounded, color: tempStartDate != null ? RumenoTheme.primaryGreen : Colors.grey, size: 20),
                         const SizedBox(width: 10),
-                        Text(
-                          tempDateRange != null
-                              ? '${tempDateRange!.start.day}/${tempDateRange!.start.month}/${tempDateRange!.start.year} – ${tempDateRange!.end.day}/${tempDateRange!.end.month}/${tempDateRange!.end.year}'
-                              : 'Select date range',
-                          style: TextStyle(fontSize: 15, color: tempDateRange != null ? Colors.black87 : Colors.grey),
+                        Expanded(
+                          child: Text(
+                            tempStartDate != null
+                                ? '${tempStartDate!.day}/${tempStartDate!.month}/${tempStartDate!.year}'
+                                : 'Select start date',
+                            style: TextStyle(fontSize: 15, color: tempStartDate != null ? Colors.black87 : Colors.grey),
+                          ),
                         ),
+                        if (tempStartDate != null)
+                          GestureDetector(
+                            onTap: () => setSheetState(() => tempStartDate = null),
+                            child: Icon(Icons.close_rounded, size: 18, color: Colors.grey[600]),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // End Date
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('End Date', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700])),
+                ),
+                const SizedBox(height: 8),
+                InkWell(
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: ctx,
+                      firstDate: tempStartDate ?? DateTime(2020),
+                      lastDate: DateTime.now(),
+                      initialDate: tempEndDate ?? DateTime.now(),
+                      builder: (context, child) => Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: ColorScheme.light(primary: RumenoTheme.primaryGreen),
+                        ),
+                        child: child!,
+                      ),
+                    );
+                    if (picked != null) setSheetState(() => tempEndDate = picked);
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.calendar_month_rounded, color: tempEndDate != null ? RumenoTheme.primaryGreen : Colors.grey, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            tempEndDate != null
+                                ? '${tempEndDate!.day}/${tempEndDate!.month}/${tempEndDate!.year}'
+                                : 'Select end date',
+                            style: TextStyle(fontSize: 15, color: tempEndDate != null ? Colors.black87 : Colors.grey),
+                          ),
+                        ),
+                        if (tempEndDate != null)
+                          GestureDetector(
+                            onTap: () => setSheetState(() => tempEndDate = null),
+                            child: Icon(Icons.close_rounded, size: 18, color: Colors.grey[600]),
+                          ),
                       ],
                     ),
                   ),
@@ -354,7 +414,8 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
                       setState(() {
                         _selectedState = tempState;
                         _selectedCountry = tempCountry;
-                        _dateRange = tempDateRange;
+                        _startDate = tempStartDate;
+                        _endDate = tempEndDate;
                         _activeFilter = tempActive;
                         _phoneFilter = tempPhone;
                         if (_selectedFarmerId != null) {
@@ -606,10 +667,15 @@ class _AdminFarmScreenState extends State<AdminFarmScreen>
                               _buildFilterChip(_selectedCountry!, () => setState(() => _selectedCountry = null)),
                             if (_selectedState != null)
                               _buildFilterChip(_selectedState!, () => setState(() => _selectedState = null)),
-                            if (_dateRange != null)
+                            if (_startDate != null)
                               _buildFilterChip(
-                                '${_dateRange!.start.day}/${_dateRange!.start.month}/${_dateRange!.start.year} – ${_dateRange!.end.day}/${_dateRange!.end.month}/${_dateRange!.end.year}',
-                                () => setState(() => _dateRange = null),
+                                'From ${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
+                                () => setState(() => _startDate = null),
+                              ),
+                            if (_endDate != null)
+                              _buildFilterChip(
+                                'To ${_endDate!.day}/${_endDate!.month}/${_endDate!.year}',
+                                () => setState(() => _endDate = null),
                               ),
                             if (_phoneFilter.isNotEmpty)
                               _buildFilterChip(
